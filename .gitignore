@@ -1,0 +1,4 @@
+
+# Beanstalk server production and dependency files
+beanstalk-server/node_modules
+beanstalk-server.zip
