@@ -9,4 +9,4 @@ tar.exe -a -c -f ../beanstalk-server.zip^
 cd ..
 
 :: Automatically deploy to AWS
-:: TODO
+eb deploy
