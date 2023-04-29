@@ -3,6 +3,10 @@
 :: Compress beanstalk-server into zip for packaging
 cd beanstalk-server
 tar.exe -a -c -f ../beanstalk-server.zip^
+    bin^
+    public^
+    routes^
+    views^
     app.js^
     package.json^
     package-lock.json
