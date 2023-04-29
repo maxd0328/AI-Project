@@ -1,14 +1,14 @@
 branch-defaults:
   master:
-    environment: ai-project-web-environment
+    environment: AI-Project-Web-Server-Env
 environment-defaults:
-  ai-project-web-environment:
+  AI-Project-Web-Server-Env:
     branch: null
     repository: null
 global:
-  application_name: AI-Project
+  application_name: AI-Project-Web-Server
   default_ec2_keyname: null
-  default_platform: Node.js 18 running on 64bit Amazon Linux 2
+  default_platform: Node.js 14 running on 64bit Amazon Linux 2
   default_region: us-east-1
   include_git_submodules: true
   instance_profile: null

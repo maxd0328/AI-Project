@@ -5,7 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="df8b0553-b669-4cfa-9c4c-cd0fe4cba2d2" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.elasticbeanstalk/config.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/beanstalk-server/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/beanstalk-server/app.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/beanstalk-server/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/beanstalk-server/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/beanstalk-server/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/beanstalk-server/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -74,7 +78,7 @@
       <option name="presentableId" value="Default" />
       <updated>1682285407230</updated>
       <workItem from="1682285409692" duration="521000" />
-      <workItem from="1682699062940" duration="301000" />
+      <workItem from="1682699062940" duration="3053000" />
     </task>
     <servers />
   </component>
