@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  core-service:
+    image: 863286959775.dkr.ecr.us-east-1.amazonaws.com/ai-project-core-service:latest
+    ports:
+      - "3000:8080"
+    environment:
+      NODE_ENV: production
+      PORT: 8080
+    #depends_on:

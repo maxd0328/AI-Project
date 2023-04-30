@@ -1,14 +1,14 @@
 branch-defaults:
   master:
-    environment: AI-Project-Web-Server-Env
+    environment: AI-Project-Web-Env
 environment-defaults:
-  AI-Project-Web-Server-Env:
+  AI-Project-Web-Env:
     branch: null
     repository: null
 global:
-  application_name: AI-Project-Web-Server
+  application_name: AI-Project-Web
   default_ec2_keyname: null
-  default_platform: Node.js 14 running on 64bit Amazon Linux 2
+  default_platform: Docker running on 64bit Amazon Linux 2
   default_region: us-east-1
   include_git_submodules: true
   instance_profile: null
@@ -18,4 +18,4 @@ global:
   sc: git
   workspace_type: Application
 deploy:
-  artifact: beanstalk-server.zip
+  artifact: docker-compose.yml

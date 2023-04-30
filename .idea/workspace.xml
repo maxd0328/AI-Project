@@ -4,29 +4,35 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="df8b0553-b669-4cfa-9c4c-cd0fe4cba2d2" name="Changes" comment="">
+    <list default="true" id="654f3128-f368-43a2-bcb5-1fbb6ba99dec" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/build-image.bat" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core-service/.dockerignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core-service/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core-service/app.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core-service/bin/www" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.elasticbeanstalk/config.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.elasticbeanstalk/config.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/jsLibraryMappings.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/beanstalk-server.iml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/beanstalk-server/app.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/beanstalk-server/package-lock.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/beanstalk-server/package.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build-server.bat" beforeDir="false" afterPath="$PROJECT_DIR$/build-server.bat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/beanstalk-server/bin/www" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/beanstalk-server/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/beanstalk-server/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/beanstalk-server/public/stylesheets/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/public/stylesheets/style.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/beanstalk-server/routes/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/routes/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/beanstalk-server/routes/users.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/routes/users.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/beanstalk-server/views/error.jade" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/views/error.jade" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/beanstalk-server/views/index.jade" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/views/index.jade" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/beanstalk-server/views/layout.jade" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/views/layout.jade" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build-server.bat" beforeDir="false" afterPath="$PROJECT_DIR$/deploy-server.bat" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
-  </component>
-  <component name="ExternalProjectsData">
-    <projectState path="$PROJECT_DIR$">
-      <ProjectState />
-    </projectState>
-  </component>
-  <component name="FileTemplateManagerImpl">
-    <option name="RECENT_TEMPLATES">
-      <list>
-        <option value="package.json" />
-      </list>
-    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -34,7 +40,7 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
-  <component name="ProjectId" id="2OqPzSjex7rbGMXMmf3q80DqlKD" />
+  <component name="ProjectId" id="2P9GselYT2tZMkkqiyeqLoXKFsO" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -44,49 +50,29 @@
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;javascript.nodejs.core.library.configured.version&quot;: &quot;18.13.0&quot;,
-    &quot;javascript.nodejs.core.library.typings.version&quot;: &quot;18.13.0&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;software.aws.toolkits.jetbrains.settings.DynamicResourcesConfigurable&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
-  <component name="RunManager">
-    <configuration default="true" type="JetRunConfigurationType">
-      <module name="AI-Project" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
-      <module name="AI-Project" />
-      <option name="filePath" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="df8b0553-b669-4cfa-9c4c-cd0fe4cba2d2" name="Changes" comment="" />
-      <created>1682285407230</created>
+      <changelist id="654f3128-f368-43a2-bcb5-1fbb6ba99dec" name="Changes" comment="" />
+      <created>1682862097100</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1682285407230</updated>
-      <workItem from="1682285409692" duration="521000" />
-      <workItem from="1682699062940" duration="3053000" />
-      <workItem from="1682801529539" duration="1857000" />
+      <updated>1682862097100</updated>
+      <workItem from="1682862099126" duration="2915000" />
+      <workItem from="1682865081639" duration="5500000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
-  </component>
-  <component name="UnknownFeatures">
-    <option featureType="com.intellij.fileTypeFactory" implementationName="*.bat" />
   </component>
 </project>
