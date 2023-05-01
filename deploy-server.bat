@@ -1,4 +1,4 @@
-@echo off
+@echo on
 
 :: If no arguments were passed, build every image
 if "%1" == "" (

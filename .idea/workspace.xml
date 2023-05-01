@@ -5,29 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="654f3128-f368-43a2-bcb5-1fbb6ba99dec" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/build-image.bat" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core-service/.dockerignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core-service/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core-service/app.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core-service/bin/www" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.elasticbeanstalk/config.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.elasticbeanstalk/config.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/jsLibraryMappings.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/beanstalk-server.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/beanstalk-server/app.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/beanstalk-server/bin/www" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/beanstalk-server/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/beanstalk-server/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/beanstalk-server/public/stylesheets/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/public/stylesheets/style.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/beanstalk-server/routes/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/routes/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/beanstalk-server/routes/users.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/routes/users.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/beanstalk-server/views/error.jade" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/views/error.jade" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/beanstalk-server/views/index.jade" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/views/index.jade" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/beanstalk-server/views/layout.jade" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/views/layout.jade" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build-server.bat" beforeDir="false" afterPath="$PROJECT_DIR$/deploy-server.bat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deploy-server.bat" beforeDir="false" afterPath="$PROJECT_DIR$/deploy-server.bat" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -68,7 +48,7 @@
       <option name="presentableId" value="Default" />
       <updated>1682862097100</updated>
       <workItem from="1682862099126" duration="2915000" />
-      <workItem from="1682865081639" duration="5500000" />
+      <workItem from="1682865081639" duration="12676000" />
     </task>
     <servers />
   </component>
