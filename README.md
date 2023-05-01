@@ -218,6 +218,8 @@ eb deploy
 
 ## 3. Development
 
+### 3.1 Breaking Down Services
+
 Each service is containerized in its own folder, with a series of configuration
 files. The purpose of each file is as follows:
 
@@ -244,6 +246,66 @@ for it must be made in this file.
 Finally, note that the Express server for each microservice has its entry point
 in the file ```bin/www```, however this file is not necessary to edit. The setup
 code for the service can be written in the ```app.js``` file.
+
+### 3.2 Creating New Services
+
+To create a new service, you can create a new folder in the project directory
+named exactly as the desired name of the service. Make sure that this new folder
+has the following:
+
+ * A copy of ```bin/www``` from any of the other services
+ * A ```package-lock.json``` and ```package.json``` (which can likely be copied
+from another service, but adjust as necessary)
+ * A ```.dockerignore```, ensuring that ```node_modules``` is excluded from the
+image.
+ * A ```Dockerfile```, which can likely just be a copy from another service, but
+feel free to make adjustments if necessary and if you know what you're doing.
+ * An ```app.js```, which is entirely up to you. This is where your Express
+service begins.
+
+Next, you have to create an ECR repository for this service. You can do so by
+the following steps:
+
+1. Go to the AWS ECR Console.
+2. Click on 'Create repository' in the top right.
+3. Ensure that it is set to private, and be **sure** to name it exactly as
+follows: ```ai-project-service-name```, where service-name is the same name as
+the service's folder in the Git repository.
+4. Leave all other settings default, and submit.
+5. Now that the repository is created, take note of the **URI**, which is
+displayed to the right of the repository's name in the console (```Amazon ECR >
+Repositories```).
+
+Once the repository is created, you can now link it to Elastic Beanstalk by
+editing the ```docker-compose.yml``` file. Under services, add the following:
+
+```
+[your-service-name]:
+  image: [URI]
+  ports:
+    - "[external port]:[internal port]"
+  environment:
+    NODE_ENV: production
+    PORT: [internal port]
+  depends_on:
+    - dependency1
+    - dependency2
+```
+
+Make sure to substitute all applicable fields.
+
+ * Paste the URI into the 'image' field.
+ * Choose an external port, make sure that no two services have the same
+external port
+ * Choose an internal port (put it in both places), 8080 is usually fine.
+ * You can add any additional environment variables you'd like (accessible in
+JavaScript via ```process.env.[variable-name]```)
+ * The 'depends_on' part is optional, but if the service uses any other services,
+put the name of each of those services. Otherwise, the entire block can be
+omitted.
+
+After following all of these steps, remember to build the service and deploy
+the server. Happy coding!
 
 ## 4. SSH Connection
 
