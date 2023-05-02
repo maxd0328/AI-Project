@@ -107,18 +107,21 @@ docker --version
 
 Once Docker has been installed, it must be authenticated with AWS so that the
 Docker images can be pushed to the Amazon ECR (Elastic Container Registry). To
-do so, get a login key from AWS with the following command:
+do so, run the following command to pipe the AWS login key into the Docker
+authentication command:
 
 ```
-aws ecr --get-login-password --region us-east-1
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin https://[IAM account ID].dkr.ecr.us-east-1.amazonaws.com
 ```
 
-This very long key along with your IAM account ID can then be piped into the
-Docker login command like so:
+**Important note:** It is possible that from time to time you may get the
+following message when attempting to build and push a Docker image:
 
 ```
-docker login -u AWS -p [login key] https://[IAM account ID].dkr.ecr.us-east-1.amazonaws.com
+denied: Your authorization token has expired. Reauthenticate and try again.
 ```
+
+If this is the case, simply run the authentication command given above again.
 
 ### 1.4 Installing the Elastic Beanstalk CLI
 
@@ -292,8 +295,6 @@ editing the ```docker-compose.yml``` file. Under services, add the following:
     - dependency2
 ```
 
-Make sure to substitute all applicable fields.
-
  * Paste the URI into the 'image' field.
  * Choose an external port, make sure that no two services have the same
 external port
@@ -304,8 +305,34 @@ JavaScript via ```process.env.[variable-name]```)
 put the name of each of those services. Otherwise, the entire block can be
 omitted.
 
-After following all of these steps, remember to build the service and deploy
-the server. Happy coding!
+Make sure to substitute all applicable fields, and to run the build and deploy
+scripts afterwards.
+
+Finally, the load balancer needs to be configured to recognize this new service
+and forward all appropriate traffic to it. To do this, go to the Elastic
+Beanstalk console, and navigate to ```Environment > Configuration > Instance
+traffic and scaling > Edit > Processes > Add process```. Configure as follows:
+
+ * **Name:** your service's name in camel case (i.e. core-service -> coreService).
+ * **Port:** your service's external port.
+ * **Protocol:** Leave as HTTP.
+ * **Health check path:** Any route handled by your service.
+
+Then scroll down to Rules, and add a rule for your service with the same name
+as the process created above.
+
+ * Leave listener port as the default.
+ * Add a PathPatterns match condition for each route your service handles. For
+example:
+   * /
+   * /login
+   * /my/route
+   * /route/* (to match all sub-routes of /route)
+ * For process, select the name of the process you created above.
+
+Make sure you've saved your process and rule, and then scroll all the way down
+to save the configuration. Then, once the Beanstalk environment updates, be
+sure that your routes are accessible on the web.
 
 ## 4. SSH Connection
 
@@ -320,6 +347,9 @@ DNS```. Connect to it using the following command:
 ```
 ssh -i [path\to\private-key] root@[public IPv4 DNS]
 ```
+
+In the event that root doesn't work as a username, it may ask you instead to
+authenticate under user ```ec2-user```, which is fine as well.
 
 If there is no known keypair associated with the instance (or if you do not
 have access to an already existing keypair), you can create one via the following

@@ -1,13 +1,13 @@
 branch-defaults:
   master:
-    environment: AI-Project-Web-Env
+    environment: AI-Project-Environment
 environment-defaults:
-  AI-Project-Web-Env:
+  AI-Project-Environment:
     branch: null
     repository: null
 global:
-  application_name: AI-Project-Web
-  default_ec2_keyname: null
+  application_name: AI-Project
+  default_ec2_keyname: ai-project-ssh
   default_platform: Docker running on 64bit Amazon Linux 2
   default_region: us-east-1
   include_git_submodules: true

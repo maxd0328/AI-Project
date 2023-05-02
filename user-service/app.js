@@ -1,6 +1,6 @@
 let express = require('express');
 let app = express();
 
-app.use('/', require('./routes/index'));
+app.use('/users', require('./routes/users'));
 
 module.exports = app;

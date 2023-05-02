@@ -8,4 +8,10 @@ services:
     environment:
       NODE_ENV: production
       PORT: 8080
-    #depends_on:
+  user-service:
+    image: 863286959775.dkr.ecr.us-east-1.amazonaws.com/ai-project-user-service
+    ports:
+      - "3001:8080"
+    environment:
+      NODE_ENV: production
+      PORT: 8080
