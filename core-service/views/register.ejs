@@ -5,7 +5,7 @@
     </head>
     <body>
         <h1>Register</h1>
-        <form>
+        <form action="/user/create" method="post">
             <label for="first-name">First Name:</label><br>
             <input type="text" id="first-name" name="first-name"><br><br>
             <label for="last-name">Last Name:</label><br>
@@ -18,10 +18,13 @@
 
             <label for="password">Password:</label><br>
             <input type="password" id="password" name="password"><br><br>
-            <label for="password">Confirm Password:</label><br>
-            <input type="password" id="password" name="password"><br><br>
+            <label for="confirm-password">Confirm Password:</label><br>
+            <input type="password" id="confirm-password" name="confirm-password"><br><br>
 
             <input type="submit" value="Submit">
         </form>
+        <p>
+            Already have an account? You can log in <a href="/login">here</a>.
+        </p>
     </body>
 </html>

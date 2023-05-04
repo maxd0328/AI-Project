@@ -5,12 +5,15 @@
     </head>
     <body>
         <h1>Log In</h1>
-        <form>
+        <form action="/user/login" method="post">
             <label for="email">Email:</label><br>
             <input type="text" id="email" name="email" placeholder="abc@example.com"><br><br>
             <label for="password">Password:</label><br>
             <input type="password" id="password" name="password"><br><br>
             <input type="submit" value="Submit">
         </form>
+        <p>
+            Don't have an account? You can register <a href="/register">here</a>.
+        </p>
     </body>
 </html>

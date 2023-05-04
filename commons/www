@@ -12,6 +12,10 @@ let logger = require('morgan');
 const express = require("express");
 const path = require("path");
 
+const session = require('express-session');
+const RedisStore = require('connect-redis')(session);
+const Redis = require('ioredis');
+
 /**
  * Add necessary middleware functions
  */
@@ -24,6 +28,30 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+/**
+ * Set up Redis session middleware
+ */
+
+const redisClient = Redis.Cluster([
+    {
+        host: 'clustercfg.ai-project-session-data.6uon1a.use1.cache.amazonaws.com',
+        port: 6379
+    }
+]);
+
+app.use(
+    session({
+        store: new RedisStore({ client: redisClient }),
+        secret: '$heG0nn4H0ll4nd0Nmy$pO0R',
+        resave: false,
+        saveUninitialized: false,
+        cookie: {
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 1000 * 60 * 60 * 24 // session timeout, currently set to 1 day
+        }
+    })
+);
 
 /**
  * Error handler

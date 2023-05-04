@@ -16,4 +16,14 @@ router.get('/register', function(req, res, next) {
     res.render('register');
 });
 
+/* GET home page. */
+router.get('/home', function(req, res, next) {
+    if(!req.session.loggedIn) {
+        res.redirect('/login');
+        return;
+    }
+
+    res.render('home', {firstName: req.session.firstName});
+});
+
 module.exports = router;
