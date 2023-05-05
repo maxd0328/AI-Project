@@ -1,6 +1,10 @@
 branch-defaults:
   master:
     environment: AI-Project-Environment
+  webServer:
+    environment: AI-Project-Environment
+deploy:
+  artifact: docker-compose.yml
 environment-defaults:
   AI-Project-Environment:
     branch: null
@@ -17,5 +21,3 @@ global:
   profile: null
   sc: git
   workspace_type: Application
-deploy:
-  artifact: docker-compose.yml
