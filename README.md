@@ -343,6 +343,12 @@ Make sure you've saved your process and rule, and then scroll all the way down
 to save the configuration. Then, once the Beanstalk environment updates, be
 sure that your routes are accessible on the web.
 
+**An additional note:** There have been many cases where this rule configuration
+hasn't stuck, and the routes have had to be configured manually. This can be done
+through the console reached by going to the EC2 console sidebar and navigating to
+```Load Balancing > Load Balancers > awseb-? > Listeners > Rules > Manage rules```.
+The rules can then be edited similarly.
+
 ## 4. SSH Connection
 
 The EC2 instances can be connected to via SSH for debugging, but only if the
@@ -413,6 +419,31 @@ printing more lines as they come in. You can type this command as the following:
 ```
 sudo tail -f [log file]
 ```
+
+### 4.2 Accessing the Redis Cluster
+
+The Redis cluster stores all the session data for users currently authenticated
+on the site. For debugging purposes, this data can be accessed and altered via
+the remote terminal. To do so run the following command:
+
+```
+~/redis-stable/src/redis-cli -c --tls -h [Redis cluster configuration endpoint] -p 6379
+```
+
+To locate the configuration endpoint, go to the Amazon ElastiCache Console, and
+starting on the side bar, navigate to ```Redis clusters > [Desired cluster] >
+Cluster details > Configuration endpoint```.
+
+Once connected to the cluster, you can run any of the following commands:
+
+```
+Get all keys: keys *
+Get data associated with a particular key: get [key]
+Set data associated with a particular key: set [key] [value]
+```
+
+Like with all CLI software, the Redis terminal can be exited by typing ```exit```
+or by typing the CLI interrupt (Ctrl+C).
 
 ## 5. Database Connection
 
