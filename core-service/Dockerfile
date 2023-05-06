@@ -11,6 +11,10 @@ COPY package*.json ./
 # Install necessary dependencies from package
 RUN npm install
 
+# Copy 'commons-tmp' folder into 'commons' folder
+RUN mkdir commons
+COPY commons-tmp/* ./commons/
+
 # Copy all server files
 # Refer to .dockerignore for ignored files
 COPY . .
