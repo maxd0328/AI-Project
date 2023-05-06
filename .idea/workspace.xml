@@ -5,26 +5,25 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="654f3128-f368-43a2-bcb5-1fbb6ba99dec" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/commons/middleware.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.elasticbeanstalk/config.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.elasticbeanstalk/config.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/commons/.env.production" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core-service/views/forgot-password.ejs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/user-service/views/invalid-token.ejs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build-image.bat" beforeDir="false" afterPath="$PROJECT_DIR$/build-image.bat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/commons/middleware.js" beforeDir="false" afterPath="$PROJECT_DIR$/commons/middleware.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/commons/www" beforeDir="false" afterPath="$PROJECT_DIR$/commons/www" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core-service/.dockerignore" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/.dockerignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core-service/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/Dockerfile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/core-service/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/app.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core-service/code/routes.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/code/routes.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/core-service/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/core-service/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/.dockerignore" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/.dockerignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core-service/views/login.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/views/login.ejs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core-service/views/register.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/views/register.ejs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user-service/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/app.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user-service/code/controller.js" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/code/controller.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/code/database.js" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/code/database.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user-service/code/routes.js" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/code/routes.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user-service/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user-service/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/views/users.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/views/reset-password.ejs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -82,7 +81,7 @@
       <updated>1682862097100</updated>
       <workItem from="1682862099126" duration="2915000" />
       <workItem from="1682865081639" duration="24791000" />
-      <workItem from="1683124412727" duration="33102000" />
+      <workItem from="1683124412727" duration="49565000" />
     </task>
     <servers />
   </component>
