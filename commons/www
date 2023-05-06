@@ -1,6 +1,14 @@
 #!/usr/bin/env node
 
 /**
+ * Load environment variables first
+ */
+
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, `.env.${process.env.NODE_ENV}`) });
+console.log(process.env.SESSION_SECRET);
+
+/**
  * Module dependencies.
  */
 
