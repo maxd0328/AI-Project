@@ -8,8 +8,8 @@ const logger = require('morgan');
 const express = require("express");
 const path = require("path");
 
-const session = require('express-session');
-const RedisStore = require('connect-redis')(session);
+const exprsession = require('express-session');
+const RedisStore = require('connect-redis')(exprsession);
 const Redis = require('ioredis');
 
 /**
@@ -36,26 +36,26 @@ function directory(app) {
  * Redis session middleware
  */
 
-function redis(app) {
-    const redisClient = new Redis.Cluster(
-        [
-            {
-                host: 'clustercfg.ai-project-session-data.6uon1a.use1.cache.amazonaws.com',
-                port: 6379
-            }
-        ],
+const redisClient = new Redis.Cluster(
+    [
         {
-            dnsLookup: (address, callback) => callback(null, address),
-            redisOptions: {
-                tls: {}
-            }
+            host: process.env.REDIS_CLUSTER_ENDPOINT,
+            port: process.env.REDIS_CLUSTER_PORT
         }
-    );
+    ],
+    {
+        dnsLookup: (address, callback) => callback(null, address),
+        redisOptions: {
+            tls: {}
+        }
+    }
+);
 
+function session(app) {
     app.use(
-        session({
+        exprsession({
             store: new RedisStore({ client: redisClient }),
-            secret: '$heG0nn4H0ll4nd0Nmy$pO0R',
+            secret: process.env.SESSION_SECRET,
             resave: false,
             saveUninitialized: false,
             cookie: {
@@ -93,6 +93,7 @@ module.exports = {
     basic,
     views,
     directory,
-    redis,
+    redisClient,
+    session,
     error
 };

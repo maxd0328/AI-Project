@@ -1,11 +1,11 @@
 const mysql = require('mysql2/promise');
 
 const pool = mysql.createPool({
-    host: 'awseb-e-crv2k26zps-stack-awsebrdsdatabase-3zbu0ldnj8jv.cjdntczfqnyu.us-east-1.rds.amazonaws.com',
-    port: '3306',
-    user: 'root',
-    password: 'De4rkGr1llBurg3r$!',
-    database: 'ebdb',
+    host: process.env.DATABASE_ENDPOINT,
+    port: process.env.DATABASE_PORT,
+    user: process.env.DATABASE_USERNAME,
+    password: process.env.DATABASE_PASSWORD,
+    database: process.env.DATABASE_NAME,
     connectionLimit: 10
 });
 
