@@ -37,5 +37,6 @@ async function sendEmail(recipients, subject, message) {
 }
 
 module.exports = {
+    aws,
     sendEmail
 };
