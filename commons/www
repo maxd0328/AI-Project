@@ -1,46 +1,19 @@
 #!/usr/bin/env node
 
 /**
+ * Load environment variables first
+ */
+
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, `.env.${process.env.NODE_ENV}`) });
+console.log(process.env.SESSION_SECRET);
+
+/**
  * Module dependencies.
  */
 
 let app = require('../app');
 let http = require('http');
-
-let cookieParser = require('cookie-parser');
-let logger = require('morgan');
-const express = require("express");
-const path = require("path");
-
-/**
- * Add necessary middleware functions
- */
-
-app.set('views', path.join(__dirname, '../views'));
-app.set('view engine', 'ejs');
-
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
-
-/**
- * Error handler
- */
-
-app.use(function(err, req, res, next) {
-    console.log(err);
-
-    // set locals, only providing error when not in production
-    res.locals.message = err.message;
-    res.locals.error = req.app.get('env') !== 'production' ? err : {};
-    let status = err.status || 500;
-
-    // render the error page
-    res.status(status);
-    res.send(`${status}: internal server error`);
-});
 
 /**
  * Get port from environment and store in Express.
