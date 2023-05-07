@@ -9,7 +9,7 @@ services:
       NODE_ENV: production
       PORT: 8080
   user-service:
-    image: 863286959775.dkr.ecr.us-east-1.amazonaws.com/ai-project-user-service
+    image: 863286959775.dkr.ecr.us-east-1.amazonaws.com/ai-project-user-service:latest
     ports:
       - "3001:8080"
     environment:

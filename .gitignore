@@ -5,8 +5,14 @@
 # Node.js dependency files
 */node_modules
 
+# Temporary files
+*/commons_tmp
+
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
 !.elasticbeanstalk/config.yml
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
+
+# Elastic Beanstalk Build Artifact
+eb-artifact.zip

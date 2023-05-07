@@ -209,7 +209,7 @@ To build one or all of the microservices and deploy the current configuration to
 Elastic Beanstalk, run the following script:
 
 ```
-.\deploy-server.bat [microservice name OR leave blank for all]
+.\deploy-server.bat [microservice name, 'all' to build every microservice, or leave blank to only deploy]
 ```
 
 To deploy to the configuration to the server without rebuilding any of the
@@ -256,7 +256,9 @@ To create a new service, you can create a new folder in the project directory
 named exactly as the desired name of the service. Make sure that this new folder
 has the following:
 
- * A copy of ```bin/www``` from any of the other services
+ * A symbolic link to the ```commons``` folder. **Make sure** that it's not a
+real directory containing copies of the commons code (IntelliJ may try to do
+this automatically). See note below for creating such a symbolic link.
  * A ```package-lock.json``` and ```package.json``` (which can likely be copied
 from another service, but adjust as necessary)
  * A ```.dockerignore```, ensuring that ```node_modules``` is excluded from the
@@ -265,6 +267,13 @@ image.
 feel free to make adjustments if necessary and if you know what you're doing.
  * An ```app.js```, which is entirely up to you. This is where your Express
 service begins.
+
+Note on creating a symbolic link: Enter the folder of your service and enter the
+following command:
+
+```
+New-Item -ItemType SymbolicLink -Path ".\commons" -Target "..\commons"
+```
 
 Next, you have to create an ECR repository for this service. You can do so by
 the following steps:
@@ -333,6 +342,12 @@ example:
 Make sure you've saved your process and rule, and then scroll all the way down
 to save the configuration. Then, once the Beanstalk environment updates, be
 sure that your routes are accessible on the web.
+
+**An additional note:** There have been many cases where this rule configuration
+hasn't stuck, and the routes have had to be configured manually. This can be done
+through the console reached by going to the EC2 console sidebar and navigating to
+```Load Balancing > Load Balancers > awseb-? > Listeners > Rules > Manage rules```.
+The rules can then be edited similarly.
 
 ## 4. SSH Connection
 
@@ -404,3 +419,63 @@ printing more lines as they come in. You can type this command as the following:
 ```
 sudo tail -f [log file]
 ```
+
+### 4.2 Accessing the Redis Cluster
+
+The Redis cluster stores all the session data for users currently authenticated
+on the site. For debugging purposes, this data can be accessed and altered via
+the remote terminal. To do so run the following command:
+
+```
+~/redis-stable/src/redis-cli -c --tls -h [Redis cluster configuration endpoint] -p 6379
+```
+
+To locate the configuration endpoint, go to the Amazon ElastiCache Console, and
+starting on the side bar, navigate to ```Redis clusters > [Desired cluster] >
+Cluster details > Configuration endpoint```.
+
+Once connected to the cluster, you can run any of the following commands:
+
+```
+Get all keys: keys *
+Get data associated with a particular key: get [key]
+Set data associated with a particular key: set [key] [value]
+```
+
+Like with all CLI software, the Redis terminal can be exited by typing ```exit```
+or by typing the CLI interrupt (Ctrl+C).
+
+## 5. Database Connection
+
+Aside from the web server itself interfacing with the database, it can be
+connected to directly via the MySQL Shell as well for altering the schema or
+for any manual database operations. First, download the MySQL Shell for Windows
+from the following link:
+
+https://dev.mysql.com/downloads/shell/
+
+Then, you can start the shell by opening a terminal and running the following
+command:
+
+```
+mysqlsh
+```
+
+Then, in order to connect to it, open up the AWS RDS Console and navigate to
+```Databases > [Desired database] > Connectivity & security```. Then, locate the
+endpoint and port. Return to the MySQL shell and type the following command:
+
+```
+\connect [endpoint] -P [port] -u root -p
+```
+
+Enter the password for the database, and once connected, type the following
+commands:
+
+```
+\use ebdb (or other database name if applicable)
+\sql
+```
+
+At this point you will be connected to the proper database and the shell will
+be ready to accept SQL commands.
