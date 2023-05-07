@@ -1,11 +1,4 @@
-const AWS = require('aws-sdk');
-
-let express = require('express');
-let app = express();
-
-app.use('/', require('./routes/emr'));
-
-module.exports = app;
+const AWS = require('../commons/aws').aws;
 
 function setUpEMRCluster(name, jarAddress, dataAddress, networkParams) {
   // Set up the EMR client
