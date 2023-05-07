@@ -5,25 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="654f3128-f368-43a2-bcb5-1fbb6ba99dec" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/commons/.env.production" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core-service/views/forgot-password.ejs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/user-service/views/invalid-token.ejs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/emr-service/code/controller.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/commons/middleware.js" beforeDir="false" afterPath="$PROJECT_DIR$/commons/middleware.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/commons/www" beforeDir="false" afterPath="$PROJECT_DIR$/commons/www" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core-service/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core-service/code/routes.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/code/routes.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core-service/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core-service/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core-service/views/login.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/views/login.ejs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core-service/views/register.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/views/register.ejs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/code/controller.js" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/code/controller.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/code/database.js" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/code/database.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/code/routes.js" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/code/routes.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/views/users.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/views/reset-password.ejs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/emr-service/.dockerignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/emr-service/Dockerfile" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/emr-service/app.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/emr-service/bin/www" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/emr-service/package-lock.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/emr-service/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/emr-service/routes/emr.js" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,26 +31,26 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "C:/Users/maxim/Documents/AI-Project/user-service",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "software.aws.toolkits.jetbrains.settings.DynamicResourcesConfigurable",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/maxim/Documents/AI-Project/user-service&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;software.aws.toolkits.jetbrains.settings.DynamicResourcesConfigurable&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "mysql"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;mysql&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\maxim\Documents\AI-Project\user-service" />
