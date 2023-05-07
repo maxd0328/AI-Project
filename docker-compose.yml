@@ -16,9 +16,16 @@ services:
       NODE_ENV: production
       PORT: 8080
   emr-service:
-    image: 863286959775.dkr.ecr.us-east-1.amazonaws.com/ai-project-emr
+    image: 863286959775.dkr.ecr.us-east-1.amazonaws.com/ai-project-emr:latest
     ports:
       - "3002:8080"
+    environment:
+      NODE_ENV: production
+      PORT: 8080
+  console-service:
+    image: 863286959775.dkr.ecr.us-east-1.amazonaws.com/ai-project-console-service:latest
+    ports:
+      - "3003:8080"
     environment:
       NODE_ENV: production
       PORT: 8080
