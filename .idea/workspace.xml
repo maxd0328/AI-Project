@@ -5,26 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="654f3128-f368-43a2-bcb5-1fbb6ba99dec" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/commons/middleware.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.elasticbeanstalk/config.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.elasticbeanstalk/config.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/emr-service/code/routes.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build-image.bat" beforeDir="false" afterPath="$PROJECT_DIR$/build-image.bat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/commons/www" beforeDir="false" afterPath="$PROJECT_DIR$/commons/www" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core-service/.dockerignore" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/.dockerignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core-service/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core-service/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core-service/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core-service/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/.dockerignore" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/.dockerignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/code/controller.js" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/code/controller.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/code/routes.js" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/code/routes.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/commons/aws.js" beforeDir="false" afterPath="$PROJECT_DIR$/commons/aws.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/emr-service/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/emr-service/app.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/emr-service/code/controller.js" beforeDir="false" afterPath="$PROJECT_DIR$/emr-service/code/controller.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,13 +32,13 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "C:/Users/maxim/Documents/AI-Project/user-service",
+    "last_opened_file_path": "C:/Users/Matej/Desktop/AI-Project/emr-service/code",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "software.aws.toolkits.jetbrains.settings.DynamicResourcesConfigurable",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
     "vue.rearranger.settings.migration": "true"
   },
   "keyToStringList": {
@@ -64,6 +49,8 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Matej\Desktop\AI-Project\emr-service\code" />
+      <recent name="C:\Users\Matej\Desktop\AI-Project\emr-service" />
       <recent name="C:\Users\maxim\Documents\AI-Project\user-service" />
       <recent name="C:\Users\maxim\Documents\AI-Project\commons" />
       <recent name="C:\Users\maxim\Documents\AI-Project" />
@@ -82,11 +69,22 @@
       <updated>1682862097100</updated>
       <workItem from="1682862099126" duration="2915000" />
       <workItem from="1682865081639" duration="24791000" />
-      <workItem from="1683124412727" duration="33102000" />
+      <workItem from="1683124412727" duration="49565000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
 </project>

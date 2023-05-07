@@ -5,7 +5,7 @@ const app = express();
 middleware.basic(app);
 middleware.views(app);
 middleware.directory(app);
-middleware.redis(app);
+middleware.session(app);
 middleware.error(app);
 
 app.use('/', require('./code/routes'));
