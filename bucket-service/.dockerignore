@@ -4,3 +4,6 @@ node_modules
 
 # Ignore commons folder (it's a symbolic link handled differently by the Dockerfile)
 commons
+
+# Don't include react-client source
+react-client

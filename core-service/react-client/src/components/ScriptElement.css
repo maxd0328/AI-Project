@@ -1,0 +1,19 @@
+
+.script-element-unselected, .script-element-selected {
+    padding: 5px 0px 5px 0px;
+    transition: background-color 0.1s;
+    border-radius: 10px;
+}
+
+.script-element-selected {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+.script-element-unselected:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.script-element-inset {
+    padding-left: 10px;
+    cursor: default;
+}

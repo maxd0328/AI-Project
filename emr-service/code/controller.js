@@ -48,13 +48,12 @@ function setUpEMRCluster(name, jarAddress, dataAddress, networkParams) {
   return params;
 }
 
-function launchEMRCluster(name, jarAddress, dataAddress, networkParams) {
-        const params = await setUpEMRCluster(name, jarAddress, dataAddress, networkParams)
-        const data = await emr.runJobFlow(params).promise();
-    };
-  }
+async function launchEMRCluster(name, jarAddress, dataAddress, networkParams) {
+  const params = await setUpEMRCluster(name, jarAddress, dataAddress, networkParams)
+  const data = await emr.runJobFlow(params).promise();
+}
 
-function addStepToCluster(clusterID, jarAddress, dataAddress, networkParams) {
+async function addStepToCluster(clusterID, jarAddress, dataAddress, networkParams) {
       const emr = new AWS.EMR();
 
       const params = {

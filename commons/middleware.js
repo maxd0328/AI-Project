@@ -29,27 +29,36 @@ function views(app) {
 }
 
 function directory(app) {
-    app.use(express.static(path.join(__dirname, 'public')));
+    app.use(express.static(path.join(__dirname, '../public')));
 }
 
 /**
  * Redis session middleware
  */
 
-const redisClient = new Redis.Cluster(
-    [
+let redisClient;
+if(process.env.NODE_ENV === 'development') {
+    redisClient = new Redis({
+        host: process.env.REDIS_CLUSTER_ENDPOINT,
+        port: process.env.REDIS_CLUSTER_PORT
+    });
+}
+else {
+    redisClient = new Redis.Cluster(
+        [
+            {
+                host: process.env.REDIS_CLUSTER_ENDPOINT,
+                port: process.env.REDIS_CLUSTER_PORT
+            }
+        ],
         {
-            host: process.env.REDIS_CLUSTER_ENDPOINT,
-            port: process.env.REDIS_CLUSTER_PORT
+            dnsLookup: (address, callback) => callback(null, address),
+            redisOptions: {
+                tls: {}
+            }
         }
-    ],
-    {
-        dnsLookup: (address, callback) => callback(null, address),
-        redisOptions: {
-            tls: {}
-        }
-    }
-);
+    );
+}
 
 function session(app) {
     app.use(

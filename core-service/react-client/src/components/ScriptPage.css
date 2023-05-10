@@ -1,0 +1,52 @@
+
+.script-page {
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+.script-sidebar {
+    width: 300px;
+    background-color: #353942;
+    color: white;
+    height: 100vh;
+    padding: 10px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+.script-container, .sidebar-container, .empty-script-container {
+    flex: 1;
+    color: white;
+    box-sizing: border-box;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.script-container, .empty-script-container {
+    background-color: #202530;
+    padding: 20px;
+}
+
+.sidebar-container {
+    margin-top: 5px;
+    margin-bottom: 7px;
+    overflow: auto;
+}
+
+.empty-script-container {
+    justify-content: center;
+    align-items: center;
+}
+
+.script-editor {
+    flex-grow: 1;
+    padding: 10px 0px 15px 0px;
+}
+
+.script-button-container {
+    display: flex;
+    justify-content: flex-end;
+}
