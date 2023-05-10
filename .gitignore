@@ -14,5 +14,5 @@
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
 
-# Elastic Beanstalk Build Artifact
-eb-artifact.zip
+# React build outputs
+bucket-service/public/console/*

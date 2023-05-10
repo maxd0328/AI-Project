@@ -1,0 +1,56 @@
+
+.ace-matej {
+    color: #ff5555;
+    border-radius: 20px;
+    overflow-x: hidden;
+}
+
+.ace-matej .ace_field {
+    color: orange;
+}
+
+.ace-matej .ace_enum {
+    color: #cc99cc;
+    font-weight: bold;
+}
+
+.ace-matej .ace_identifier {
+    color: #bbbbbb;
+}
+
+.ace-matej .ace_operator {
+    color: #fff;
+}
+
+.ace-matej .ace_numeric {
+    color: #74a5ee;
+}
+
+.ace-matej .ace_comment {
+    color: gray;
+    font-style: italic;
+}
+
+.script-header {
+    font-family: Calibri;
+    font-size: 25px;
+    margin: 5px 5px 10px 5px;
+}
+
+.ace_scrollbar::-webkit-scrollbar {
+    height: 7px;
+    width: 7px;
+}
+
+.ace_scrollbar::-webkit-scrollbar-track
+{
+    box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    background-color: #282a36; /* Matches ace monokai */
+    border-radius: 10px;
+}
+
+.ace_scrollbar::-webkit-scrollbar-thumb {
+    background-color: darkgrey;
+    outline: 1px solid slategrey;
+    border-radius: 10px;
+}

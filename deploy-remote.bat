@@ -2,8 +2,10 @@
 
 :: If no arguments were passed, build every image
 if "%1" == "all" (
-    .\build-image.bat core-service
-    .\build-image.bat user-service
+    :: Build all images
+    for /d %%d in (*-service) do (
+        .\build-image.bat %%d
+    )
 
     :: Automatically deploy docker-compose.yml to AWS
     eb deploy

@@ -193,6 +193,36 @@ should be installed, and all scripts in this project should be functional.
 
 ## 2. Building and Deploying
 
+### 2.1 Local Deployment
+
+To build and deploy the server locally, run the following command:
+
+```
+.\deploy-local.bat
+```
+
+Note that this preserves the state of the server from the previous deployment,
+meaning that the database, Redis cache, and any information stored within the
+services will still remain. If you wish to reset everything and start from an
+empty database and cache, run the script like so:
+
+```
+.\deploy-local.bat reset
+```
+
+For safety, this mode will prompt you to confirm.
+
+**Important note:** If you make any changes
+to the ```.db-init``` folder (such as adding or altering tables in the schema),
+it is necessary to run the reset command for those changes to take effect.
+
+When running the server locally, it is not necessary to locate any logs for
+viewing debug output. The stdouterr of every service is displayed in the
+generated terminal. This includes any ```console.log(...)``` statements in the
+server code.
+
+### 2.2 Remote Deployment
+
 Each microservice is built as a docker container, and pushed to a corresponding
 Amazon ECR (Elastic Container Registry) repository. These repositories are then
 deployed to the Beanstalk server via the ```docker-compose.yml``` configuration
@@ -209,15 +239,12 @@ To build one or all of the microservices and deploy the current configuration to
 Elastic Beanstalk, run the following script:
 
 ```
-.\deploy-server.bat [microservice name, 'all' to build every microservice, or leave blank to only deploy]
+.\deploy-remote.bat [microservice name, 'all' to build every microservice, or leave blank to only deploy]
 ```
 
-To deploy to the configuration to the server without rebuilding any of the
-servers, run the following command:
-
-```
-eb deploy
-```
+**Note:** At the current stage this deployment will not work, as all of our AWS
+services have either been suspended or terminated. We'll worry about that when
+it's time to actually deploy our app.
 
 ## 3. Development
 
@@ -275,8 +302,8 @@ following command:
 New-Item -ItemType SymbolicLink -Path ".\commons" -Target "..\commons"
 ```
 
-Next, you have to create an ECR repository for this service. You can do so by
-the following steps:
+Next, for remote deployment, you have to create an ECR repository for this
+service. You can do so by the following steps:
 
 1. Go to the AWS ECR Console.
 2. Click on 'Create repository' in the top right.
@@ -314,11 +341,47 @@ JavaScript via ```process.env.[variable-name]```)
 put the name of each of those services. Otherwise, the entire block can be
 omitted.
 
-Make sure to substitute all applicable fields, and to run the build and deploy
-scripts afterwards.
+For local deployment, all you need to do is add a similar entry to the
+```docker-compose.local.yml``` file. Use the same model as above, but be sure
+that ```image: [URI]``` is replaced with ```build: ./[service-name]``` and that
+```NODE_ENV: production``` is replaced with ```NODE_ENV: development```. This
+is to ensure that the correct environment variable registry is used.
 
-Finally, the load balancer needs to be configured to recognize this new service
-and forward all appropriate traffic to it. To do this, go to the Elastic
+Finally, the routes need to be configured. This needs to be done separately for
+local and remote deployment. Note that remote deployment can be ignored for now,
+as the Beanstalk server is suspended.
+
+For local deployment, open the ```nginx.conf``` file and add the following
+entries (note the usage of internal port, **not** external port):
+
+```
+http {
+
+   ...
+   
+   upstream [service_name, WITH UNDERSCORES INSTEAD OF HYPHENS] {
+      server [service-name]:[INTERNAL port];
+   }
+   
+   server {
+      
+      ...
+      
+      location /[directory containing your routes]/ {
+         proxy_pass http://[service_name, AGAIN WITH UNDERSCORES];
+         proxy_set_header Host $host;
+         proxy_set_header X-Real-IP $remote_addr;
+         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+         proxy_set_header X-Forwarded-Proto $scheme;
+      }
+      
+   }
+   
+}
+```
+
+For remote deployment, the AWS load balancer needs to be configured to recognize
+and forward all appropriate traffic to your service. To do this, go to the Elastic
 Beanstalk console, and navigate to ```Environment > Configuration > Instance
 traffic and scaling > Edit > Processes > Add process```. Configure as follows:
 
@@ -343,16 +406,10 @@ Make sure you've saved your process and rule, and then scroll all the way down
 to save the configuration. Then, once the Beanstalk environment updates, be
 sure that your routes are accessible on the web.
 
-**An additional note:** There have been many cases where this rule configuration
-hasn't stuck, and the routes have had to be configured manually. This can be done
-through the console reached by going to the EC2 console sidebar and navigating to
-```Load Balancing > Load Balancers > awseb-? > Listeners > Rules > Manage rules```.
-The rules can then be edited similarly.
-
 ## 4. SSH Connection
 
-The EC2 instances can be connected to via SSH for debugging, but only if the
-instance has an associated key-pair.
+When running the server remotely, the EC2 instances can be connected to via
+SSH for debugging, but only if the instance has an associated key-pair.
 
 If there is already a known key-pair associated with the instance, it can be
 connected to via the public DNS. You can find the public DNS in the EC2 console
@@ -424,14 +481,16 @@ sudo tail -f [log file]
 
 The Redis cluster stores all the session data for users currently authenticated
 on the site. For debugging purposes, this data can be accessed and altered via
-the remote terminal. To do so run the following command:
+the remote terminal. To do so run the following command (Note that this is only
+available in production mode. If you wish to do so locally, a local Redis client
+will have to be installed.):
 
 ```
 ~/redis-stable/src/redis-cli -c --tls -h [Redis cluster configuration endpoint] -p 6379
 ```
 
 To locate the configuration endpoint, go to the Amazon ElastiCache Console, and
-starting on the side bar, navigate to ```Redis clusters > [Desired cluster] >
+starting on the sidebar, navigate to ```Redis clusters > [Desired cluster] >
 Cluster details > Configuration endpoint```.
 
 Once connected to the cluster, you can run any of the following commands:
@@ -468,6 +527,10 @@ endpoint and port. Return to the MySQL shell and type the following command:
 ```
 \connect [endpoint] -P [port] -u root -p
 ```
+
+**Note:** Connecting to the database when running locally is much simpler, just
+replace the endpoint with ```localhost```. The port number can be found in the
+```docker-compose.local.yml``` file under the ```db``` service. (Hint: it's 3306)
 
 Enter the password for the database, and once connected, type the following
 commands:
