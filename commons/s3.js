@@ -8,6 +8,19 @@ const s3 = process.env.NODE_ENV !== 'development' ? new aws.S3()
         s3ForcePathStyle: true
     });
 
+async function ensureBucketExists(bucket) {
+    s3.headBucket({ Bucket: bucket }, (err, data) => {
+        if(err && err.code === 'NotFound') {
+            s3.createBucket({ Bucket: bucket }, (err, data) => {
+                if(err)
+                    console.error(`Error creating bucket ${bucket}.`, err);
+            });
+        }
+        else if(err)
+            console.error(`Error verifying bucket ${bucket}.`, err);
+    });
+}
+
 async function getResource(bucket, filename, callback) {
     const params = {
         Bucket: bucket,
@@ -53,7 +66,28 @@ async function putResource(bucket, filename, body, callback) {
     }
 }
 
+/* Callback only for err */
+async function deleteResource(bucket, filename, callback) {
+    const params = {
+        Bucket: bucket,
+        Key: filename
+    };
+
+    try {
+        await s3.deleteObject(params).promise();
+    }
+    catch(err) {
+        if(callback)
+            callback(err);
+        else throw err;
+    }
+}
+
+ensureBucketExists(process.env.S3_USER_BUCKET).then(noAction => {});
+
 module.exports = {
+    ensureBucketExists,
     getResource,
-    putResource
+    putResource,
+    deleteResource
 }

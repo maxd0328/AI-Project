@@ -5,57 +5,40 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="654f3128-f368-43a2-bcb5-1fbb6ba99dec" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.local/db-init/init.sql" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/bucket-service/code/routes.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build-react.bat" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/commons/.env.development" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/commons/s3.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core-service/react-client/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core-service/react-client/package-lock.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core-service/react-client/package.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core-service/react-client/public/index.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core-service/react-client/public/manifest.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core-service/react-client/public/robots.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core-service/react-client/src/App.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core-service/react-client/src/compiler/Compiler.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core-service/react-client/src/compiler/Parser.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core-service/react-client/src/compiler/Tokenizer.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core-service/react-client/src/components/ScriptEditor.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core-service/react-client/src/components/ScriptEditor.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core-service/react-client/src/components/ScriptElement.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core-service/react-client/src/components/ScriptElement.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core-service/react-client/src/components/ScriptPage.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core-service/react-client/src/components/ScriptPage.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core-service/react-client/src/components/Styles.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core-service/react-client/src/index.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core-service/react-client/src/index.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core-service/react-client/src/reportWebVitals.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/deploy-local.bat" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docker-compose.local.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/fix-symbolic-links.bat" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/nginx.conf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bucket-service/code/controller.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core-service/public/images/background.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core-service/public/javascripts/index.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core-service/public/styles/index.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core-service/public/styles/styles.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core-service/react-client/src/components/HomePage.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core-service/react-client/src/components/HomePage.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core-service/react-client/src/controllers/ScriptController.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core-service/react-client/src/controllers/SessionContext.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/commons/.env.production" beforeDir="false" afterPath="$PROJECT_DIR$/commons/.env.production" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/commons/middleware.js" beforeDir="false" afterPath="$PROJECT_DIR$/commons/middleware.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/commons/www" beforeDir="false" afterPath="$PROJECT_DIR$/commons/www" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/console-service/.dockerignore" beforeDir="false" afterPath="$PROJECT_DIR$/bucket-service/.dockerignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/console-service/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/bucket-service/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/console-service/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/bucket-service/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/console-service/commons" beforeDir="false" afterPath="$PROJECT_DIR$/bucket-service/commons" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/console-service/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/bucket-service/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/console-service/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/bucket-service/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/deploy-server.bat" beforeDir="false" afterPath="$PROJECT_DIR$/deploy-remote.bat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/emr-service/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/emr-service/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/emr-service/code/controller.js" beforeDir="false" afterPath="$PROJECT_DIR$/emr-service/code/controller.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/emr-service/code/routes.js" beforeDir="false" afterPath="$PROJECT_DIR$/emr-service/code/routes.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/emr-service/commons" beforeDir="false" afterPath="$PROJECT_DIR$/emr-service/commons" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/code/controller.js" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/code/controller.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/code/database.js" beforeDir="false" afterPath="$PROJECT_DIR$/commons/database.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.local/db-init/init.sql" beforeDir="false" afterPath="$PROJECT_DIR$/.local/db-init/init.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bucket-service/code/routes.js" beforeDir="false" afterPath="$PROJECT_DIR$/bucket-service/code/routes.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bucket-service/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/bucket-service/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bucket-service/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/bucket-service/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/commons/.env.development" beforeDir="false" afterPath="$PROJECT_DIR$/commons/.env.development" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/commons/s3.js" beforeDir="false" afterPath="$PROJECT_DIR$/commons/s3.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core-service/.dockerignore" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/.dockerignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core-service/code/routes.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/code/routes.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core-service/react-client/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/App.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/components/ScriptElement.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/components/ScriptElement.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/components/ScriptPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/components/ScriptPage.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/components/Styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/Styles.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core-service/views/forgot-password.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/views/forgot-password.ejs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core-service/views/home.ejs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/core-service/views/index.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/views/index.ejs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core-service/views/login.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/views/login.ejs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core-service/views/register.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/views/register.ejs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deploy-local.bat" beforeDir="false" afterPath="$PROJECT_DIR$/deploy-local.bat" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user-service/code/routes.js" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/code/routes.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/views/invalid-token.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/views/invalid-token.ejs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/views/reset-password.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/views/reset-password.ejs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -84,7 +67,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "settings.editor.selected.configurable": "preferences.editor",
     "ts.external.directory.path": "C:\\Program Files\\JetBrains\\IntelliJ IDEA 2022.3.1\\plugins\\javascript-impl\\jsLanguageServicesImpl\\external",
     "vue.rearranger.settings.migration": "true"
   },
@@ -104,11 +87,11 @@
       <recent name="C:\Users\maxim\Documents\AI-Project\user-service" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\maxim\Documents\AI-Project\core-service\public\styles" />
+      <recent name="C:\Users\maxim\Documents\AI-Project\core-service\public\javascripts" />
+      <recent name="C:\Users\maxim\Documents\AI-Project\core-service\public\images" />
+      <recent name="C:\Users\maxim\Documents\AI-Project\core-service\react-client\src" />
       <recent name="C:\Users\maxim\Documents\AI-Project\core-service" />
-      <recent name="C:\Users\maxim\Documents\AI-Project\commons" />
-      <recent name="C:\Users\maxim\Documents\AI-Project\.local\db-init" />
-      <recent name="C:\Users\maxim\Documents\AI-Project" />
-      <recent name="C:\Users\maxim\Documents\AI-Project\nginx" />
     </key>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
@@ -124,6 +107,7 @@
       <workItem from="1683124412727" duration="49565000" />
       <workItem from="1683467033220" duration="1593000" />
       <workItem from="1683715970572" duration="22209000" />
+      <workItem from="1683753816358" duration="38636000" />
     </task>
     <servers />
   </component>

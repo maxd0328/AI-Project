@@ -31,7 +31,7 @@
     outline: 2px solid #007bff;
 }
 
-.button-green, .button-red {
+.button {
     padding: 10px 20px;
     margin: 0px 5px 0px 5px;
     border: none;
@@ -41,32 +41,50 @@
     cursor: pointer;
 }
 
-.button-green:not(:active), .button-red:not(:active) {
+.button:not(:active) {
     transition: all 0.1s ease-in-out;
 }
 
-.button-green {
+.button:disabled {
+    cursor: default;
+    pointer-events: none;
+    opacity: 0.35;
+}
+
+.green {
     background-color: #23940f;
 }
 
-.button-green:hover {
+.green:hover {
     background-color: #1b6e0c;
 }
 
-.button-green:active {
+.green:active {
     background-color: #15500a;
 }
 
-.button-red {
+.red {
     background-color: #d23030;
 }
 
-.button-red:hover {
+.red:hover {
     background-color: #ad2828;
 }
 
-.button-red:active {
+.red:active {
     background-color: #771b1b;
+}
+
+.blue {
+    background-color: #1672d7;
+}
+
+.blue:hover {
+    background-color: #0254ab;
+}
+
+.blue:active {
+    background-color: #02458c;
 }
 
 ::-webkit-scrollbar {

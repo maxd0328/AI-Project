@@ -14,7 +14,7 @@ router.post('/create', async function(req, res, next) {
         const userID = await controller.addUser(email, firstName, lastName, phoneNumber, password);
         controller.enterSession(req.session, { userID, email: email, firstName: firstName,
             lastName: lastName, phoneNumber: phoneNumber, password: password });
-        res.redirect('/home');
+        res.redirect('/console/home');
     }
     catch(err) {
         // TODO
@@ -31,7 +31,7 @@ router.post('/login', async function(req, res, next) {
     try {
         const userRow = await controller.authenticateUser(email, password);
         controller.enterSession(req.session, userRow);
-        res.redirect('/home');
+        res.redirect('/console/home');
     }
     catch(err) {
         // TODO
@@ -91,7 +91,7 @@ router.post('/reset-password', async function(req, res, next) {
         if(user) {
             await controller.updateUserPassword(user, password);
             controller.enterSession(req.session, user);
-            res.redirect('/home');
+            res.redirect('/console/home');
         }
         else {
             // TODO
@@ -102,6 +102,13 @@ router.post('/reset-password', async function(req, res, next) {
         // TODO
         res.redirect(`/user/reset-password?token=${token}`);
     }
+});
+
+/* GET public user session data. */
+router.get('/session', function(req, res, next) {
+    if(!req.session.loggedIn)
+        res.redirect('/login');
+    res.json({ firstName: req.session.firstName });
 });
 
 module.exports = router;

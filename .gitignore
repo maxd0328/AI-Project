@@ -15,4 +15,5 @@
 !.elasticbeanstalk/*.global.yml
 
 # React build outputs
-bucket-service/public/console/*
+core-service/public/console/*
+core-service/views/*.react.html
