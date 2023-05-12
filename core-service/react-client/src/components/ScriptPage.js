@@ -2,14 +2,17 @@ import React from 'react';
 import ScriptEditor from './ScriptEditor';
 import ScriptElement from './ScriptElement';
 import './ScriptPage.css';
-import './Styles.css';
+import '../Styles.css';
+import '../controllers/ScriptController';
+import * as Controller from '../controllers/ScriptController';
 
 class ScriptPage extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = { scripts: [], selectedIndex: -1, provisionalName: '', content: '', search: '' };
+        this.state = { scripts: [], selectedIndex: -1, provisionalName: '', content: '', search: '', error: false, edited: false };
 
+        this.reload = this.reload.bind(this);
         this.selectScript = this.selectScript.bind(this);
         this.updateSearch = this.updateSearch.bind(this);
         this.updateScript = this.updateScript.bind(this);
@@ -18,14 +21,46 @@ class ScriptPage extends React.Component {
         this.createScript = this.createScript.bind(this);
         this.saveScript = this.saveScript.bind(this);
         this.deleteScript = this.deleteScript.bind(this);
+
+        this.reload();
+    }
+
+    reload() {
+        Controller.fetchScripts().then((scripts) => {
+            let selectedIndex = this.state.selectedIndex;
+            if(selectedIndex >= scripts.length)
+                selectedIndex = -1;
+
+            if(selectedIndex >= 0) {
+                let script = scripts[selectedIndex];
+                Controller.fetchScriptContent(script.scriptID).then(
+                    (content) => this.setState({ scripts, selectedIndex, provisionalName: script.name, content, error: false, edited: false }),
+                    (err) => this.setState({ scripts, selectedIndex, error: true }));
+            }
+            else this.setState({ scripts, error: false, selectedIndex });
+        }, (err) => this.setState( { scripts: [], error: true }));
     }
 
     selectScript(index) {
-        this.setState({
-            selectedIndex: index,
-            provisionalName: index < 0 ? '' : this.state.scripts[index].name,
-            content: index < 0 ? '' : this.state.scripts[index].content
-        });
+        if(this.state.error) {
+            this.setState({ selectedIndex: index }, () => this.reload());
+            return;
+        }
+
+        if(index < 0) {
+            this.setState({ selectedIndex: index, provisionalName: '', content: '' });
+            return;
+        }
+
+        let script = this.state.scripts[index];
+        Controller.fetchScriptContent(script.scriptID).then((content) => {
+            this.setState({
+                selectedIndex: index,
+                provisionalName: script.name,
+                edited: false,
+                content
+            });
+        }, (err) => this.setState({ error: true }));
     }
 
     updateSearch(event) {
@@ -33,7 +68,7 @@ class ScriptPage extends React.Component {
     }
 
     updateScript(content) {
-        this.setState({ content });
+        this.setState({ content, edited: true });
     }
 
     updateProvisionalName(event) {
@@ -41,33 +76,46 @@ class ScriptPage extends React.Component {
     }
 
     submitName(event) {
+        if(this.state.error) return;
         if(!event.key || event.key === 'Enter') {
             let scripts = [...this.state.scripts];
-            scripts[this.state.selectedIndex].name = this.state.provisionalName;
-            this.setState({ scripts });
+            let script = scripts[this.state.selectedIndex];
+            script.name = this.state.provisionalName;
+
+            Controller.sendScriptName(script.scriptID, this.state.provisionalName).then((result) => this.setState({ scripts }),
+                (err) => this.setState({ error: true }));
         }
     }
 
     createScript() {
-        let scripts = [...this.state.scripts];
-        let index = scripts.length;
-        scripts.push({ name: 'New script', content: '\n# Write your script here\n' });
-        this.setState({ scripts }, () => this.selectScript(index));
+        if(this.state.error) return;
+        const name = 'New script';
+        Controller.sendNewScript(name, '\n# Write your script here\n').then((scriptID) => {
+            let scripts = [...this.state.scripts];
+            scripts.push({ scriptID, name });
+            this.setState({ scripts }, () => this.selectScript(scripts.length - 1));
+        }, (err) => this.setState({ error: true }));
     }
 
     saveScript() {
+        if(this.state.error) return;
         let scripts = [...this.state.scripts];
-        scripts[this.state.selectedIndex].content = this.state.content;
-        this.setState({ scripts });
+        let script = scripts[this.state.selectedIndex];
+
+        Controller.sendScriptContent(script.scriptID, this.state.content).then((result) => this.setState({ edited: false }),
+            (err) => this.setState({ error: true }));
     }
 
     deleteScript() {
-        let scripts = [...this.state.scripts];
-        scripts.splice(this.state.selectedIndex, 1);
-        this.setState({ scripts }, () => {
-            let index = this.state.selectedIndex >= this.state.scripts.length ? this.state.scripts.length - 1 : this.state.selectedIndex;
-            this.selectScript(index);
-        });
+        if(this.state.error) return;
+        Controller.sendDeleteScript(this.state.scripts[this.state.selectedIndex].scriptID).then((result) => {
+            let scripts = [...this.state.scripts];
+            scripts.splice(this.state.selectedIndex, 1);
+            this.setState({ scripts }, () => {
+                let index = this.state.selectedIndex >= this.state.scripts.length ? this.state.scripts.length - 1 : this.state.selectedIndex;
+                this.selectScript(index);
+            });
+        }, (err) => this.setState({ error: true }));
     }
 
     render() {
@@ -85,9 +133,9 @@ class ScriptPage extends React.Component {
                             else return null;
                         })
                     }</div>
-                    <button className="button-green" onClick={this.createScript}>Create New</button>
+                    <button className="button green" onClick={this.createScript}>Create New</button>
                 </div>
-                {this.state.selectedIndex >= 0 ? this.renderEditor() : this.renderEmpty()}
+                {!this.state.error ? this.state.selectedIndex >= 0 ? this.renderEditor() : this.renderEmpty() : this.renderError()}
             </div>
         );
     }
@@ -107,8 +155,8 @@ class ScriptPage extends React.Component {
                     </ScriptEditor>
                 </div>
                 <div className="script-button-container">
-                    <button className="button-green" onClick={this.saveScript}>Save</button>
-                    <button className="button-red" onClick={this.deleteScript}>Delete</button>
+                    <button className="button green" onClick={this.saveScript} disabled={!this.state.edited}>Save</button>
+                    <button className="button red" onClick={this.deleteScript}>Delete</button>
                 </div>
             </div>
         );
@@ -117,8 +165,17 @@ class ScriptPage extends React.Component {
     renderEmpty() {
         return (
             <div className="empty-script-container">
-                <p className="small-header" style={{marginBottom: 10 + 'px'}}>Create a script to get started!</p>
-                <button className="button-green" onClick={this.createScript}>Create</button>
+                <p className="small-header" style={{marginBottom: 10 + 'px'}}>Open or create a script to get started!</p>
+                <button className="button green" onClick={this.createScript}>Create</button>
+            </div>
+        );
+    }
+
+    renderError() {
+        return (
+            <div className="empty-script-container">
+                <p className="small-header" style={{marginBottom: 10 + 'px'}}>Something went wrong, please try again.</p>
+                <button className="button blue" onClick={this.reload}>Reload</button>
             </div>
         );
     }

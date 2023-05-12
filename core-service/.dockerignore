@@ -2,5 +2,8 @@
 # Ignore dependencies
 node_modules
 
+# Ignore React client sources
+react-client
+
 # Ignore commons folder (it's a symbolic link handled differently by the Dockerfile)
 commons

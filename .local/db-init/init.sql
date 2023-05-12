@@ -13,8 +13,8 @@ CREATE TABLE users (
 );
 
 CREATE TABLE scripts (
-    userID INT,
-    scriptID INT AUTO_INCREMENT,
+    userID INT NOT NULL,
+    scriptID BIGINT NOT NULL,
     name VARCHAR(50) NOT NULL,
     PRIMARY KEY(userID, scriptID)
 );

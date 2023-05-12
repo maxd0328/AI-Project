@@ -1,0 +1,126 @@
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    color: #ddd;
+    background-color: #22242d;
+}
+
+.wrapper {
+    margin-top: 15vh;
+}
+
+.container {
+    max-width: 400px;
+    margin: auto;
+    padding: 20px;
+    background-color: #343944;
+    border: 1px solid #505359;
+    border-radius: 10px;
+}
+
+h1 {
+    text-align: center;
+}
+
+form {
+    margin-top: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+input[type="email"],
+input[type="password"],
+input[type="text"],
+input[type="tel"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #505359;
+    background-color: #44474d;
+    color: #ddd;
+    border-radius: 3px;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+    outline: 1px solid rgba(0, 0, 0, 0);
+    transition: outline 0.15s;
+}
+
+input[type="email"]:hover,
+input[type="password"]:hover,
+input[type="text"]:hover,
+input[type="tel"]:hover {
+    outline: 1px solid #007bff;
+}
+
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="text"]:focus,
+input[type="tel"]:focus {
+    outline: 2px solid #007bff;
+}
+
+button[type="submit"] {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color: #23940f;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+button[type="submit"]:not(:active) {
+    transition: all 0.1s ease-in-out;
+}
+
+button[type="submit"]:hover {
+    background-color: #1b6e0c;
+}
+
+button[type="submit"]:active {
+    background-color: #15500a;
+}
+
+.notes {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.notes p {
+    margin-bottom: 10px;
+}
+
+.notes a {
+    text-decoration: none;
+    color: #3abcff;
+}
+
+.notes a:hover {
+    color: #63c9ff;
+}
+
+.column input,
+.column label {
+    display: block;
+    width: 100%;
+}
+
+.two-column-form {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.two-column-form .column {
+    flex-basis: 45%; /* Adjust the flex-basis as needed */
+}
+
+.two-column-form label,
+.two-column-form input {
+    width: 100%;
+}

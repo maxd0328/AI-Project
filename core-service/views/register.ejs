@@ -1,30 +1,38 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html>
     <head>
         <title>Register - GrAI Matter</title>
+        <link rel="stylesheet" type="text/css" href="/styles/styles.css">
     </head>
     <body>
-        <h1>Register</h1>
-        <form action="/user/create" method="post">
-            <label for="first-name">First Name:</label><br>
-            <input type="text" id="first-name" name="first-name"><br><br>
-            <label for="last-name">Last Name:</label><br>
-            <input type="text" id="last-name" name="last-name"><br><br>
-
-            <label for="email">Email:</label><br>
-            <input type="text" id="email" name="email" placeholder="abc@example.com"><br><br>
-            <label for="phone-number">Phone Number:</label><br>
-            <input type="text" id="phone-number" name="phone-number"><br><br>
-
-            <label for="password">Password:</label><br>
-            <input type="password" id="password" name="password"><br><br>
-            <label for="confirm-password">Confirm Password:</label><br>
-            <input type="password" id="confirm-password" name="confirm-password"><br><br>
-
-            <input type="submit" value="Register">
-        </form>
-        <p>
-            Already have an account? You can log in <a href="/login">here</a>.
-        </p>
+        <div class="wrapper">
+            <h1>GrAI Matter</h1>
+            <div class="container" style="max-width: 600px">
+                <h1 style="font-size: 26px">Register</h1>
+                <form action="/user/register" method="post" class="two-column-form">
+                    <div class="column">
+                        <label for="firstName">First Name</label>
+                        <input type="text" id="firstName" name="firstName" required>
+                        <label for="lastName">Last Name</label>
+                        <input type="text" id="lastName" name="lastName" required>
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="column">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" name="phone" required>
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" required>
+                        <label for="confirmPassword">Confirm Password</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" required>
+                    </div>
+                    <button type="submit">Register</button>
+                </form>
+                <div class="notes">
+                    <p>Already have an account? <a href="/login">Log in</a></p>
+                </div>
+            </div>
+            <p style="text-align: center">&copy; GrAI Matter 2023</p>
+        </div>
     </body>
 </html>

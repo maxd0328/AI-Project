@@ -1,22 +1,27 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html>
     <head>
         <title>Log In - GrAI Matter</title>
+        <link rel="stylesheet" type="text/css" href="/styles/styles.css">
     </head>
     <body>
-        <h1>Log In</h1>
-        <form action="/user/login" method="post">
-            <label for="email">Email:</label><br>
-            <input type="text" id="email" name="email" placeholder="abc@example.com"><br><br>
-            <label for="password">Password:</label><br>
-            <input type="password" id="password" name="password"><br><br>
-            <input type="submit" value="Log In">
-        </form>
-        <p>
-            <a href="/forgot-password">Forgot your password?</a>
-        </p>
-        <p>
-            Don't have an account? You can register <a href="/register">here</a>.
-        </p>
+        <div class="wrapper">
+            <h1>GrAI Matter</h1>
+            <div class="container">
+                <h1 style="font-size: 26px">Log In</h1>
+                <form action="/user/login" method="post">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                    <button type="submit">Log In</button>
+                </form>
+                <div class="notes">
+                    <p><a href="/forgot-password">Forgot password?</a></p>
+                    <p>Don't have an account? <a href="/register">Register</a></p>
+                </div>
+            </div>
+            <p style="text-align: center">&copy GrAI Matter 2023</p>
+        </div>
     </body>
 </html>

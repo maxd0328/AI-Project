@@ -1,6 +1,6 @@
 import React from 'react';
 import './ScriptElement.css';
-import './Styles.css';
+import '../Styles.css';
 
 class ScriptElement extends React.Component {
 

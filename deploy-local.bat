@@ -6,6 +6,8 @@ if "%1" == "reset" (
     docker system prune
     docker volume rm ai-project_db-data -f
     docker volume rm ai-project_cache-data -f
+    rd /s /q .local\data-s3\
+    mkdir .local\data-s3\
 )
 
 :: Create a temporary 'real' folder for commons in each microservice
