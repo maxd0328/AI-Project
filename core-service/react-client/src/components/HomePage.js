@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import '../Styles.css';
 import './HomePage.css';
 import { SessionContext } from '../controllers/SessionContext';
@@ -9,9 +9,17 @@ import * as ScriptController from '../controllers/ScriptController';
 import MenuBar from './MenuBar';
 
 const ProjectType = (props) => {
+    const navigate = useNavigate();
+
+    const createProject = (name, type) => {
+        Controller.sendNewProject(name, type).then((projectID) => {
+            navigate(`/console/project?id=${projectID}`);
+        }).catch((err) => { /* TODO */ });
+    }
+
     const type = GenController.getProjectType(props.code);
     return (
-        <button className="project-type" disabled={!props.active}>
+        <button className="project-type" disabled={!props.active} onClick={createProject.bind(null, 'New Project', props.code)}>
             <img src={type.image} alt={type.image}/>
             <p>{type.name}</p>
         </button>
@@ -21,7 +29,7 @@ const ProjectType = (props) => {
 const Project = (props) => {
     const type = GenController.getProjectType(props.type);
     return (
-        <button className="home-list-item">
+        <button className="home-list-item" onClick={props.open}>
             <img src={type.image} alt={type.image}/>
             <p style={{marginLeft: 10, width: 30 + '%', textAlign: 'left'}}>{props.name}</p>
             <div className="project-details">
@@ -61,6 +69,7 @@ const HomePage = () => {
     const [logoutError, setLogoutError] = useState(false);
 
     const navigate = useNavigate();
+    const location = useLocation();
     const session = useContext(SessionContext);
     const scriptMax = 5;
 
@@ -69,12 +78,14 @@ const HomePage = () => {
         reloadScripts();
     }, []);
 
+    useEffect(() => { window.location.hash = ''; }, [location]);
+
     const reloadProjects = () => {
         Controller.fetchProjects().then(projects => {
             setProjects(projects);
             setErrorProjects(false);
         }).catch(err => setErrorProjects(true));
-    }
+    };
 
     const reloadScripts = () => {
         ScriptController.fetchScripts().then(scripts => {
@@ -83,11 +94,15 @@ const HomePage = () => {
             else setScripts(scripts);
             setErrorScripts(false);
         }).catch(err => setErrorScripts(true));
-    }
+    };
 
     const updateSearchProjects = (event) => {
         setSearchProjects(event.target.value);
-    }
+    };
+
+    const openProject = (projectID) => {
+        navigate(`/console/project?id=${projectID}`);
+    };
 
     const openScriptEditor = () => {
         navigate('/console/scripts');
@@ -119,7 +134,8 @@ const HomePage = () => {
             <div className="home-vertical-container">
                 { projects.map(project => {
                     if(project.name.toLowerCase().includes(searchProjects.trim().toLowerCase()))
-                        return <Project type={project.type} name={project.name} lastModified={project.lastModified} />;
+                        return <Project type={project.type} name={project.name} lastModified={project.lastModified}
+                                        open={openProject.bind(null, project.projectID)} />;
                     else return null;
                 }) }
             </div>
@@ -179,6 +195,7 @@ const HomePage = () => {
                 <button className="button red" style={{marginTop: 15, marginBottom: 15}} onClick={logout}>Log Out</button>
                 { logoutError ? <p style={{marginLeft: 20 + 'px', color: '#ff4444'}}>Logout failed</p> : null }
             </div>
+            <div style={{flexGrow: 1}}/>
             <p style={{textAlign: 'center'}}>&copy; GrAI Matter 2023</p>
         </div>
     );
