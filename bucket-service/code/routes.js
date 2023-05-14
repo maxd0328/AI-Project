@@ -160,7 +160,7 @@ router.get('/fetch-project', async (req, res) => {
 
     try {
         const project = await controller.getProject(req.session.userID, projectID);
-        res.status(200).json({ project });
+        res.status(200).json(project);
     }
     catch(err) {
         res.status(400).json({ error: 'Something went wrong' });

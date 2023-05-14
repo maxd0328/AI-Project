@@ -5,17 +5,29 @@ function parseBlock(stream, dest, after = 'operator<}>') {
             continue;
         else {
             try {
-                parseStatement(stream, dest);
+                if(matchesLookAhead(stream, 'annotation'))
+                    parseAnnotation(stream, dest);
+                else
+                    parseStatement(stream, dest);
                 match(stream, 'newline');
             }
             catch(err) {
-                if(err !== 'panic') throw err;
-                panic(stream, 'newline');
-                if(!matches(stream, 'newline'))
-                    throw 'abort';
+                panic(err, stream, 'newline');
             }
         }
     }
+}
+
+function parseAnnotation(stream, dest) {
+    let key = match(stream, 'annotation');
+
+    let params = [];
+    if(matches(stream, 'operator<(>')) {
+        do params.push(match(stream, 'identifier').value);
+        while(matches(stream, 'operator<,>'));
+        match(stream, 'operator<)>');
+    }
+    put(stream, dest, key, params);
 }
 
 function parseStatement(stream, dest) {
@@ -39,7 +51,12 @@ function parseStatement(stream, dest) {
     }
     else if(matchesLookAhead(stream, 'operator<{>')) {
         match(stream, 'operator<{>');
-        match(stream, 'newline');
+        try {
+            match(stream, 'newline');
+        }
+        catch(err) {
+            panic(err, stream, 'newline');
+        }
 
         let newDest = {};
         put(stream, dest, key, newDest);
@@ -93,12 +110,21 @@ function backtrack(stream, ruleName) {
     throw 'panic';
 }
 
-function panic(stream, stop) {
-    let token = stream.tokens[stream.position];
-    while(token.family !== stop && token.family !== 'end-of-stream') {
+function panic(err, stream, stop) {
+    if(err !== 'panic')
+        throw err;
+    let token = stream.tokens[stream.position], scopes = 0;
+    while((token.family !== stop || scopes) && token.family !== 'end-of-stream') {
+        if(token.family === 'operator<{>')
+            scopes++;
+        else if(scopes && token.family === 'operator<}>')
+            scopes--;
+
         stream.position++;
         token = stream.tokens[stream.position];
     }
+    if(!matches(stream, stop))
+        throw 'abort';
 }
 
 function put(stream, dest, key, value) {
