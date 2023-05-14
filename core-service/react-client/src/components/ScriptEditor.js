@@ -6,6 +6,8 @@ import ace from 'ace-builds';
 import 'ace-builds/src-noconflict/theme-dracula';
 import 'ace-builds/src-noconflict/ext-language_tools';
 
+import * as Definitions from '../compiler/Definitions';
+
 // This only defines high-level behaviour of the Mode like folding etc.
 ace.define('ace/mode/custom', ['require', 'exports', 'ace/lib/oop', 'ace/mode/text', 'ace/mode/custom_highlight_rules'], (acequire, exports) => {
     const oop = acequire('ace/lib/oop');
@@ -38,10 +40,11 @@ ace.define('ace/mode/custom_highlight_rules', ['require', 'exports', 'ace/lib/oo
     const CustomHighlightRules = function CustomHighlightRules() {
         this.$rules = {
             start: [
-                { token: 'field', regex: '\\b(activation|dataShape|type|poolingShape|stride|poolingType|padding)\\b' },
-                { token: 'enum', regex: '\\b(POOLING|MAX)\\b' },
+                { token: 'annotation', regex: /(?:^|\s)@[A-Za-z_][A-Za-z0-9_]*\b/ },
+                { token: 'field', regex: '\\b' + Definitions.toRegex(Definitions.KEYS) + '\\b' },
+                { token: 'enum', regex: '\\b' + Definitions.toRegex(Definitions.ENUMS) + '\\b' },
                 { token: 'identifier', regex: '\\b[A-Za-z_][A-Za-z0-9_]*\\b' },
-                { token: 'operator', regex: '[=\\{\\},]' },
+                { token: 'operator', regex: '[=\\{\\},\\(\\)]' },
                 { token: 'numeric', regex: '(?<![A-Za-z0-9.])[-]?(\\d+\\.?|\\d*\\.\\d+)(?![A-Za-z0-9.])' },
                 { token: 'comment', regex: '#.*$' }
             ]

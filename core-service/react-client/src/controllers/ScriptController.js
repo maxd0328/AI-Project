@@ -1,5 +1,6 @@
 
 export async function fetchScripts() {
+    return [ { scriptID: 1, name: 'Script' } ];
     const response = await fetch('/bucket/fetch-scripts');
 
     if(response.status !== 200)
@@ -8,6 +9,7 @@ export async function fetchScripts() {
 }
 
 export async function fetchScriptContent(scriptID) {
+    return '\n# Content\n';
     const response = await fetch(`/bucket/script-content?id=${scriptID}`);
 
     if(response.status !== 200)

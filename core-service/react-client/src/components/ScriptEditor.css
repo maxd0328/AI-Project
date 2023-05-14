@@ -14,6 +14,10 @@
     font-weight: bold;
 }
 
+.ace-matej .ace_annotation {
+    color: #f3f352;
+}
+
 .ace-matej .ace_identifier {
     color: #bbbbbb;
 }

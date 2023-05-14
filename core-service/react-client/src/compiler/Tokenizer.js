@@ -1,6 +1,7 @@
+import * as Definitions from './Definitions';
 
-const ALPHANUMERIC = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_.-';
-const SYMBOLIC = '={},';
+const ALPHANUMERIC = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_.-@';
+const SYMBOLIC = '={},()';
 const WHITESPACE = ' \t\n\r';
 const COMMENTS = '#';
 
@@ -42,10 +43,11 @@ function scanLine(line, startingIndex, lineNo, exportMessage) {
 
 function classifyToken(token, exportMessage) {
     let family;
-    if(/^(activation|dataShape|type|poolingShape|stride|poolingType|padding)$/.test(token.value)) family = 'key';
-    else if(/^(POOLING|MAX)$/.test(token.value)) family = 'enum';
+    if(new RegExp('^' + Definitions.toRegex(Definitions.KEYS) + '$').test(token.value)) family = 'key';
+    else if(new RegExp('^' + Definitions.toRegex(Definitions.ENUMS) + '$').test(token.value)) family = 'enum';
+    else if(new RegExp('^' + Definitions.toRegex(Definitions.ANNOTATIONS) + '$').test(token.value)) family = 'annotation';
     else if(/^[A-Za-z_][A-Za-z0-9_]*$/.test(token.value)) family = 'identifier';
-    else if(/^[={},]$/.test(token.value)) family = `operator<${token.value}>`;
+    else if(/^[={},()]$/.test(token.value)) family = `operator<${token.value}>`;
     else if(/^-?(\d+\.?|\d*\.\d+)$/.test(token.value)) family = 'numeric';
     else {
         exportMessage({
@@ -96,7 +98,7 @@ function tokenize(source, exportMessage) {
 
         tokens.push({
             family: 'newline',
-            value: '\n',
+            value: 'newline',
             row: row,
             col: line.length
         });

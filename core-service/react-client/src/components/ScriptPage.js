@@ -5,6 +5,7 @@ import './ScriptPage.css';
 import '../Styles.css';
 import '../controllers/ScriptController';
 import * as Controller from '../controllers/ScriptController';
+import compile from '../compiler/Compiler';
 import MenuBar from "./MenuBar";
 
 const ScriptElement = (props) => {
@@ -25,10 +26,29 @@ const ScriptPage = () => {
     const [search, setSearch] = useState('');
     const [error, setError] = useState(false);
     const [edited, setEdited] = useState(false);
+    const [compiledContent, setCompiledContent] = useState('');
 
     const didMount = useRef(false);
     const [searchParams, setSearchParams] = useSearchParams();
     const location = useLocation();
+
+    /* Compile the script every 5 seconds if it has been changed */
+    const compileTimeout = useRef(null);
+    const compileDebounce = useCallback((content) => {
+        const later = () => {
+            clearTimeout(compileTimeout.current);
+            compile(content);
+            setCompiledContent(content);
+        };
+
+        clearTimeout(compileTimeout.current);
+        compileTimeout.current = setTimeout(later, 3000); // 3 seconds
+    }, []); // 3 seconds
+
+    useEffect(() => {
+        if(content !== compiledContent)
+            compileDebounce(content);
+    }, [content, compiledContent, compileDebounce]);
 
     /* Function to fetch ID from search params, if null then null is returned, otherwise it's parsed to an int */
     const currentScriptID = useCallback(() => {
