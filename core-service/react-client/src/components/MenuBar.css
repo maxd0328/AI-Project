@@ -13,7 +13,7 @@
     color: #eee;
 }
 
-.menu-bar button {
+.menu-bar-image-button {
     background-color: rgba(255, 255, 255, 0);
     border: none;
     width: 45px;
@@ -26,19 +26,38 @@
     outline: none;
 }
 
-.menu-bar button:not(:active) {
+.menu-bar-image-button:not(:active) {
     transition: background-color 0.15s;
 }
 
-.menu-bar button:hover {
+.menu-bar-image-button:hover {
     background-color: rgba(255, 255, 255, 0.3);
 }
 
-.menu-bar button:active {
+.menu-bar-image-button:active {
     background-color: rgba(100, 100, 100, 0.6);
 }
 
 .menu-bar img {
     width: 55%;
     height: 55%;
+}
+
+.menu-bar-invisible {
+    background-color: transparent;
+    border: none;
+    color: #eee;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.menu-bar-invisible:not(:active) {
+    outline: none;
+}
+
+.menu-bar-invisible:active {
+    outline: none;
 }

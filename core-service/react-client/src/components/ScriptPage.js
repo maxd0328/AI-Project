@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import ScriptEditor from './ScriptEditor';
 import './ScriptPage.css';
 import '../Styles.css';
@@ -28,6 +28,7 @@ const ScriptPage = () => {
 
     const didMount = useRef(false);
     const [searchParams, setSearchParams] = useSearchParams();
+    const location = useLocation();
 
     /* Function to fetch ID from search params, if null then null is returned, otherwise it's parsed to an int */
     const currentScriptID = useCallback(() => {
@@ -59,6 +60,9 @@ const ScriptPage = () => {
             reload(id);
         else setSearchParams(id === undefined ? {} : { id });
     }, [setSearchParams, reload, error]);
+
+    /* Prevent hashes from URL */
+    useEffect(() => { window.location.hash = ''; }, [location]);
 
     /* Effect handler for updating DOM whenever script list or search param changes */
     useEffect(() => {
