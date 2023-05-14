@@ -10,7 +10,7 @@
     background-color: #353942;
     color: white;
     height: 100vh;
-    padding: 10px;
+    padding: 60px 10px 10px 10px;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
@@ -27,13 +27,17 @@
 
 .script-container, .empty-script-container {
     background-color: #202530;
-    padding: 20px;
+    padding: 70px 20px 20px 20px;
 }
 
 .sidebar-container {
     margin-top: 5px;
     margin-bottom: 7px;
     overflow: auto;
+}
+
+.sidebar-container::-webkit-scrollbar-track {
+    background-color: transparent;
 }
 
 .empty-script-container {
@@ -49,4 +53,23 @@
 .script-button-container {
     display: flex;
     justify-content: flex-end;
+}
+
+.script-element-unselected, .script-element-selected {
+    padding: 5px 0px 5px 0px;
+    transition: background-color 0.1s;
+    border-radius: 10px;
+}
+
+.script-element-selected {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+.script-element-unselected:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.script-element-inset {
+    padding-left: 10px;
+    cursor: default;
 }

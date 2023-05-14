@@ -1,185 +1,211 @@
-import React from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import ScriptEditor from './ScriptEditor';
-import ScriptElement from './ScriptElement';
 import './ScriptPage.css';
 import '../Styles.css';
 import '../controllers/ScriptController';
 import * as Controller from '../controllers/ScriptController';
+import MenuBar from "./MenuBar";
 
-class ScriptPage extends React.Component {
+const ScriptElement = (props) => {
+    return (
+        <div
+            className={props.selected ? 'script-element-selected' : 'script-element-unselected'}
+            onClick={props.select.bind(null, props.id)}
+        >
+            <p className="small-header script-element-inset">{props.name}</p>
+        </div>
+    );
+}
 
-    constructor(props) {
-        super(props);
-        this.state = { scripts: [], selectedIndex: -1, provisionalName: '', content: '', search: '', error: false, edited: false };
+const ScriptPage = () => {
+    const [scripts, setScripts] = useState([]);
+    const [provisionalName, setProvisionalName] = useState('');
+    const [content, setContent] = useState('');
+    const [search, setSearch] = useState('');
+    const [error, setError] = useState(false);
+    const [edited, setEdited] = useState(false);
 
-        this.reload = this.reload.bind(this);
-        this.selectScript = this.selectScript.bind(this);
-        this.updateSearch = this.updateSearch.bind(this);
-        this.updateScript = this.updateScript.bind(this);
-        this.updateProvisionalName = this.updateProvisionalName.bind(this);
-        this.submitName = this.submitName.bind(this);
-        this.createScript = this.createScript.bind(this);
-        this.saveScript = this.saveScript.bind(this);
-        this.deleteScript = this.deleteScript.bind(this);
+    const didMount = useRef(false);
+    const [searchParams, setSearchParams] = useSearchParams();
 
-        this.reload();
-    }
+    /* Function to fetch ID from search params, if null then null is returned, otherwise it's parsed to an int */
+    const currentScriptID = useCallback(() => {
+        let id = searchParams.get('id');
+        return id === null ? null : parseInt(id);
+    }, [searchParams]);
 
-    reload() {
-        Controller.fetchScripts().then((scripts) => {
-            let selectedIndex = this.state.selectedIndex;
-            if(selectedIndex >= scripts.length)
-                selectedIndex = -1;
+    /* Function to search for script from script list (can be overridden) from current script ID */
+    const currentScript = useCallback((scriptList = scripts) => {
+        const scriptID = currentScriptID();
+        return scriptID === null ? null : scriptList.find(e => e.scriptID === scriptID);
+    }, [currentScriptID, scripts]);
 
-            if(selectedIndex >= 0) {
-                let script = scripts[selectedIndex];
-                Controller.fetchScriptContent(script.scriptID).then(
-                    (content) => this.setState({ scripts, selectedIndex, provisionalName: script.name, content, error: false, edited: false }),
-                    (err) => this.setState({ scripts, selectedIndex, error: true }));
-            }
-            else this.setState({ scripts, error: false, selectedIndex });
-        }, (err) => this.setState( { scripts: [], error: true }));
-    }
+    /* Reload page, fetches all scripts and loads content of one specified by newID (left the same by default */
+    const reload = useCallback((newID = undefined) => {
+        Controller.fetchScripts().then((newScripts) => {
+            setScripts(newScripts);
+            setError(false);
+            if(newID !== undefined) setSearchParams({ id: newID });
+        }, (err) => {
+            setScripts([]);
+            setError(true);
+        });
+    }, [setSearchParams]);
 
-    selectScript(index) {
-        if(this.state.error) {
-            this.setState({ selectedIndex: index }, () => this.reload());
+    /* Select script by setting value of search param 'id' */
+    const selectScript = useCallback((id) => {
+        if(error)
+            reload(id);
+        else setSearchParams(id === undefined ? {} : { id });
+    }, [setSearchParams, reload, error]);
+
+    /* Effect handler for updating DOM whenever script list or search param changes */
+    useEffect(() => {
+        if(!didMount.current) {
+            reload();
+            didMount.current = true;
+            return;
+        }
+        else if(error)
+            return;
+
+        const script = currentScript();
+        if(!script && currentScriptID() !== null) {
+            selectScript(undefined);
             return;
         }
 
-        if(index < 0) {
-            this.setState({ selectedIndex: index, provisionalName: '', content: '' });
-            return;
+        if(script) {
+            Controller.fetchScriptContent(script.scriptID).then((newContent) => {
+                setProvisionalName(script.name);
+                setEdited(false);
+                setContent(newContent);
+            }, (err) => setError(true));
         }
+        else {
+            setProvisionalName('');
+            setContent('');
+        }
+    }, [error, currentScript, currentScriptID, reload, selectScript, scripts]);
 
-        let script = this.state.scripts[index];
-        Controller.fetchScriptContent(script.scriptID).then((content) => {
-            this.setState({
-                selectedIndex: index,
-                provisionalName: script.name,
-                edited: false,
-                content
-            });
-        }, (err) => this.setState({ error: true }));
+    /* Handler functions */
+    const updateSearch = (event) => {
+        setSearch(event.target.value);
     }
 
-    updateSearch(event) {
-        this.setState({ search: event.target.value });
+    const updateScript = (newContent) => {
+        setContent(newContent);
+        setEdited(true);
     }
 
-    updateScript(content) {
-        this.setState({ content, edited: true });
+    const updateProvisionalName = (event) => {
+        setProvisionalName(event.target.value);
     }
 
-    updateProvisionalName(event) {
-        this.setState({ provisionalName: event.target.value });
-    }
-
-    submitName(event) {
-        if(this.state.error) return;
+    const submitName = (event) => {
+        if(error) return;
         if(!event.key || event.key === 'Enter') {
-            let scripts = [...this.state.scripts];
-            let script = scripts[this.state.selectedIndex];
-            script.name = this.state.provisionalName;
-
-            Controller.sendScriptName(script.scriptID, this.state.provisionalName).then((result) => this.setState({ scripts }),
-                (err) => this.setState({ error: true }));
+            Controller.sendScriptName(currentScriptID(), provisionalName).then(() => setScripts(scripts => {
+                    let newScripts = [...scripts];
+                    let script = currentScript(newScripts);
+                    script.name = provisionalName;
+                    return newScripts;
+                }),
+                (err) => setError(true));
         }
     }
 
-    createScript() {
-        if(this.state.error) return;
-        const name = 'New script';
-        Controller.sendNewScript(name, '\n# Write your script here\n').then((scriptID) => {
-            let scripts = [...this.state.scripts];
-            scripts.push({ scriptID, name });
-            this.setState({ scripts }, () => this.selectScript(scripts.length - 1));
-        }, (err) => this.setState({ error: true }));
-    }
-
-    saveScript() {
-        if(this.state.error) return;
-        let scripts = [...this.state.scripts];
-        let script = scripts[this.state.selectedIndex];
-
-        Controller.sendScriptContent(script.scriptID, this.state.content).then((result) => this.setState({ edited: false }),
-            (err) => this.setState({ error: true }));
-    }
-
-    deleteScript() {
-        if(this.state.error) return;
-        Controller.sendDeleteScript(this.state.scripts[this.state.selectedIndex].scriptID).then((result) => {
-            let scripts = [...this.state.scripts];
-            scripts.splice(this.state.selectedIndex, 1);
-            this.setState({ scripts }, () => {
-                let index = this.state.selectedIndex >= this.state.scripts.length ? this.state.scripts.length - 1 : this.state.selectedIndex;
-                this.selectScript(index);
+    const createScript = () => {
+        if(error) return;
+        const name = 'New script', content = '\n# Write your script here\n';
+        Controller.sendNewScript(name, content).then((scriptID) => {
+            setScripts(scripts => {
+                let newScripts = [...scripts];
+                newScripts.push({ scriptID, name });
+                return newScripts;
             });
-        }, (err) => this.setState({ error: true }));
+            selectScript(scriptID);
+        }, (err) => setError(true));
     }
 
-    render() {
-        return (
-            <div className="script-page">
-                <div className="script-sidebar">
-                    <p className="small-header">Browse Scripts</p>
-                    <input type="text" placeholder="Search" className="text-field" style={{fontSize: 12 + 'px'}}
-                        onChange={this.updateSearch} value={this.state.search}/>
-                    <div className="sidebar-container">{
-                        this.state.scripts.map((script, i) => {
-                            if(script.name.toLowerCase().includes(this.state.search.trim().toLowerCase()))
-                                return (<ScriptElement name={script.name} key={i} index={i} select={this.selectScript}
-                                           selected={this.state.selectedIndex === i}/>);
-                            else return null;
-                        })
-                    }</div>
-                    <button className="button green" onClick={this.createScript}>Create New</button>
-                </div>
-                {!this.state.error ? this.state.selectedIndex >= 0 ? this.renderEditor() : this.renderEmpty() : this.renderError()}
-            </div>
-        );
+    const saveScript = () => {
+        if(error) return;
+
+        Controller.sendScriptContent(currentScriptID(), content).then((result) => setEdited(false),
+            (err) => setError(true));
     }
 
-    renderEditor() {
+    const deleteScript = () => {
+        if(error) return;
+        Controller.sendDeleteScript(currentScriptID()).then(() => {
+            setScripts(scripts => scripts.filter(e => e.scriptID !== currentScriptID()));
+            selectScript(undefined);
+        }, (err) => setError(true));
+    }
+
+    /* Render functions */
+    const renderEditor = () => {
         return (
             <div className="script-container">
                 <input type="text" placeholder="Script name" className="text-field"
-                       value={this.state.provisionalName}
-                       onChange={this.updateProvisionalName}
-                       onKeyDown={this.submitName}
-                       onBlur={this.submitName}
+                       value={provisionalName}
+                       onChange={updateProvisionalName}
+                       onKeyDown={submitName}
+                       onBlur={submitName}
                 />
                 <div className="script-editor">
-                    <ScriptEditor callback={this.updateScript}>
-                        {this.state.content}
+                    <ScriptEditor callback={updateScript}>
+                        {content}
                     </ScriptEditor>
                 </div>
                 <div className="script-button-container">
-                    <button className="button green" onClick={this.saveScript} disabled={!this.state.edited}>Save</button>
-                    <button className="button red" onClick={this.deleteScript}>Delete</button>
+                    <button className="button green" onClick={saveScript} disabled={!edited}>Save</button>
+                    <button className="button red" onClick={deleteScript}>Delete</button>
                 </div>
             </div>
         );
     }
 
-    renderEmpty() {
+    const renderEmpty = () => {
         return (
             <div className="empty-script-container">
                 <p className="small-header" style={{marginBottom: 10 + 'px'}}>Open or create a script to get started!</p>
-                <button className="button green" onClick={this.createScript}>Create</button>
+                <button className="button green" onClick={createScript}>Create</button>
             </div>
         );
     }
 
-    renderError() {
+    const renderError = () => {
         return (
             <div className="empty-script-container">
                 <p className="small-header" style={{marginBottom: 10 + 'px'}}>Something went wrong, please try again.</p>
-                <button className="button blue" onClick={this.reload}>Reload</button>
+                <button className="button blue" onClick={reload}>Reload</button>
             </div>
         );
     }
 
-}
+    /* Primary render */
+    return (
+        <div className="script-page">
+            <MenuBar/>
+            <div className="script-sidebar">
+                <p className="small-header">Browse Scripts</p>
+                <input type="text" placeholder="Search" className="text-field" style={{fontSize: 12 + 'px'}}
+                       onChange={updateSearch} value={search}/>
+                <div className="sidebar-container">{
+                    scripts.map((script, i) => {
+                        if(script.name.toLowerCase().includes(search.trim().toLowerCase()))
+                            return (<ScriptElement name={script.name} key={i} id={script.scriptID} select={selectScript}
+                                                   selected={script.scriptID === currentScriptID()}/>);
+                        else return null;
+                    })
+                }</div>
+                <button className="button green" onClick={createScript}>Create New</button>
+            </div>
+            {!error ? currentScriptID() !== null ? renderEditor() : renderEmpty() : renderError()}
+        </div>
+    );
+};
 
 export default ScriptPage;
