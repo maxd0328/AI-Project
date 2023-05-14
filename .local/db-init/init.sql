@@ -12,9 +12,19 @@ CREATE TABLE users (
     password VARCHAR(50) NOT NULL
 );
 
+CREATE TABLE projects (
+    userID INT NOT NULL,
+    projectID BIGINT NOT NULL,
+    name VARCHAR(50) NOT NULL,
+    type CHAR(3) NOT NULL,
+    lastModified BIGINT,
+    PRIMARY KEY(userID, projectID)
+);
+
 CREATE TABLE scripts (
     userID INT NOT NULL,
     scriptID BIGINT NOT NULL,
     name VARCHAR(50) NOT NULL,
+    lastModified BIGINT,
     PRIMARY KEY(userID, scriptID)
 );

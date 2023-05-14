@@ -1,4 +1,19 @@
 
+button {
+    cursor: pointer;
+    outline: 1px solid rgba(0, 0, 0, 0);
+}
+
+button:disabled {
+    cursor: default;
+    pointer-events: none;
+}
+
+button:focus {
+    outline: 1px solid #007bff;
+    z-index: 1;
+}
+
 .small-header {
     margin: 5px 0px 5px 0px;
     font-size: 16px;
@@ -39,16 +54,19 @@
     color: #fff;
     font-size: 16px;
     cursor: pointer;
+    outline: none;
+}
+
+.button:disabled {
+    opacity: 0.35;
+}
+
+.button:focus {
+    outline: none;
 }
 
 .button:not(:active) {
     transition: all 0.1s ease-in-out;
-}
-
-.button:disabled {
-    cursor: default;
-    pointer-events: none;
-    opacity: 0.35;
 }
 
 .green {
@@ -88,15 +106,16 @@
 }
 
 ::-webkit-scrollbar {
-    width: 7px;
+    width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-    background-color: transparent;
+    background-color: #2d303d;
 }
 
 ::-webkit-scrollbar-thumb {
     background-color: #616173;
+    border-color: #5e6167;
     border-radius: 5px;
 }
 

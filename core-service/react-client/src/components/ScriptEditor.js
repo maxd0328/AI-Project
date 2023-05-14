@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import AceEditor from 'react-ace';
 import './ScriptEditor.css';
 
@@ -53,41 +53,33 @@ ace.define('ace/mode/custom_highlight_rules', ['require', 'exports', 'ace/lib/oo
     exports.CustomHighlightRules = CustomHighlightRules;
 });
 
-class ScriptEditor extends React.Component {
-
-    constructor(props) {
-        super(props);
-        this.handleChange = this.handleChange.bind(this);
-    }
-
-    handleChange(value) {
-        this.props.callback(value);
-    }
-
-    componentDidMount() {
-        const editor = this.aceEditor.editor;
+const ScriptEditor = (props) => {
+    const aceEditor = useRef(null);
+    useEffect(() => {
+        const editor = aceEditor.current.editor;
         editor.setOptions({
             enableBasicAutocompletion: true
         });
-    }
+    }, []);
 
-    render() {
-        return (
-            <AceEditor
-                mode="custom"
-                theme="dracula"
-                className="ace-matej"
-                fontSize={14}
-                width="100%"
-                height="100%"
-                editorProps={{ $blockScrolling: true, wrapEnabled: true }}
-                value={this.props.children}
-                onChange={this.handleChange}
-                ref={(instance) => { this.aceEditor = instance; }}
-            />
-        );
-    }
+    const handleChange = (event) => {
+        props.callback(event);
+    };
 
-}
+    return (
+        <AceEditor
+            mode="custom"
+            theme="dracula"
+            className="ace-matej"
+            fontSize={14}
+            width="100%"
+            height="100%"
+            editorProps={{ $blockScrolling: true, wrapEnabled: true }}
+            value={props.children}
+            onChange={handleChange}
+            ref={aceEditor}
+        />
+    );
+};
 
 export default ScriptEditor;

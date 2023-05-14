@@ -4,10 +4,10 @@ const router = express.Router();
 
 /* POST create new user. */
 router.post('/create', async function(req, res, next) {
-    const firstName = req.body['first-name'];
-    const lastName = req.body['last-name'];
+    const firstName = req.body['firstName'];
+    const lastName = req.body['lastName'];
     const email = req.body['email'];
-    const phoneNumber = req.body['phone-number'];
+    const phoneNumber = req.body['phone'];
     const password = req.body['password'];
 
     try {
