@@ -1,16 +1,16 @@
 import tokenize from './Tokenizer';
 import parse from './Parser';
-
-function exportMessage(details) {
-    console.log(`${details.type}: ${details.message}`);
-}
+import validate from './Validator';
 
 function compile(source) {
-    const tokens = tokenize(source, exportMessage);
-    const result = parse(tokens, exportMessage);
+    const annotations = [];
+    const exportMessage = message => annotations.push(message);
 
-    //console.log(JSON.stringify(tokens));
-    console.log(JSON.stringify(result));
+    const tokens = tokenize(source, exportMessage);
+    const output = parse(tokens, exportMessage);
+    validate(output, exportMessage);
+
+    return { output, annotations };
 }
 
 export default compile;

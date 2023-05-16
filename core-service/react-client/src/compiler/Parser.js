@@ -1,14 +1,17 @@
 
 function parseBlock(stream, dest, after = 'operator<}>') {
+    let annotations = {};
     while(!matchesLookAhead(stream, after)) {
         if(matches(stream, 'newline'))
             continue;
         else {
             try {
                 if(matchesLookAhead(stream, 'annotation'))
-                    parseAnnotation(stream, dest);
-                else
-                    parseStatement(stream, dest);
+                    parseAnnotation(stream, annotations);
+                else {
+                    parseStatement(stream, dest, annotations);
+                    annotations = {};
+                }
                 match(stream, 'newline');
             }
             catch(err) {
@@ -16,10 +19,21 @@ function parseBlock(stream, dest, after = 'operator<}>') {
             }
         }
     }
+
+    // Special case: annotations without a corresponding definition
+    for(let key in annotations)
+        if(annotations.hasOwnProperty(key) && key !== 'sourceMap' && key !== 'annotations')
+            stream.exportMessage({
+                type: 'warning',
+                message: `Annotation '@${key}' is not associated with a definition. Line will be ignored`,
+                row: annotations.sourceMap[key].row,
+                col: annotations.sourceMap[key].col
+            });
 }
 
 function parseAnnotation(stream, dest) {
     let key = match(stream, 'annotation');
+    key.value = key.value.substring(1);
 
     let params = [];
     if(matches(stream, 'operator<(>')) {
@@ -27,27 +41,27 @@ function parseAnnotation(stream, dest) {
         while(matches(stream, 'operator<,>'));
         match(stream, 'operator<)>');
     }
-    put(stream, dest, key, params);
+    put(stream, dest, key, params, null);
 }
 
-function parseStatement(stream, dest) {
+function parseStatement(stream, dest, annotations) {
     let key = matches(stream, 'key');
     if(!key)
         key = match(stream, 'identifier');
 
     match(stream, 'operator<=>');
 
-    if(matchesLookAhead(stream, 'numeric')) {
-        let value = [parseFloat(match(stream, 'numeric').value)];
+    if(matchesLookAhead(stream, 'number')) {
+        let value = [parseFloat(match(stream, 'number').value)];
         while(matches(stream, 'operator<,>'))
-            value.push(parseFloat(match(stream, 'numeric').value));
+            value.push(parseFloat(match(stream, 'number').value));
 
         if(value.length === 1)
             value = value[0];
-        put(stream, dest, key, value);
+        put(stream, dest, key, value, annotations);
     }
     else if(matchesLookAhead(stream, 'enum')) {
-        put(stream, dest, key, match(stream, 'enum').value);
+        put(stream, dest, key, match(stream, 'enum').value, annotations);
     }
     else if(matchesLookAhead(stream, 'operator<{>')) {
         match(stream, 'operator<{>');
@@ -59,7 +73,7 @@ function parseStatement(stream, dest) {
         }
 
         let newDest = {};
-        put(stream, dest, key, newDest);
+        put(stream, dest, key, newDest, annotations);
         parseBlock(stream, newDest);
 
         match(stream, 'operator<}>');
@@ -73,9 +87,12 @@ function match(stream, family) {
     if(token) return token;
     else {
         token = stream.tokens[stream.position];
+
+        let familyLegible = family.replace(/operator<(.*)>/, '\'$1\'');
+        let tokenLegible = token.family === 'end-of-stream' || token.family === 'newline' ? token.family : `token '${token.value}'`;
         stream.exportMessage({
             type: 'warning',
-            message: `Unexpected ${token.family === 'end-of-stream' ? token.family : `token '${token.value}'`}, expected ${family}`,
+            message: `Unexpected ${tokenLegible}, expected ${familyLegible}. Line may be ignored`,
             row: token.row,
             col: token.col
         });
@@ -101,9 +118,10 @@ function matchesLookAhead(stream, family) {
 
 function backtrack(stream, ruleName) {
     let token = stream.tokens[stream.position];
+    let tokenLegible = token.family === 'end-of-stream' || token.family === 'newline' ? token.family : `token '${token.value}'`;
     stream.exportMessage({
         type: 'warning',
-        message: `Unexpected ${token.family === 'end-of-stream' ? token.family : `token '${token.value}'`}, expected ${ruleName}`,
+        message: `Unexpected ${tokenLegible}, expected ${ruleName}. Line may be ignored`,
         row: token.row,
         col: token.col
     });
@@ -127,7 +145,17 @@ function panic(err, stream, stop) {
         throw 'abort';
 }
 
-function put(stream, dest, key, value) {
+function put(stream, dest, key, value, annotations) {
+    if(key.value === 'sourceMap' || key.value === 'annotations') {
+        stream.exportMessage({
+            type: 'warning',
+            message: `'${key.value}' is a reserved identifier and may not be used. Line will be ignored`,
+            row: key.row,
+            col: key.col
+        });
+        return;
+    }
+
     if(dest[`${key.value}`])
         stream.exportMessage({
             type: 'warning',
@@ -136,6 +164,16 @@ function put(stream, dest, key, value) {
             col: key.col
         });
     dest[`${key.value}`] = value;
+
+    if(dest.sourceMap === undefined)
+        dest.sourceMap = {};
+    dest.sourceMap[`${key.value}`] = { row: key.row, col: key.col };
+
+    if(annotations !== null) {
+        if(dest.annotations === undefined)
+            dest.annotations = {};
+        dest.annotations[`${key.value}`] = annotations;
+    }
 }
 
 
@@ -148,7 +186,13 @@ function parse(tokens, exportMessage) {
     };
     let dest = {};
 
-    parseBlock(stream, dest, 'end-of-stream');
+    try {
+        parseBlock(stream, dest, 'end-of-stream');
+    }
+    catch(err) {
+        if(err !== 'abort')
+            throw err;
+    }
 
     return dest;
 }

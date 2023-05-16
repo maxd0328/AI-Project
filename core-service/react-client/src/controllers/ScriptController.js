@@ -18,7 +18,9 @@ export async function fetchScriptContent(scriptID) {
     return data.content;
 }
 
+let id = 3;
 export async function sendNewScript(name, content) {
+    return id++;
     const response = await fetch('/bucket/create-script', {
         method: 'POST',
         headers: {
