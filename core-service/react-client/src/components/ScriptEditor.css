@@ -36,7 +36,7 @@
 }
 
 .script-header {
-    font-family: Calibri;
+    font-family: Calibri, serif;
     font-size: 25px;
     margin: 5px 5px 10px 5px;
 }
@@ -57,4 +57,65 @@
     background-color: darkgrey;
     outline: 1px solid slategrey;
     border-radius: 10px;
+}
+
+.script-console {
+    background-color: #282a36;
+    margin-left: 20px;
+    width: 30%;
+    height: 100%;
+    border-radius: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.script-console h1 {
+    margin: 15px 15px 0 15px;
+    color: #eee;
+    font-size: 20px;
+}
+
+.script-console h2 {
+    margin: 5px 15px 0 15px;
+    color: #ccc;
+    font-weight: normal;
+    font-size: 14px;
+}
+
+.script-annotation {
+    font-family: monospace;
+    color: #eee;
+    text-align: left;
+    background-color: #373949;
+    border: none;
+    border-top: 1px solid #55596e;
+    width: 100%;
+    padding: 5px 15px 5px 15px;
+    box-sizing: border-box;
+}
+
+.script-annotation:not(:active) {
+    transition: background-color 0.15s;
+    outline: none;
+}
+
+.script-annotation:hover {
+    background-color: #434559;
+}
+
+.script-annotation:active {
+    background-color: #2f303f;
+    outline: none;
+}
+
+.script-annotation-container {
+    margin-top: 10px;
+    overflow: auto;
+    box-sizing: border-box;
+}
+
+.script-annotation-container:last-child {
+    border-bottom: 1px solid #4e5165;
 }

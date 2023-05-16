@@ -41,23 +41,15 @@ function scanLine(line, startingIndex, lineNo, exportMessage) {
     };
 }
 
-function classifyToken(token, exportMessage) {
+function classifyToken(token) {
     let family;
     if(new RegExp('^' + Definitions.toRegex(Definitions.KEYS) + '$').test(token.value)) family = 'key';
     else if(new RegExp('^' + Definitions.toRegex(Definitions.ENUMS) + '$').test(token.value)) family = 'enum';
     else if(new RegExp('^' + Definitions.toRegex(Definitions.ANNOTATIONS) + '$').test(token.value)) family = 'annotation';
     else if(/^[A-Za-z_][A-Za-z0-9_]*$/.test(token.value)) family = 'identifier';
     else if(/^[={},()]$/.test(token.value)) family = `operator<${token.value}>`;
-    else if(/^-?(\d+\.?|\d*\.\d+)$/.test(token.value)) family = 'numeric';
-    else {
-        exportMessage({
-            type: 'warning',
-            message: `Unrecognized token '${token.value}'`,
-            row: token.row,
-            col: token.col
-        });
-        family = 'error';
-    }
+    else if(/^-?(\d+\.?|\d*\.\d+)$/.test(token.value)) family = 'number';
+    else family = 'error';
 
     token.family = family;
 }
@@ -88,7 +80,7 @@ function tokenize(source, exportMessage) {
                     row: row,
                     col: col + 1
                 };
-                classifyToken(token, exportMessage);
+                classifyToken(token);
                 tokens.push(token);
 
                 col += result.token.length;

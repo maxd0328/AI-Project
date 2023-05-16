@@ -46,7 +46,8 @@
 }
 
 .script-editor {
-    flex-grow: 1;
+    flex: 1;
+    overflow: hidden;
     padding: 10px 0px 15px 0px;
 }
 
