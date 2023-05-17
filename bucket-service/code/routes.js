@@ -33,7 +33,7 @@ router.post('/rename-script', async (req, res) => {
 
     try {
         await controller.updateScriptName(req.session.userID, scriptID, name);
-        res.status(200).json();
+        res.status(204).json();
     }
     catch(err) {
         res.status(400).json({ error: 'Something went wrong' });
@@ -48,7 +48,7 @@ router.post('/save-script', async (req, res) => {
 
     try {
         await controller.updateScriptContent(req.session.userID, scriptID, content);
-        res.status(200).json();
+        res.status(204).json();
     }
     catch(err) {
         res.status(400).json({ error: 'Something went wrong' });
@@ -62,7 +62,7 @@ router.post('/delete-script', async (req, res) => {
 
     try {
         await controller.deleteScript(req.session.userID, scriptID);
-        res.status(200).json();
+        res.status(204).json();
     }
     catch(err) {
         res.status(400).json({ error: 'Something went wrong' });
@@ -119,7 +119,7 @@ router.post('/rename-project', async (req, res) => {
 
     try {
         await controller.updateProjectName(req.session.userID, projectID, name);
-        res.status(200).json();
+        res.status(204).json();
     }
     catch(err) {
         res.status(400).json({ error: 'Something went wrong' });
@@ -133,7 +133,7 @@ router.post('/delete-project', async (req, res) => {
 
     try {
         await controller.deleteProject(req.session.userID, projectID);
-        res.status(200).json();
+        res.status(204).json();
     }
     catch(err) {
         res.status(400).json({ error: 'Something went wrong' });
@@ -161,6 +161,62 @@ router.get('/fetch-project', async (req, res) => {
     try {
         const project = await controller.getProject(req.session.userID, projectID);
         res.status(200).json(project);
+    }
+    catch(err) {
+        res.status(400).json({ error: 'Something went wrong' });
+    }
+});
+
+/* GET request presets. */
+router.get('/fetch-presets', async (req, res) => {
+    if(!ensureLoggedIn(req, res)) return;
+
+    try {
+        const presets = await controller.getPresets();
+        res.status(200).json(presets);
+    }
+    catch(err) {
+        res.status(400).json({ error: 'Something went wrong' });
+    }
+});
+
+/* GET request preset content. */
+router.get('/preset-content', async (req, res) => {
+    if(!ensureLoggedIn(req, res)) return;
+    const presetID = req.query.id;
+
+    try {
+        const content = await controller.getPresetContent(presetID);
+        res.status(200).json({ content });
+    }
+    catch(err) {
+        res.status(400).json({ error: 'Something went wrong' });
+    }
+});
+
+/* GET project pipeline stages. */
+router.get('/fetch-pipeline', async (req, res) => {
+    if(!ensureLoggedIn(req, res)) return;
+    const projectID = req.query.id;
+
+    try {
+        const stages = await controller.getConfigStages(req.session.userID, projectID);
+        res.status(200).json(stages);
+    }
+    catch(err) {
+        res.status(400).json({ error: 'Something went wrong' });
+    }
+});
+
+/* POST submit project pipeline stages. */
+router.post('/save-pipeline', async (req, res) => {
+    if(!ensureLoggedIn(req, res)) return;
+    const projectID = req.body['projectID'];
+    const stages = req.body['stages'];
+
+    try {
+        await controller.saveConfigStages(req.session.userID, projectID, stages);
+        res.status(204).json();
     }
     catch(err) {
         res.status(400).json({ error: 'Something went wrong' });

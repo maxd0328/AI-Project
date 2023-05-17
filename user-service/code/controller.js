@@ -13,10 +13,9 @@ async function addUser(email, firstName, lastName, phoneNumber, password) {
     const query = `INSERT INTO users (email, firstName, lastName, phoneNumber, password) VALUES (?, ?, ?, ?, ?)`;
     const values = [email, firstName, lastName, phoneNumber, password];
 
-    await db.query(query, values);
+    const [result] = await db.query(query, values);
 
-    const [rows] = await db.query(`SELECT LAST_INSERT_ID() as id`);
-    return rows[0].id;
+    return result.insertId;
 }
 
 async function authenticateUser(email, password) {

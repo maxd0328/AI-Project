@@ -1,0 +1,40 @@
+
+.pipeline-stage {
+    width: 100%;
+    background-color: #383a42;
+    border: 1px solid #505359;
+    border-radius: 20px;
+}
+
+.pipeline-stage input {
+    background-color: #2d2e34;
+}
+
+.pipeline-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 10px 20px 10px 20px;
+    height: 50px;
+    box-sizing: border-box;
+}
+
+.pipeline-container {
+    padding: 5px 20px 10px 20px;
+    box-sizing: border-box;
+}
+
+.vertical-line-container {
+    width: 100%;
+    height: 35px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.vertical-line {
+    width: 4px;
+    height: 100%;
+    border-left: 1px solid #505359;
+    border-right: 1px solid #505359;
+}

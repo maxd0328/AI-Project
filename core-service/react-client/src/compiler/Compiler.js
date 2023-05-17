@@ -10,6 +10,8 @@ function compile(source) {
     const output = parse(tokens, exportMessage);
     validate(output, exportMessage);
 
+    console.log(JSON.stringify(output, null, 2));
+
     return { output, annotations };
 }
 
