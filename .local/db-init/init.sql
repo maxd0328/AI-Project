@@ -13,18 +13,46 @@ CREATE TABLE users (
 );
 
 CREATE TABLE projects (
+    projectID INT PRIMARY KEY AUTO_INCREMENT,
     userID INT NOT NULL,
-    projectID BIGINT NOT NULL,
     name VARCHAR(50) NOT NULL,
-    type CHAR(3) NOT NULL,
+    type ENUM('cnn') NOT NULL,
+    presetID INT,
     lastModified BIGINT,
-    PRIMARY KEY(userID, projectID)
+    FOREIGN KEY(userID) REFERENCES users(userID)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    FOREIGN KEY(presetID) REFERENCES presets(presetID)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT
+);
+
+CREATE TABLE presets (
+    presetID INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(50) NOT NULL,
+    description VARCHAR(250)
+);
+
+CREATE TABLE configs (
+    projectID INT NOT NULL,
+    index INT NOT NULL,
+    name VARCHAR(50) NOT NULL,
+    type ENUM('int', 'ext', 'gen') NOT NULL,
+    scriptID INT NULL,
+    PRIMARY KEY(projectID, index),
+    FOREIGN KEY(projectID) REFERENCES projects(projectID)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    FOREIGN KEY(scriptID) REFERENCES scripts(scriptID)
+        ON UPDATE CASCADE
+        ON DELETE SET NULL
 );
 
 CREATE TABLE scripts (
+    scriptID INT PRIMARY KEY AUTO_INCREMENT,
     userID INT NOT NULL,
-    scriptID BIGINT NOT NULL,
     name VARCHAR(50) NOT NULL,
-    lastModified BIGINT,
-    PRIMARY KEY(userID, scriptID)
+    FOREIGN KEY(userID) REFERENCES users(userID)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 );

@@ -1,26 +1,23 @@
 
 export async function fetchScripts() {
-    return [ { scriptID: 1, name: 'Script' } ];
+    return [{scriptID: 1, name: 'Hello'}, {scriptID: 2, name: 'Another'}];
     const response = await fetch('/bucket/fetch-scripts');
 
-    if(response.status !== 200)
+    if(!response.ok)
         throw new Error('BAD_REQUEST');
     return await response.json();
 }
 
 export async function fetchScriptContent(scriptID) {
-    return '\n# Content\n';
     const response = await fetch(`/bucket/script-content?id=${scriptID}`);
 
-    if(response.status !== 200)
+    if(!response.ok)
         throw new Error('BAD_REQUEST');
     const data = await response.json();
     return data.content;
 }
 
-let id = 3;
 export async function sendNewScript(name, content) {
-    return id++;
     const response = await fetch('/bucket/create-script', {
         method: 'POST',
         headers: {
@@ -29,7 +26,7 @@ export async function sendNewScript(name, content) {
         body: JSON.stringify({ name, content })
     });
 
-    if(response.status !== 201)
+    if(!response.ok)
         throw new Error('BAD_REQUEST');
     const data = await response.json();
     return data.scriptID;
@@ -44,7 +41,7 @@ export async function sendScriptName(scriptID, name) {
         body: JSON.stringify({ scriptID, name })
     });
 
-    if(response.status !== 200)
+    if(!response.ok)
         throw new Error('BAD_REQUEST');
 }
 
@@ -57,7 +54,7 @@ export async function sendScriptContent(scriptID, content) {
         body: JSON.stringify({ scriptID, content })
     });
 
-    if(response.status !== 200)
+    if(!response.ok)
         throw new Error('BAD_REQUEST');
 }
 
@@ -70,6 +67,6 @@ export async function sendDeleteScript(scriptID) {
         body: JSON.stringify({ scriptID })
     });
 
-    if(response.status !== 200)
+    if(!response.ok)
         throw new Error('BAD_REQUEST');
 }

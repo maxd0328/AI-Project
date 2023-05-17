@@ -2,7 +2,7 @@
 export async function fetchProjects() {
     const response = await fetch('/bucket/fetch-projects');
 
-    if(response.status !== 200)
+    if(!response.ok)
         throw new Error('BAD_REQUEST');
     return await response.json();
 }
@@ -16,7 +16,7 @@ export async function sendNewProject(name, type) {
         body: JSON.stringify({ name, type })
     });
 
-    if(response.status !== 201)
+    if(!response.ok)
         throw new Error('BAD_REQUEST');
     const data = await response.json();
     return data.projectID;

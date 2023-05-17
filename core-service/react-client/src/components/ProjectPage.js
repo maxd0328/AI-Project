@@ -22,7 +22,7 @@ const ProjectTab = (props) => {
 }
 
 const ProjectPage = () => {
-    const [project, setProject] = useState({ name: 'Loading...', type: '' });
+    const [project, setProject] = useState({ name: 'Loading...', type: '', presetID: null });
     const [error, setError] = useState(false);
 
     const [searchParams] = useSearchParams();
@@ -31,14 +31,13 @@ const ProjectPage = () => {
 
     const pages = useMemo(() => [
         { hash: 'details', gen: () => <DetailsPage project={project} setProject={setProject} raiseError={setError.bind(null, true)}/> },
-        { hash: 'configuration', gen: () => <ConfigurationPage/> },
+        { hash: 'configuration', gen: () => <ConfigurationPage project={project}/> },
         { hash: 'datasets', gen: () => <DatasetsPage/> },
         { hash: 'training', gen: () => <TrainingPage/> },
         { hash: 'results', gen: () => <ResultsPage/> }
     ], [project]);
 
     const reload = useCallback(() => {
-        console.log('reload');
         const projectID = searchParams.get('id');
         if(projectID === null)
             navigate('/console/home');

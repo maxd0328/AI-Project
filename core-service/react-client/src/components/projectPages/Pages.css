@@ -3,7 +3,8 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    min-height: 100%;
+    height: 100%;
+    overflow: auto;
 }
 
 .row {
@@ -44,6 +45,11 @@ h3.outer-element {
     margin-bottom: 5px;
 }
 
+.outer-container {
+    padding: 10px 20px 10px 20px;
+    box-sizing: border-box;
+}
+
 .page input {
     background-color: #3b3b42;
 }
@@ -70,4 +76,49 @@ h3.outer-element {
 .image-button:active {
     outline: none;
     background-color: rgba(200, 200, 200, 0.7);
+}
+
+.text-button {
+    color: #eee;
+    padding: 10px;
+    font-weight: bold;
+    border-radius: 10px;
+}
+
+.page-block {
+    margin-top: 10px;
+    background-color: #383a42;
+    border-top: 1px solid #505359;
+    border-bottom: 1px solid #505359;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 0 20px 0 20px;
+    box-sizing: border-box;
+}
+
+.page-block input {
+    background-color: #2d2e34;
+}
+
+.page-list {
+    border-radius: 20px;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #4c4f54;
+}
+
+.page-list-item {
+    background-color: #35363d;
+    border-bottom: 1px solid #4c4f54;
+    padding: 7px 7px 7px 15px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+}
+
+.page-list-item p {
+    margin: 0;
+    font-size: 14px;
 }
