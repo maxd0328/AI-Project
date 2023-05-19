@@ -51,10 +51,10 @@ function parseStatement(stream, dest, annotations) {
 
     match(stream, 'operator<=>');
 
-    if(matchesLookAhead(stream, 'number')) {
-        let value = [parseFloat(match(stream, 'number').value)];
+    if(matchesLookAhead(stream, 'number') || matchesLookAhead(stream, 'empty')) {
+        let value = matches(stream, 'empty') ? [null] : [parseFloat(match(stream, 'number').value)];
         while(matches(stream, 'operator<,>'))
-            value.push(parseFloat(match(stream, 'number').value));
+            value.push(matches(stream, 'empty') ? null : parseFloat(match(stream, 'number').value));
 
         if(value.length === 1)
             value = value[0];

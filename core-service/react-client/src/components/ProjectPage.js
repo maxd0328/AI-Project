@@ -5,11 +5,11 @@ import '../Styles.css';
 import MenuBar from './MenuBar';
 import * as Controller from '../controllers/ProjectController';
 import * as GenController from '../controllers/GeneralController';
-import DetailsPage from './projectPages/DetailsPage';
-import ConfigurationPage from './projectPages/ConfigurationPage';
-import DatasetsPage from './projectPages/DatasetsPage';
-import TrainingPage from './projectPages/TrainingPage';
-import ResultsPage from './projectPages/ResultsPage';
+import DetailsTab from './projectPage/DetailsTab';
+import ConfigurationTab from './projectPage/ConfigurationTab';
+import DatasetsTab from './projectPage/DatasetsTab';
+import TrainingTab from './projectPage/TrainingTab';
+import ResultsTab from './projectPage/ResultsTab';
 
 const ProjectTab = (props) => {
     const location = useLocation();
@@ -30,11 +30,11 @@ const ProjectPage = () => {
     const navigate = useNavigate();
 
     const pages = useMemo(() => [
-        { hash: 'details', gen: () => <DetailsPage project={project} setProject={setProject} raiseError={setError.bind(null, true)}/> },
-        { hash: 'configuration', gen: () => <ConfigurationPage project={project}/> },
-        { hash: 'datasets', gen: () => <DatasetsPage/> },
-        { hash: 'training', gen: () => <TrainingPage/> },
-        { hash: 'results', gen: () => <ResultsPage/> }
+        { hash: 'details', gen: () => <DetailsTab project={project} setProject={setProject} raiseError={setError.bind(null, true)}/> },
+        { hash: 'configuration', gen: () => <ConfigurationTab project={project} setProject={setProject}/> },
+        { hash: 'datasets', gen: () => <DatasetsTab/> },
+        { hash: 'training', gen: () => <TrainingTab/> },
+        { hash: 'results', gen: () => <ResultsTab/> }
     ], [project]);
 
     const reload = useCallback(() => {

@@ -5,21 +5,37 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="654f3128-f368-43a2-bcb5-1fbb6ba99dec" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/core-service/react-client/src/components/projectPages/ConfigurationPage.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core-service/react-client/src/compiler/Decompiler.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core-service/react-client/src/components/PresetPage.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core-service/react-client/src/components/PresetPage.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core-service/react-client/src/components/projectPage/configurationTab/EasyStageBody.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core-service/react-client/src/components/projectPage/configurationTab/InlineStageBody.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core-service/react-client/src/components/projectPage/configurationTab/ScriptStageBody.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.local/db-init/init.sql" beforeDir="false" afterPath="$PROJECT_DIR$/.local/db-init/init.sql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bucket-service/code/controller.js" beforeDir="false" afterPath="$PROJECT_DIR$/bucket-service/code/controller.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bucket-service/code/routes.js" beforeDir="false" afterPath="$PROJECT_DIR$/bucket-service/code/routes.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/App.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/core-service/react-client/src/Styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/Styles.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/core-service/react-client/src/compiler/Compiler.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/compiler/Compiler.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/components/ProjectPage.css" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/components/ProjectPage.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/compiler/Definitions.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/compiler/Definitions.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/compiler/Parser.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/compiler/Parser.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/compiler/Tokenizer.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/compiler/Tokenizer.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/compiler/Validator.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/compiler/Validator.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/components/HomePage.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/components/HomePage.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/core-service/react-client/src/components/ProjectPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/components/ProjectPage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/components/projectPages/ConfigurationPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/components/projectPages/ConfigurationPage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/components/projectPages/Pages.css" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/components/projectPages/Pages.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/components/ScriptEditor.css" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/components/script/ScriptEditor.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/components/ScriptEditor.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/components/script/ScriptEditor.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/components/ScriptPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/components/ScriptPage.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/components/projectPages/ConfigurationPage.css" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/components/projectPage/ConfigurationTab.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/components/projectPages/ConfigurationPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/components/projectPage/ConfigurationTab.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/components/projectPages/DatasetsPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/components/projectPage/DatasetsTab.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/components/projectPages/DetailsPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/components/projectPage/DetailsTab.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/components/projectPages/Pages.css" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/components/projectPage/Tabs.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/components/projectPages/ResultsPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/components/projectPage/ResultsTab.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/components/projectPages/TrainingPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/components/projectPage/TrainingTab.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/controllers/GeneralController.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/controllers/GeneralController.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/core-service/react-client/src/controllers/HomeController.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/controllers/HomeController.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/core-service/react-client/src/controllers/ProjectController.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/controllers/ProjectController.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/controllers/ScriptController.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/controllers/ScriptController.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/code/controller.js" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/code/controller.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,7 +64,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.editor",
+    "settings.editor.selected.configurable": "database.data.csv.formats",
     "ts.external.directory.path": "C:\\Program Files\\JetBrains\\IntelliJ IDEA 2022.3.1\\plugins\\javascript-impl\\jsLanguageServicesImpl\\external",
     "vue.rearranger.settings.migration": "true"
   },
@@ -69,11 +85,11 @@
       <recent name="C:\Users\maxim\Documents\AI-Project\user-service" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\maxim\Documents\AI-Project\core-service\react-client\src\components" />
+      <recent name="C:\Users\maxim\Documents\AI-Project\core-service\react-client\src\components\projectPage\configurationTab" />
+      <recent name="C:\Users\maxim\Documents\AI-Project\core-service\react-client\src\components\scriptPage" />
       <recent name="C:\Users\maxim\Documents\AI-Project\core-service\public\styles" />
       <recent name="C:\Users\maxim\Documents\AI-Project\core-service\public\javascripts" />
-      <recent name="C:\Users\maxim\Documents\AI-Project\core-service\public\images" />
-      <recent name="C:\Users\maxim\Documents\AI-Project\core-service\react-client\src" />
-      <recent name="C:\Users\maxim\Documents\AI-Project\core-service" />
     </key>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
@@ -90,7 +106,8 @@
       <workItem from="1683467033220" duration="1593000" />
       <workItem from="1683715970572" duration="22209000" />
       <workItem from="1683753816358" duration="78736000" />
-      <workItem from="1684053939015" duration="81562000" />
+      <workItem from="1684053939015" duration="91196000" />
+      <workItem from="1684418652771" duration="34488000" />
     </task>
     <servers />
   </component>

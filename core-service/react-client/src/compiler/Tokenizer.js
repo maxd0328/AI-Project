@@ -43,9 +43,10 @@ function scanLine(line, startingIndex, lineNo, exportMessage) {
 
 function classifyToken(token) {
     let family;
-    if(new RegExp('^' + Definitions.toRegex(Definitions.KEYS) + '$').test(token.value)) family = 'key';
-    else if(new RegExp('^' + Definitions.toRegex(Definitions.ENUMS) + '$').test(token.value)) family = 'enum';
-    else if(new RegExp('^' + Definitions.toRegex(Definitions.ANNOTATIONS) + '$').test(token.value)) family = 'annotation';
+    if(new RegExp('^' + Definitions.getKeyRegex() + '$').test(token.value)) family = 'key';
+    else if(new RegExp('^' + Definitions.getEnumRegex() + '$').test(token.value)) family = 'enum';
+    else if(new RegExp('^' + Definitions.getAnnotationRegex() + '$').test(token.value)) family = 'annotation';
+    else if(/^empty$/.test(token.value)) family = 'empty';
     else if(/^[A-Za-z_][A-Za-z0-9_]*$/.test(token.value)) family = 'identifier';
     else if(/^[={},()]$/.test(token.value)) family = `operator<${token.value}>`;
     else if(/^-?(\d+\.?|\d*\.\d+)$/.test(token.value)) family = 'number';

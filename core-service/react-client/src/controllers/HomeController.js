@@ -7,13 +7,13 @@ export async function fetchProjects() {
     return await response.json();
 }
 
-export async function sendNewProject(name, type) {
+export async function sendNewProject(name, type, presetID) {
     const response = await fetch('/bucket/create-project', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ name, type })
+        body: JSON.stringify({ name, type, presetID })
     });
 
     if(!response.ok)

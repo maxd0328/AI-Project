@@ -2,9 +2,9 @@
 export function getProjectType(code) {
     switch(code) {
         case 'cnn':
-            return { name: 'Convolutional Neural Network', image: '/console/images/cnn.png' };
+            return { name: 'Convolutional Neural Network', image: '/console/images/cnn.png', defaultPreset: null };
         default:
-            return { name: 'Coming soon!', image: '/console/images/coming-soon.png' };
+            return { name: 'Coming soon!', image: '/console/images/coming-soon.png', defaultPreset: null };
     }
 }
 
