@@ -1,6 +1,5 @@
 
 export async function fetchScripts() {
-    return [{scriptID: 1, name: 'Hello'}, {scriptID: 2, name: 'Another'}];
     const response = await fetch('/bucket/fetch-scripts');
 
     if(!response.ok)

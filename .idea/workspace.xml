@@ -5,37 +5,28 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="654f3128-f368-43a2-bcb5-1fbb6ba99dec" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/core-service/react-client/src/compiler/Decompiler.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core-service/react-client/src/components/PresetPage.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core-service/react-client/src/components/PresetPage.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core-service/react-client/src/components/projectPage/configurationTab/EasyStageBody.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core-service/react-client/src/components/projectPage/configurationTab/InlineStageBody.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core-service/react-client/src/components/projectPage/configurationTab/ScriptStageBody.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.local/data-s3/.minio.sys/buckets/.bloomcycle.bin/xl.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.local/data-s3/.minio.sys/buckets/.bloomcycle.bin/xl.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.local/data-s3/.minio.sys/buckets/.usage-cache.bin/xl.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.local/data-s3/.minio.sys/buckets/.usage-cache.bin/xl.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.local/data-s3/.minio.sys/buckets/.usage.json/xl.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.local/data-s3/.minio.sys/buckets/.usage.json/xl.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.local/data-s3/.minio.sys/buckets/user-bucket/.metadata.bin/xl.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.local/data-s3/.minio.sys/buckets/user-bucket/.metadata.bin/xl.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.local/data-s3/.minio.sys/buckets/user-bucket/.usage-cache.bin/xl.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.local/data-s3/.minio.sys/buckets/user-bucket/.usage-cache.bin/xl.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.local/data-s3/.minio.sys/config/config.json/xl.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.local/data-s3/.minio.sys/config/config.json/xl.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.local/data-s3/.minio.sys/config/iam/format.json/xl.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.local/data-s3/.minio.sys/config/iam/format.json/xl.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.local/data-s3/.minio.sys/format.json" beforeDir="false" afterPath="$PROJECT_DIR$/.local/data-s3/.minio.sys/format.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.local/data-s3/.minio.sys/pool.bin/xl.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.local/data-s3/.minio.sys/pool.bin/xl.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.local/data-s3/user-bucket/script-1-1684086726307.matej/xl.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.local/data-s3/user-bucket/script-1-1684086799725.matej/xl.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.local/db-init/init.sql" beforeDir="false" afterPath="$PROJECT_DIR$/.local/db-init/init.sql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bucket-service/code/controller.js" beforeDir="false" afterPath="$PROJECT_DIR$/bucket-service/code/controller.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bucket-service/code/routes.js" beforeDir="false" afterPath="$PROJECT_DIR$/bucket-service/code/routes.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/App.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/Styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/Styles.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/compiler/Compiler.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/compiler/Compiler.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/compiler/Definitions.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/compiler/Definitions.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/compiler/Parser.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/compiler/Parser.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/compiler/Tokenizer.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/compiler/Tokenizer.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/compiler/Validator.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/compiler/Validator.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core-service/code/routes.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/code/routes.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/core-service/react-client/src/components/HomePage.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/components/HomePage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/components/ProjectPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/components/ProjectPage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/components/ScriptEditor.css" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/components/script/ScriptEditor.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/components/ScriptEditor.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/components/script/ScriptEditor.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/components/ScriptPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/components/ScriptPage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/components/projectPages/ConfigurationPage.css" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/components/projectPage/ConfigurationTab.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/components/projectPages/ConfigurationPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/components/projectPage/ConfigurationTab.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/components/projectPages/DatasetsPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/components/projectPage/DatasetsTab.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/components/projectPages/DetailsPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/components/projectPage/DetailsTab.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/components/projectPages/Pages.css" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/components/projectPage/Tabs.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/components/projectPages/ResultsPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/components/projectPage/ResultsTab.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/components/projectPages/TrainingPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/components/projectPage/TrainingTab.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/controllers/GeneralController.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/controllers/GeneralController.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/controllers/HomeController.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/controllers/HomeController.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/components/projectPage/ConfigurationTab.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/components/projectPage/ConfigurationTab.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/components/projectPage/configurationTab/EasyStageBody.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/components/projectPage/configurationTab/EasyStageBody.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/core-service/react-client/src/controllers/ProjectController.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/controllers/ProjectController.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/controllers/ScriptController.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/controllers/ScriptController.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core-service/react-client/src/controllers/SessionContext.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/react-client/src/controllers/SessionContext.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -107,7 +98,7 @@
       <workItem from="1683715970572" duration="22209000" />
       <workItem from="1683753816358" duration="78736000" />
       <workItem from="1684053939015" duration="91196000" />
-      <workItem from="1684418652771" duration="34488000" />
+      <workItem from="1684418652771" duration="39775000" />
     </task>
     <servers />
   </component>

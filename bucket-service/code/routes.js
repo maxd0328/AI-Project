@@ -205,6 +205,7 @@ router.get('/fetch-pipeline', async (req, res) => {
         res.status(200).json(stages);
     }
     catch(err) {
+        console.error(err);
         res.status(400).json({ error: 'Something went wrong' });
     }
 });

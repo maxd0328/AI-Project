@@ -1,6 +1,5 @@
 
 export async function fetchProject(projectID) {
-    return { projectID: 1, name: 'My Project', type: 'cnn', presetID: 1 };
     const response = await fetch(`/bucket/fetch-project?id=${projectID}`);
 
     if(!response.ok)
@@ -35,8 +34,6 @@ export async function sendDeleteProject(projectID) {
 }
 
 export async function fetchPresets() {
-    return [{presetID: 1, name: 'Image Recognition', description: 'An example description'},
-        {presetID: 2, name: 'Another One', description: 'Another example description'}];
     const response = await fetch('/bucket/fetch-presets');
 
     if(!response.ok)
@@ -45,7 +42,6 @@ export async function fetchPresets() {
 }
 
 export async function fetchPresetContent(presetID) {
-    return 'activation = RELU\n@show\nsafd = RELU\n@show\nlayer0 = {\n@show\ntype = 3\nactivation = RELU\n}';
     const response = await fetch(`/bucket/preset-content?id=${presetID}`);
 
     if(!response.ok)
@@ -54,7 +50,6 @@ export async function fetchPresetContent(presetID) {
 }
 
 export async function fetchStages(projectID) {
-    return [{ name: 'My Stage', type: 'ext', scriptID: null }];
     const response = await fetch(`/bucket/fetch-pipeline?id=${projectID}`);
 
     if(!response.ok)

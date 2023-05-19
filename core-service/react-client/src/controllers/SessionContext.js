@@ -6,13 +6,13 @@ export const SessionProvider = ({ children }) => {
     const [session, setSession] = useState(null);
     const [error, setError] = useState(null);
     useEffect(() => {
-        /*
+
         fetch('/user/session')
             .then(response => response.json())
             .then(data => setSession(data))
             .catch(error => setError(error.toString()));
-         */
-        setSession({ firstName: 'Max' });
+
+        // setSession({ firstName: 'Max' });
     }, []);
 
     if(error) {

@@ -134,6 +134,7 @@ const ConfigurationTab = ({ project, setProject }) => {
     const [stages, setStages] = useState([]);
     const [stageError, setStageError] = useState(false);
     const [saveError, setSaveError] = useState(false);
+    const [loadingStages, setLoadingStages] = useState(true);
     const stageKey = useRef(0); // Used simply for unique keys for each stage, allows it to persist its state after being moved
 
     // Reloads the preset list from the server
@@ -146,6 +147,9 @@ const ConfigurationTab = ({ project, setProject }) => {
 
     // Reloads the saved config pipeline and preset choice from the server
     const reloadConfig = useCallback(() => {
+        if(project.projectID === null || project.projectID === undefined)
+            return;
+        setLoadingStages(true);
         Controller.fetchStages(project.projectID).then(result => {
             for(let i = 0 ; i < result.length ; ++i)
                 result[i].key = stageKey.current++;
@@ -154,7 +158,11 @@ const ConfigurationTab = ({ project, setProject }) => {
             setStageError(false);
             setCurrentPresetID(project.presetID);
             setEdited(false);
-        }).catch(err => setStageError(true));
+            setLoadingStages(false);
+        }).catch(err => {
+            setStageError(true);
+            setLoadingStages(false);
+        });
     }, [project]);
 
     // When the component is first mounted, load the preset list
@@ -202,7 +210,6 @@ const ConfigurationTab = ({ project, setProject }) => {
             Controller.fetchPresetContent(currentPresetID).then(content => {
                 const { output } = compile(content);
                 const showContentOnly = decompile(output, false, true);
-                console.log(JSON.stringify(output, null, 2));
                 addStage({ name: 'Starter Configuration', type: 'gen', content: showContentOnly, key: stageKey.current++ });
             }).catch(err => setPresetError(true));
         }
@@ -291,17 +298,22 @@ const ConfigurationTab = ({ project, setProject }) => {
             ) : null }
 
             <h3 className="outer-element" style={{marginTop: 20 + 'px'}}>Pipeline</h3>
-            { stages.length === 0 ? (
-                <div style={{width: 100 + '%', textAlign: 'center'}}>
-                    <div className="row" style={{justifyContent: 'center', marginTop: 30 + 'px'}}>
-                        <button className="button green outer-element" style={{margin: 0}} disabled={currentPresetID === null} onClick={addStarterStage}>
-                            { currentPresetID === null ? 'Choose a preset first' : 'Create Starter Configuration' }
-                        </button>
-                    </div>
-                    <p>Or, if you've done this kind of thing before:</p>
+            { loadingStages ? (
+                <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', width: 100 + '%'}}>
+                    <p>Loading pipeline...</p>
                 </div>
-            ) : null }
-            { !stageError ? [
+            ) : !stageError ? [
+                stages.length === 0 ? (
+                    <div style={{width: 100 + '%', textAlign: 'center'}}>
+                        <div className="row" style={{justifyContent: 'center', marginTop: 30 + 'px'}}>
+                            <button className="button green outer-element" style={{margin: 0}} disabled={currentPresetID === null} onClick={addStarterStage}>
+                                { currentPresetID === null ? 'Choose a preset first' : 'Create Starter Configuration' }
+                            </button>
+                        </div>
+                        <p>Or, if you've done this kind of thing before:</p>
+                    </div>
+                ) : null,
+
                 <div className="outer-container" style={{width: 100 + '%', marginBottom: 0, paddingBottom: 0}} key={1}>
                     { stages.map((stage, index) => (
                         <PipelineStage stage={stage} set={updateStage.bind(null, index)} key={stage.key}
