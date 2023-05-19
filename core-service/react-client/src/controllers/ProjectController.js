@@ -45,6 +45,7 @@ export async function fetchPresets() {
 }
 
 export async function fetchPresetContent(presetID) {
+    return 'activation = RELU\n@show\nsafd = RELU\n@show\nlayer0 = {\n@show\ntype = 3\nactivation = RELU\n}';
     const response = await fetch(`/bucket/preset-content?id=${presetID}`);
 
     if(!response.ok)
@@ -61,13 +62,13 @@ export async function fetchStages(projectID) {
     return await response.json();
 }
 
-export async function saveStages(projectID, stages) {
+export async function saveStages(projectID, presetID, stages) {
     const response = await fetch('/bucket/save-pipeline', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ projectID, stages })
+        body: JSON.stringify({ projectID, presetID, stages })
     });
 
     if(!response.ok)

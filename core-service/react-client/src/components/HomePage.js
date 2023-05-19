@@ -11,15 +11,15 @@ import MenuBar from './MenuBar';
 const ProjectType = (props) => {
     const navigate = useNavigate();
 
-    const createProject = (name, type) => {
-        Controller.sendNewProject(name, type).then((projectID) => {
+    const createProject = (name, type, presetID) => {
+        Controller.sendNewProject(name, type, presetID).then((projectID) => {
             navigate(`/console/project?id=${projectID}`);
         }).catch((err) => { /* TODO */ });
     }
 
     const type = GenController.getProjectType(props.code);
     return (
-        <button className="project-type" disabled={!props.active} onClick={createProject.bind(null, 'New Project', props.code)}>
+        <button className="project-type" disabled={!props.active} onClick={createProject.bind(null, 'New Project', props.code, type.defaultPreset)}>
             <img src={type.image} alt={type.image}/>
             <p>{type.name}</p>
         </button>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
-import ScriptEditor from './ScriptEditor';
+import ScriptEditor from './script/ScriptEditor';
 import './ScriptPage.css';
 import '../Styles.css';
 import '../controllers/ScriptController';

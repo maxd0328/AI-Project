@@ -4,8 +4,8 @@ import './ScriptEditor.css';
 import ace from 'ace-builds';
 import 'ace-builds/src-noconflict/theme-dracula';
 import 'ace-builds/src-noconflict/ext-language_tools';
-import * as Definitions from '../compiler/Definitions';
-import compile from "../compiler/Compiler";
+import * as Definitions from '../../compiler/Definitions';
+import compile from '../../compiler/Compiler';
 
 // This only defines high-level behaviour of the Mode like folding etc.
 ace.define('ace/mode/custom', ['require', 'exports', 'ace/lib/oop', 'ace/mode/text', 'ace/mode/custom_highlight_rules'], (acequire, exports) => {
@@ -40,8 +40,9 @@ ace.define('ace/mode/custom_highlight_rules', ['require', 'exports', 'ace/lib/oo
         this.$rules = {
             start: [
                 { token: 'annotation', regex: /(?:^|\s)@[A-Za-z_][A-Za-z0-9_]*\b/ },
-                { token: 'field', regex: '\\b' + Definitions.toRegex(Definitions.KEYS) + '\\b' },
-                { token: 'enum', regex: '\\b' + Definitions.toRegex(Definitions.ENUMS) + '\\b' },
+                { token: 'field', regex: '\\b' + Definitions.getKeyRegex() + '\\b' },
+                { token: 'enum', regex: '\\b' + Definitions.getEnumRegex() + '\\b' },
+                { token: 'empty', regex: '\\b(empty)\\b' },
                 { token: 'identifier', regex: '\\b[A-Za-z_][A-Za-z0-9_]*\\b' },
                 { token: 'operator', regex: '[=\\{\\},\\(\\)]' },
                 { token: 'numeric', regex: '(?<![A-Za-z0-9.])[-]?(\\d+\\.?|\\d*\\.\\d+)(?![A-Za-z0-9.])' },
@@ -112,7 +113,7 @@ const ScriptEditor = (props) => {
 
     /* Update parent component with changed content */
     const handleChange = (event) => {
-        props.callback(event);
+        if(props.callback) props.callback(event);
     };
 
     /* Set cursor position in editor (called by annotation console when clicking on a warning) */
@@ -135,21 +136,22 @@ const ScriptEditor = (props) => {
                 theme="dracula"
                 className="ace-matej"
                 fontSize={14}
-                width="70%"
+                width={props.callback ? '70%' : '100%'}
                 height="100%"
                 editorProps={{ $blockScrolling: true, wrapEnabled: true }}
                 value={props.children}
                 onChange={handleChange}
+                readOnly={!props.callback}
                 ref={aceEditor}
             />
-            <div className="script-console">
+            { props.callback ? <div className="script-console">
                 <h1>{annotationQty} Compiler Message{annotationQty !== 1 ? 's' : ''}</h1>
                 <h2 style={notificationQty > 0 ? {color: '#80b8ff'} : {}}>{notificationQty} Notification{notificationQty !== 1 ? 's' : ''}</h2>
                 <h2 style={warningQty > 0 ? {color: '#ffff33'} : {}}>{warningQty} Warning{warningQty !== 1 ? 's' : ''}</h2>
                 <div className="script-annotation-container">
                     { annotations.map((annotation, index) => <ScriptAnnotation key={index} annotation={annotation} select={selectInEditor} />) }
                 </div>
-            </div>
+            </div> : null }
         </div>
     );
 };

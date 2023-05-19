@@ -1,7 +1,7 @@
 import React from 'react';
-import './Pages.css';
+import './Tabs.css';
 
-const DatasetsPage = () => {
+const DatasetsTab = () => {
     return (
         <div className="page">
             <h1 className="outer-element">Datasets</h1>
@@ -9,4 +9,4 @@ const DatasetsPage = () => {
     );
 };
 
-export default DatasetsPage;
+export default DatasetsTab;

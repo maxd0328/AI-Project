@@ -2,15 +2,22 @@ import tokenize from './Tokenizer';
 import parse from './Parser';
 import validate from './Validator';
 
-function compile(source) {
+export function matejScriptType(value) {
+    if(value === null) return 'empty';
+    if(Array.isArray(value)) return 'array';
+    if(typeof value === 'number') return 'number';
+    if(typeof value === 'string') return 'enum';
+    if(typeof value === 'object') return 'layer';
+    return 'error';
+}
+
+export function compile(source) {
     const annotations = [];
     const exportMessage = message => annotations.push(message);
 
     const tokens = tokenize(source, exportMessage);
     const output = parse(tokens, exportMessage);
     validate(output, exportMessage);
-
-    console.log(JSON.stringify(output, null, 2));
 
     return { output, annotations };
 }

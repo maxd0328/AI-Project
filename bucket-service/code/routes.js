@@ -101,9 +101,10 @@ router.post('/create-project', async (req, res) => {
     if(!ensureLoggedIn(req, res)) return;
     const name = req.body['name'];
     const type = req.body['type'];
+    const presetID = req.body['presetID'];
 
     try {
-        const projectID = await controller.createProject(req.session.userID, name, type);
+        const projectID = await controller.createProject(req.session.userID, name, type, presetID);
         res.status(201).json({ projectID });
     }
     catch(err) {
@@ -212,10 +213,11 @@ router.get('/fetch-pipeline', async (req, res) => {
 router.post('/save-pipeline', async (req, res) => {
     if(!ensureLoggedIn(req, res)) return;
     const projectID = req.body['projectID'];
+    const presetID = req.body['presetID'];
     const stages = req.body['stages'];
 
     try {
-        await controller.saveConfigStages(req.session.userID, projectID, stages);
+        await controller.saveConfigStages(req.session.userID, projectID, presetID, stages);
         res.status(204).json();
     }
     catch(err) {

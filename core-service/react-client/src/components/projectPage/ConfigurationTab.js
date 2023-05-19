@@ -1,13 +1,23 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import * as Controller from '../../controllers/ProjectController';
-import * as ScriptController from '../../controllers/ScriptController';
-import './Pages.css';
+import ScriptStageBody from './configurationTab/ScriptStageBody';
+import InlineStageBody from './configurationTab/InlineStageBody';
+import EasyStageBody from './configurationTab/EasyStageBody';
+import compile from '../../compiler/Compiler';
+import decompile from '../../compiler/Decompiler';
+import './Tabs.css';
 import '../../Styles.css';
-import './ConfigurationPage.css';
+import './ConfigurationTab.css';
 
-const nothingFound = () => <p style={{width: 100 + '%', height: 100 + '%', textAlign: 'center'}}>No results found.</p>;
+const nothingFound = () => (<p style={{width: 100 + '%', height: 100 + '%', textAlign: 'center'}}>No results found.</p>);
 
+/* Represents a list item in the list of presets */
 const ConfigurationPreset = ({ preset, apply }) => {
+    const openPresetPage = useCallback(() => {
+        const url = preset ? `/console/presets?id=${preset.presetID}` : '/console/presets';
+        window.open(new URL(url, window.location.origin).href, '_blank');
+    }, [preset]);
+
     return (
         <div className="page-list-item">
             <div style={{flexGrow: 1}}>
@@ -15,27 +25,19 @@ const ConfigurationPreset = ({ preset, apply }) => {
                 <p style={{fontSize: 12 + 'px'}}>{preset.description}</p>
             </div>
             <button className="image-button text-button" onClick={apply.bind(null, preset)}>Use</button>
-            <button className="image-button text-button">View</button>
+            <button className="image-button text-button" onClick={openPresetPage}>View</button>
         </div>
     )
 };
 
-const ScriptOption = ({ script, apply }) => {
-    return (
-        <div className="page-list-item" style={{alignItems: 'center'}}>
-            <p style={{flexGrow: 1, marginBottom: 5 + 'px', color: '#eee'}}><b>{script.name}</b></p>
-            <button className="image-button text-button" onClick={apply.bind(null, script)}>Use</button>
-            <button className="image-button text-button">Open</button>
-        </div>
-    );
-};
-
-const PipelineStage = ({ stage, set, remove, swap, bar }) => {
+/* Represents a single pipeline stage, including the header */
+const PipelineStage = ({ stage, set, remove, swap }) => {
     const [expanded, setExpanded] = useState(false);
     const [editingName, setEditingName] = useState(false);
     const [provisionalName, setProvisionalName] = useState('');
     const editNameField = useRef(null);
 
+    // When clicking edit name, focus the text field and set the initial text equal to the current name
     useEffect(() => {
         if(editingName) {
             editNameField.current.focus();
@@ -43,23 +45,27 @@ const PipelineStage = ({ stage, set, remove, swap, bar }) => {
         }
     }, [editingName, stage]);
 
+    // Handler functions
     const toggleExpanded = () => setExpanded(expanded => !expanded);
 
     const editName = () => setEditingName(true);
 
     const saveName = () => {
         setEditingName(false);
-        stage.name = provisionalName;
-        set(stage);
+        set({ // Apply changes to parent (this component holds no permanent state)
+            ...stage,
+            name: provisionalName
+        });
     }
 
     const cancelName = () => setEditingName(false);
 
     const updateProvisionalName = (event) => setProvisionalName(event.target.value);
 
+    // Render the pipeline stage, including the line underneath it if 'bar' is set to true (which is the case when it's not the last element)
     return [
         <div className="pipeline-stage" key={1}>
-            { !editingName ? (
+            { !editingName ? ( // When not editing the name
                 <div className="pipeline-header">
                     <button className="image-button" style={{width: 20 + 'px', height: 20 + 'px', marginRight: 5 + 'px',
                         transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)'}} onClick={toggleExpanded}>
@@ -81,7 +87,7 @@ const PipelineStage = ({ stage, set, remove, swap, bar }) => {
                         <img src="/console/images/delete.png" alt="/console/images/delete.png" style={{width: 70 + '%', height: 70 + '%'}}/>
                     </button>
                 </div>
-            ) : (
+            ) : ( // When editing the name
                 <div className="pipeline-header">
                     <button className="image-button" style={{width: 20 + 'px', height: 20 + 'px', marginRight: 10 + 'px',
                         transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)'}} onClick={toggleExpanded}>
@@ -94,98 +100,43 @@ const PipelineStage = ({ stage, set, remove, swap, bar }) => {
                 </div>
             ) }
 
-            { expanded ? (
+            { expanded ? ( // If it's expanded, render the body based on the type of stage
                 <div className="pipeline-container">
                     { stage.type === 'ext' ? (
                         <ScriptStageBody stage={stage} set={set} />
                     ) : stage.type === 'int' ? (
-                        null
+                        <InlineStageBody stage={stage} set={set} />
                     ) : stage.type === 'gen' ? (
-                        null
+                        <EasyStageBody stage={stage} set={set} />
                     ) : null }
                 </div>
             ) : null }
         </div>,
-        bar ? (
-            <div className="vertical-line-container" key={2}>
-                <div className="vertical-line"/>
-            </div>
-        ) : null
-    ];
-}
-
-const ScriptStageBody = ({ stage, set }) => {
-    const [showSearchScripts, setShowSearchScripts] = useState(false);
-    const [searchScripts, setSearchScripts] = useState('');
-    const [scripts, setScripts] = useState([]);
-    const [scriptError, setScriptError] = useState(false);
-
-    const reload = useCallback(() => {
-        ScriptController.fetchScripts().then(result => {
-            setScripts(result);
-            setScriptError(false);
-        }).catch(err => setScriptError(true));
-    }, []);
-
-    useEffect(() => reload(), [reload]);
-
-    const getScript = (scriptID) => {
-        const script = scripts.find(e => e.scriptID === scriptID);
-        return script ? script : { scriptID, name: '' };
-    };
-
-    const toggleShowSearchScripts = () => setShowSearchScripts(showSearchScripts => !showSearchScripts);
-
-    const updateSearchScripts = (event) => setSearchScripts(event.target.value);
-
-    const updateSelectedScript = (script) => {
-        stage.scriptID = script.scriptID;
-        set(stage);
-    }
-
-    const filteredScripts = scripts.filter(script => script.name.toLowerCase().includes(searchScripts.trim().toLowerCase()));
-    return (
-        <div>
-            <div style={{display: 'flex', flexDirection: 'row', marginBottom: 10 + 'px'}}>
-                <p style={{margin: '0 5px 0 0'}}>{stage.scriptID === null ? 'No script selected' : getScript(stage.scriptID).name}</p>
-                <button className="image-button" style={{width: 20 + 'px', height: 20 + 'px',
-                        transform: showSearchScripts ? 'rotate(180deg)' : 'rotate(0deg)'}} onClick={toggleShowSearchScripts}>
-                    <img src="/console/images/arrow.png" alt="/console/images/arrow.png" style={{width: 70 + '%', height: 70 + '%'}}/>
-                </button>
-            </div>
-
-            { showSearchScripts ? !scriptError ? (
-                <div style={{display: 'flex', flexDirection: 'column'}}>
-                    <p style={{marginTop: 10 + 'px', marginBottom: 5 + 'px', color: '#eee'}}><b>Search Scripts</b></p>
-                    <input type="text" placeholder="Search" className="text-field" value={searchScripts} onChange={updateSearchScripts}/>
-                    <div className="page-list" style={{marginTop: 5 + 'px', marginBottom: 10 + 'px', maxHeight: 200 + 'px'}}>
-                        { filteredScripts.length === 0 ? nothingFound()
-                            : filteredScripts.map((script, index) =>
-                                <ScriptOption key={index} script={script} apply={updateSelectedScript} />) }
-                    </div>
-                </div>
-            ) : (
-                <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-                    <p style={{marginTop: 5 + 'px', marginBottom: 10 + 'px'}}>Something went wrong. Please try again later.</p>
-                    <button className="button blue" onClick={reload} style={{marginBottom: 5 + 'px'}}>Reload</button>
-                </div>
-            ) : null }
+        <div className="vertical-line-container" key={2}>
+            <div className="vertical-line"/>
         </div>
-    );
+    ];
 };
 
-const ConfigurationPage = ({project}) => {
+/* Represents the entire configuration tab */
+const ConfigurationTab = ({ project, setProject }) => {
+    // State to store whether an edit has been made (enable the save button)
+    const [edited, setEdited] = useState(false);
+
+    // Preset related states
     const [showSearchPresets, setShowSearchPresets] = useState(false);
     const [searchPresets, setSearchPresets] = useState('');
     const [presets, setPresets] = useState([]);
-    const [currentPresetID, setCurrentPresetID] = useState(null);
+    const [currentPresetID, setCurrentPresetID] = useState(null); // Provisional, not final
     const [presetError, setPresetError] = useState(false);
 
+    // Stage related states
     const [stages, setStages] = useState([]);
     const [stageError, setStageError] = useState(false);
     const [saveError, setSaveError] = useState(false);
-    const stageKey = useRef(0);
+    const stageKey = useRef(0); // Used simply for unique keys for each stage, allows it to persist its state after being moved
 
+    // Reloads the preset list from the server
     const reloadPresets = useCallback(() => {
         Controller.fetchPresets().then(result => {
             setPresets(result);
@@ -193,46 +144,78 @@ const ConfigurationPage = ({project}) => {
         }).catch(err => setPresetError(true));
     }, []);
 
-    const reloadStages = useCallback(() => {
+    // Reloads the saved config pipeline and preset choice from the server
+    const reloadConfig = useCallback(() => {
         Controller.fetchStages(project.projectID).then(result => {
             for(let i = 0 ; i < result.length ; ++i)
-                result[i].key = stageKey.current += 2;
+                result[i].key = stageKey.current++;
 
             setStages(result);
             setStageError(false);
+            setCurrentPresetID(project.presetID);
+            setEdited(false);
         }).catch(err => setStageError(true));
     }, [project]);
 
-    useEffect(() => {
-        reloadPresets();
-        reloadStages();
-        setCurrentPresetID(project.presetID);
-    }, [reloadPresets, reloadStages, project]);
+    // When the component is first mounted, load the preset list
+    useEffect(() => reloadPresets(), [reloadPresets]);
 
+    // Whenever a change is made to the project (including init), reload the configuration
+    useEffect(() => reloadConfig(), [reloadConfig]);
+
+    // Fetch preset from preset list given the presetID
     const getPreset = (presetID) => {
         const preset = presets.find(e => e.presetID === presetID);
         return preset ? preset : { presetID, name: '', description: '' };
     };
 
+    // Handler functions
     const toggleShowSearchPresets = () => setShowSearchPresets(showSearchPresets => !showSearchPresets);
 
     const updateSearchPresets = (event) => setSearchPresets(event.target.value);
 
-    const updateCurrentPreset = (preset) => setCurrentPresetID(preset.presetID);
+    const updateCurrentPreset = (preset) => {
+        setCurrentPresetID(preset.presetID);
+        setEdited(true);
+    };
 
-    const deleteCurrentPreset = () => setCurrentPresetID(null);
+    const deleteCurrentPreset = () => {
+        setCurrentPresetID(null);
+        setEdited(true);
+    };
 
-    const addScriptStage = (stage) => setStages(stages => {
-        const newStages = [...stages];
-        newStages.push({ name: 'New Stage', type: 'ext', scriptID: null, key: stageKey.current += 2 });
-        return newStages;
-    });
+    const addStage = (stage) => {
+        setStages(stages => {
+            const newStages = [...stages];
+            newStages.push(stage);
+            return newStages;
+        });
+        setEdited(true);
+    };
 
-    const updateStage = (index, stage) => setStages(stages => {
-        const newStages = [...stages];
-        newStages[index] = stage;
-        return newStages;
-    });
+    const addEasyStage = addStage.bind(null, { name: 'New Stage', type: 'gen', content: '', key: stageKey.current++ });
+    const addInlineStage = addStage.bind(null, { name: 'New Stage', type: 'int', content: '\n# Write your script here\n', key: stageKey.current++ });
+    const addScriptStage = addStage.bind(null, { name: 'New Stage', type: 'ext', scriptID: null, key: stageKey.current++ });
+
+    const addStarterStage = () => {
+        if(currentPresetID !== null) {
+            Controller.fetchPresetContent(currentPresetID).then(content => {
+                const { output } = compile(content);
+                const showContentOnly = decompile(output, false, true);
+                console.log(JSON.stringify(output, null, 2));
+                addStage({ name: 'Starter Configuration', type: 'gen', content: showContentOnly, key: stageKey.current++ });
+            }).catch(err => setPresetError(true));
+        }
+    };
+
+    const updateStage = (index, stage) => {
+        setStages(stages => {
+            const newStages = [...stages];
+            newStages[index] = stage;
+            return newStages;
+        });
+        setEdited(true);
+    };
 
     const swapStage = (index, offset) => {
         if(index + offset < 0 || index + offset >= stages.length)
@@ -244,21 +227,33 @@ const ConfigurationPage = ({project}) => {
             newStages[index + offset] = current;
             return newStages;
         });
+        setEdited(true);
     };
 
-    const deleteStage = (index) => setStages(stages => {
-        const newStages = [...stages];
-        newStages.splice(index, 1);
-        return newStages;
-    });
+    const deleteStage = (index) => {
+        setStages(stages => {
+            const newStages = [...stages];
+            newStages.splice(index, 1);
+            return newStages;
+        });
+        setEdited(true);
+    };
 
-    const cancelConfig = () => window.location.hash = 'details';
+    const cancelConfig = () => reloadConfig();
 
     const saveConfig = () => {
-        Controller.saveStages(project.projectID, stages)
-            .catch(err => setSaveError(true));
+        // Create a copy of the stages without the key property (because it's only used in the React app)
+        const outStages = stages.map(e => {
+            const { key, ...rest } = e;
+            return rest;
+        });
+        Controller.saveStages(project.projectID, currentPresetID, outStages).then(() => {
+            setProject({ ...project, presetID: currentPresetID });
+            setEdited(false);
+        }).catch(err => setSaveError(true));
     };
 
+    // Render the configuration tab
     const filteredPresets = presets.filter(preset => preset.name.toLowerCase().includes(searchPresets.trim().toLowerCase()));
     return (
         <div className="page">
@@ -296,17 +291,30 @@ const ConfigurationPage = ({project}) => {
             ) : null }
 
             <h3 className="outer-element" style={{marginTop: 20 + 'px'}}>Pipeline</h3>
+            { stages.length === 0 ? (
+                <div style={{width: 100 + '%', textAlign: 'center'}}>
+                    <div className="row" style={{justifyContent: 'center', marginTop: 30 + 'px'}}>
+                        <button className="button green outer-element" style={{margin: 0}} disabled={currentPresetID === null} onClick={addStarterStage}>
+                            { currentPresetID === null ? 'Choose a preset first' : 'Create Starter Configuration' }
+                        </button>
+                    </div>
+                    <p>Or, if you've done this kind of thing before:</p>
+                </div>
+            ) : null }
             { !stageError ? [
-                <div className="outer-container" style={{width: 100 + '%', marginBottom: 10 + 'px'}} key={1}>
+                <div className="outer-container" style={{width: 100 + '%', marginBottom: 0, paddingBottom: 0}} key={1}>
                     { stages.map((stage, index) => (
                         <PipelineStage stage={stage} set={updateStage.bind(null, index)} key={stage.key}
-                                       remove={deleteStage.bind(null, index)} swap={swapStage.bind(null, index)}
-                                       bar={index < stages.length - 1} />
+                                       remove={deleteStage.bind(null, index)} swap={swapStage.bind(null, index)} />
                     )) }
                 </div>,
 
-                <div className="row" style={{justifyContent: 'center', marginBottom: 20 + 'px'}} key={2}>
-                    <button className="button blue" onClick={addScriptStage}>Add Script Stage</button>
+                <div className="row" style={{justifyContent: 'center', marginTop: 0}} key={2}>
+                    <div className="add-stage-container">
+                        <button className="button blue" onClick={addEasyStage}>Add Easy Stage</button>
+                        <button className="button blue" onClick={addInlineStage}>Add Inline Stage</button>
+                        <button className="button blue" onClick={addScriptStage}>Add Script Stage</button>
+                    </div>
                 </div>,
 
                 <div style={{flexGrow: 1}} key={3}/>,
@@ -315,16 +323,16 @@ const ConfigurationPage = ({project}) => {
                         <p style={{color: '#f44', margin: 0, marginRight: 10 + 'px'}}>Save failed. Please try again later.</p>
                     ) : null }
                     <button className="button red" onClick={cancelConfig}>Cancel</button>
-                    <button className="button green" onClick={saveConfig}>Save</button>
+                    <button className="button green" onClick={saveConfig} disabled={!edited}>Save</button>
                 </div>
             ] : (
                 <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', width: 100 + '%'}}>
                     <p style={{marginBottom: 10 + 'px'}}>Something went wrong, please try again later.</p>
-                    <button className="button blue" style={{marginBottom: 10 + 'px'}} onClick={reloadStages}>Reload</button>
+                    <button className="button blue" style={{marginBottom: 10 + 'px'}} onClick={reloadConfig}>Reload</button>
                 </div>
             ) }
         </div>
     );
 };
 
-export default ConfigurationPage;
+export default ConfigurationTab;

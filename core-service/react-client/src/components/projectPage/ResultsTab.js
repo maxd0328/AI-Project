@@ -1,7 +1,7 @@
 import React from 'react';
-import './Pages.css';
+import './Tabs.css';
 
-const ResultsPage = () => {
+const ResultsTab = () => {
     return (
         <div className="page">
             <h1 className="outer-element">Results</h1>
@@ -9,4 +9,4 @@ const ResultsPage = () => {
     );
 };
 
-export default ResultsPage;
+export default ResultsTab;

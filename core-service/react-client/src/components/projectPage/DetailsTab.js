@@ -2,10 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 import * as GenController from '../../controllers/GeneralController';
 import * as Controller from '../../controllers/ProjectController';
-import './Pages.css';
+import './Tabs.css';
 import '../../Styles.css';
 
-const DetailsPage = (props) => {
+const DetailsTab = (props) => {
     const [editName, setEditName] = useState(false);
     const [provisionalName, setProvisionalName] = useState('');
 
@@ -75,4 +75,4 @@ const DetailsPage = (props) => {
     );
 };
 
-export default DetailsPage;
+export default DetailsTab;

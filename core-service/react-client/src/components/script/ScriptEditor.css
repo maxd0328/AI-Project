@@ -9,6 +9,10 @@
     color: orange;
 }
 
+.ace-matej .ace_empty {
+    color: #cc99cc;
+}
+
 .ace-matej .ace_enum {
     color: #cc99cc;
     font-weight: bold;
