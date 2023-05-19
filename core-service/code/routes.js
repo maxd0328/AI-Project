@@ -36,5 +36,7 @@ function serveApp(req, res, next) {
 }
 router.get('/console/home', serveApp);
 router.get('/console/scripts', serveApp);
+router.get('/console/project', serveApp);
+router.get('/console/presets', serveApp);
 
 module.exports = router;

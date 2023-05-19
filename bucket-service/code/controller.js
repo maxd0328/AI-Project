@@ -5,7 +5,7 @@ const genS3ScriptKey = (userID, scriptID) => `script-${userID}-${scriptID}.matej
 
 const genS3PresetKey = (presetID) => `preset-${presetID}.matej`;
 
-const genS3InternalConfigKey = (projectID, index) => `config-${projectID}-${index}.matej`;
+const genS3InternalConfigKey = (projectID, location) => `config-${projectID}-${location}.matej`;
 
 async function createScript(userID, name, content) {
     // Use a transaction to ensure that the database and s3 bucket are updated before committing
@@ -123,7 +123,7 @@ async function getProjects(userID) {
 }
 
 async function getProject(userID, projectID) {
-    const query = `SELECT name, type FROM projects WHERE userID = ? AND projectID = ?`;
+    const query = `SELECT name, type, lastModified, presetID FROM projects WHERE userID = ? AND projectID = ?`;
     const values = [userID, projectID];
 
     const [rows] = await db.query(query, values);
@@ -168,11 +168,11 @@ async function getConfigStages(userID, projectID) {
     if(!await projectExists(userID, projectID))
         throw new Error('No such project exists');
 
-    // Do a big query to get all the matching rows of the config table; order by index so the stages are received in order
-    const query = `SELECT c.configID, c.name, c.type, c.scriptID FROM configs c 
+    // Do a big query to get all the matching rows of the config table; order by location so the stages are received in order
+    const query = `SELECT c.name, c.type, c.scriptID FROM configs c 
                     INNER JOIN projects p ON p.projectID = c.projectID
                     WHERE c.projectID = ? AND p.userID = ?
-                    ORDER BY c.index ASC`;
+                    ORDER BY c.location ASC`;
     const values = [projectID, userID];
 
     const [rows] = await db.query(query, values);
@@ -197,13 +197,13 @@ async function saveConfigStages(userID, projectID, presetID, stages) {
         throw new Error('No such project exists');
 
     // Create a snapshot of the S3 entries in case transaction fails
-    let query = `SELECT index FROM configs WHERE projectID = ?`;
+    let query = `SELECT location FROM configs WHERE projectID = ?`;
     let values = [projectID];
 
     const [rows] = await db.query(query, values);
     let snapshot = [];
     for(let i = 0 ; i < rows.length ; ++i) {
-        const key = genS3InternalConfigKey(projectID, rows[i].index); // Snapshot contains key and associated content
+        const key = genS3InternalConfigKey(projectID, rows[i].location); // Snapshot contains key and associated content
         snapshot.push({ key, content: await s3.getResource(process.env.S3_USER_BUCKET, key) });
     }
 
@@ -220,7 +220,7 @@ async function saveConfigStages(userID, projectID, presetID, stages) {
 
         // For every stage received from the client, re-insert it
         for(let i = 0 ; i < stages.length ; ++i) {
-            query = `INSERT INTO configs (projectID, name, index, type, scriptID) VALUES (?, ?, ?, ?, ?)`;
+            query = `INSERT INTO configs (projectID, location, name, type, scriptID) VALUES (?, ?, ?, ?, ?)`;
             values = [projectID, i, stages[i].name, stages[i].type, stages[i].scriptID !== undefined ? stages[i].scriptID : null];
 
             await connection.query(query, values);

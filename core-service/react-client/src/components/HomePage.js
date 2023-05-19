@@ -65,7 +65,9 @@ const HomePage = () => {
     const [scripts, setScripts] = useState([]);
     const [searchProjects, setSearchProjects] = useState('');
     const [errorProjects, setErrorProjects] = useState(false);
+    const [loadingProjects, setLoadingProjects] = useState(true);
     const [errorScripts, setErrorScripts] = useState(false);
+    const [loadingScripts, setLoadingScripts] = useState(true);
     const [logoutError, setLogoutError] = useState(false);
 
     const navigate = useNavigate();
@@ -81,19 +83,29 @@ const HomePage = () => {
     useEffect(() => { window.location.hash = ''; }, [location]);
 
     const reloadProjects = () => {
+        setLoadingProjects(true);
         Controller.fetchProjects().then(projects => {
             setProjects(projects);
             setErrorProjects(false);
-        }).catch(err => setErrorProjects(true));
+            setLoadingProjects(false);
+        }).catch(err => {
+            setErrorProjects(true);
+            setLoadingProjects(false);
+        });
     };
 
     const reloadScripts = () => {
+        setLoadingScripts(true);
         ScriptController.fetchScripts().then(scripts => {
             if(scripts.length > scriptMax)
                 setScripts(scripts.slice(0, scriptMax));
             else setScripts(scripts);
             setErrorScripts(false);
-        }).catch(err => setErrorScripts(true));
+            setLoadingScripts(false);
+        }).catch(err => {
+            setErrorScripts(true);
+            setLoadingScripts(false);
+        });
     };
 
     const updateSearchProjects = (event) => {
@@ -117,6 +129,12 @@ const HomePage = () => {
     };
 
     const renderProjects = () => {
+        if(loadingProjects) return (
+            <div style={{textAlign: 'center'}}>
+                <p>Loading projects...</p>
+            </div>
+        );
+
         if(errorProjects) return (
             <div style={{textAlign: 'center'}}>
                 <p>Something went wrong, please try again later.</p>
@@ -143,6 +161,12 @@ const HomePage = () => {
     };
 
     const renderScripts = () => {
+        if(loadingScripts) return (
+            <div style={{textAlign: 'center'}}>
+                <p>Loading scripts...</p>
+            </div>
+        );
+
         if(errorScripts) return (
             <div style={{textAlign: 'center'}}>
                 <p>Something went wrong, please try again later.</p>
