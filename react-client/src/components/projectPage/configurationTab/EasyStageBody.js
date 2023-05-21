@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import '../Tabs.css';
-import '../ConfigurationTab.css';
-import { compile, matejScriptType } from '../../../compiler/Compiler';
-import decompile from '../../../compiler/Decompiler';
-import { KEYS } from '../../../compiler/Definitions';
+import 'components/projectPage/Tabs.css';
+import 'components/projectPage/ConfigurationTab.css';
+import { compile, matejScriptType } from 'compiler/Compiler';
+import decompile from 'compiler/Decompiler';
+import { KEYS } from 'compiler/Definitions';
 
 /* Converts from that key's MatejScript type to the UIs internal representation */
 const computeValueType = (key) => {

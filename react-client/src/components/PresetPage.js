@@ -1,9 +1,9 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import {useSearchParams} from 'react-router-dom';
-import ScriptEditor from './script/ScriptEditor';
+import ScriptEditor from 'components/script/ScriptEditor';
 import './PresetPage.css';
 import MenuBar from './MenuBar';
-import * as ProjectController from '../controllers/ProjectController';
+import * as ProjectController from 'controllers/ProjectController';
 
 const PresetPage = () => {
     // Set up states

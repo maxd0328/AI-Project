@@ -1,11 +1,10 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import '../Styles.css';
 import './HomePage.css';
-import { SessionContext } from '../controllers/SessionContext';
-import * as GenController from '../controllers/GeneralController';
-import * as Controller from '../controllers/HomeController';
-import * as ScriptController from '../controllers/ScriptController';
+import { SessionContext } from 'controllers/SessionContext';
+import * as GenController from 'controllers/GeneralController';
+import * as Controller from 'controllers/HomeController';
+import * as ScriptController from 'controllers/ScriptController';
 import MenuBar from './MenuBar';
 
 const ProjectType = (props) => {

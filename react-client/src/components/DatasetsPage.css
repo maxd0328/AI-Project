@@ -1,0 +1,103 @@
+
+.datasets-page {
+    flex: 1;
+    color: white;
+    box-sizing: border-box;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #23272f;
+}
+
+.datasets-container {
+    margin: 50px 12vw 0 12vw;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+}
+
+.datasets-sidebar {
+    background-color: #383a42;
+    color: #eee;
+    border-left: 1px solid #505359;
+    border-right: 1px solid #505359;
+    width: 25%;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.datasets-sidebar h2 {
+    margin: 5px 0 5px 0;
+}
+
+.datasets-primary {
+    background-color: #2d2e34;
+    border-right: 1px solid #505359;
+    width: 75%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.data-label-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.data-label-item {
+    flex: 0 0 auto;
+    background-color: #383a42;
+    border: 1px solid #505359;
+    border-radius: 15px;
+    padding: 10px;
+    text-align: center;
+    margin: 5px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.data-label-item p {
+    margin: 0;
+}
+
+.data-label-item button {
+    margin-left: 5px;
+}
+
+.datasets-file {
+    background-color: #383a42;
+    border-top: 1px solid #505359;
+    border-left: 1px solid #505359;
+    border-right: 1px solid #505359;
+    padding: 10px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.datasets-file:last-child {
+    border-bottom: 1px solid #505359;
+}
+
+.datasets-file p {
+    margin: 0 5px 0 0;
+}
+
+.datasets-save-block {
+    background-color: #26272c;
+    border-top: 1px solid #3d3f46;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    padding: 10px;
+}
+
+.datasets-sidebar input, .data-label-item input {
+    background-color: #2d2e34;
+}

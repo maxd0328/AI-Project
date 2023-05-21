@@ -30,3 +30,22 @@ export function getRelativeTimeString(timestamp) {
         }
     }
 }
+
+const sizeUnits = [
+    { name: 'B', bytes: 1 },
+    { name: 'KB', bytes: 1_000 },
+    { name: 'MB', bytes: 1_000_000 },
+    { name: 'GB', bytes: 1_000_000_000 },
+    { name: 'TB', bytes: 1_000_000_000_000 }
+];
+
+export function getFileSizeString(sizeBytes) {
+    let units = sizeUnits;
+
+    for(let i = 0 ; i < units.length ; ++i) {
+        if(i === units.length - 1 || sizeBytes < units[i + 1].bytes) {
+            let qty = Math.floor(sizeBytes / units[i].bytes);
+            return `${qty} ${units[i].name}`;
+        }
+    }
+}

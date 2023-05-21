@@ -1,9 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate } from "react-router-dom";
-import * as GenController from '../../controllers/GeneralController';
-import * as Controller from '../../controllers/ProjectController';
+import { useNavigate } from 'react-router-dom';
+import * as GenController from 'controllers/GeneralController';
+import * as Controller from 'controllers/ProjectController';
 import './Tabs.css';
-import '../../Styles.css';
 
 const DetailsTab = (props) => {
     const [editName, setEditName] = useState(false);
