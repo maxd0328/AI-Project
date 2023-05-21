@@ -1,7 +1,7 @@
 import React, {} from 'react';
-import '../Tabs.css';
-import '../ConfigurationTab.css';
-import ScriptEditor from '../../script/ScriptEditor';
+import 'components/projectPage/Tabs.css';
+import 'components/projectPage/ConfigurationTab.css';
+import ScriptEditor from 'components/script/ScriptEditor';
 
 const InlineStageBody = ({ stage, set }) => {
 

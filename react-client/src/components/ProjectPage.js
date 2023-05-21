@@ -1,10 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import './ProjectPage.css';
-import '../Styles.css';
 import MenuBar from './MenuBar';
-import * as Controller from '../controllers/ProjectController';
-import * as GenController from '../controllers/GeneralController';
+import * as Controller from 'controllers/ProjectController';
+import * as GenController from 'controllers/GeneralController';
 import DetailsTab from './projectPage/DetailsTab';
 import ConfigurationTab from './projectPage/ConfigurationTab';
 import DatasetsTab from './projectPage/DatasetsTab';

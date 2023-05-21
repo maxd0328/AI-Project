@@ -1,12 +1,11 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import * as Controller from '../../controllers/ProjectController';
+import * as Controller from 'controllers/ProjectController';
 import ScriptStageBody from './configurationTab/ScriptStageBody';
 import InlineStageBody from './configurationTab/InlineStageBody';
 import EasyStageBody from './configurationTab/EasyStageBody';
-import compile from '../../compiler/Compiler';
-import decompile from '../../compiler/Decompiler';
+import compile from 'compiler/Compiler';
+import decompile from 'compiler/Decompiler';
 import './Tabs.css';
-import '../../Styles.css';
 import './ConfigurationTab.css';
 
 const nothingFound = () => (<p style={{width: 100 + '%', height: 100 + '%', textAlign: 'center'}}>No results found.</p>);

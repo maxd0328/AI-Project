@@ -4,8 +4,8 @@ import './ScriptEditor.css';
 import ace from 'ace-builds';
 import 'ace-builds/src-noconflict/theme-dracula';
 import 'ace-builds/src-noconflict/ext-language_tools';
-import * as Definitions from '../../compiler/Definitions';
-import compile from '../../compiler/Compiler';
+import * as Definitions from 'compiler/Definitions';
+import compile from 'compiler/Compiler';
 
 // This only defines high-level behaviour of the Mode like folding etc.
 ace.define('ace/mode/custom', ['require', 'exports', 'ace/lib/oop', 'ace/mode/text', 'ace/mode/custom_highlight_rules'], (acequire, exports) => {

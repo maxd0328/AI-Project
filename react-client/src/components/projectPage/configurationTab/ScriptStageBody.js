@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import * as ScriptController from '../../../controllers/ScriptController';
-import '../Tabs.css';
-import '../ConfigurationTab.css';
+import * as ScriptController from 'controllers/ScriptController';
+import 'components/projectPage/Tabs.css';
+import 'components/projectPage/ConfigurationTab.css';
 
 const nothingFound = () => (<p style={{width: 100 + '%', height: 100 + '%', textAlign: 'center'}}>No results found.</p>);
 

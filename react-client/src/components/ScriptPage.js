@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
-import ScriptEditor from './script/ScriptEditor';
+import ScriptEditor from 'components/script/ScriptEditor';
 import './ScriptPage.css';
-import '../Styles.css';
-import '../controllers/ScriptController';
-import * as Controller from '../controllers/ScriptController';
+import 'controllers/ScriptController';
+import * as Controller from 'controllers/ScriptController';
 import MenuBar from "./MenuBar";
 
 const ScriptElement = (props) => {
