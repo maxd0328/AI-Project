@@ -4,19 +4,21 @@ const router = express.Router();
 
 /* POST create new user. */
 router.post('/create', async function(req, res, next) {
-    const firstName = req.body['first-name'];
-    const lastName = req.body['last-name'];
+    const firstName = req.body['firstName'];
+    const lastName = req.body['lastName'];
     const email = req.body['email'];
-    const phoneNumber = req.body['phone-number'];
+    const phoneNumber = req.body['phone'];
     const password = req.body['password'];
 
     try {
-        await controller.addUser(email, firstName, lastName, phoneNumber, password);
-        controller.enterSession(req.session, { email: email, firstName: firstName, lastName: lastName, phoneNumber: phoneNumber, password: password });
-        res.redirect('/home');
+        const userID = await controller.addUser(email, firstName, lastName, phoneNumber, password);
+        controller.enterSession(req.session, { userID, email: email, firstName: firstName,
+            lastName: lastName, phoneNumber: phoneNumber, password: password });
+        res.redirect('/console/home');
     }
     catch(err) {
         // TODO
+        console.log(JSON.stringify(err));
         res.redirect('/register');
     }
 });
@@ -29,10 +31,11 @@ router.post('/login', async function(req, res, next) {
     try {
         const userRow = await controller.authenticateUser(email, password);
         controller.enterSession(req.session, userRow);
-        res.redirect('/home');
+        res.redirect('/console/home');
     }
     catch(err) {
         // TODO
+        console.log(JSON.stringify(err));
         res.redirect('/login');
     }
 });
@@ -50,9 +53,9 @@ router.post('/forgot-password', async function(req, res, next) {
     const email = req.body['email'];
 
     try {
-        const userExists = controller.userExists(email);
-        if(userExists) {
-            await controller.sendResetPasswordToken(email);
+        const user = controller.fetchUserByEmail(email);
+        if(user) {
+            await controller.sendResetPasswordToken(user);
             res.redirect(`/forgot-password?submitted=true&email=${email}`);
         }
         else {
@@ -69,8 +72,8 @@ router.post('/forgot-password', async function(req, res, next) {
 /* GET reset password page. */
 router.get('/reset-password', async function(req, res, next) {
     try {
-        const email = await controller.validateResetPasswordToken(req.query.token, false);
-        if(email) res.render('reset-password', { email: email, token: req.query.token });
+        const user = await controller.validateResetPasswordToken(req.query.token, false);
+        if(user) res.render('reset-password', { email: user.email, token: req.query.token });
         else res.render('invalid-token');
     }
     catch(err) {
@@ -84,11 +87,11 @@ router.post('/reset-password', async function(req, res, next) {
     const token = req.body['token'];
 
     try {
-        const email = await controller.validateResetPasswordToken(token, true);
-        if(email) {
-            const user = await controller.updateUserPassword(email, password);
+        const user = await controller.validateResetPasswordToken(token, true);
+        if(user) {
+            await controller.updateUserPassword(user, password);
             controller.enterSession(req.session, user);
-            res.redirect('/home');
+            res.redirect('/console/home');
         }
         else {
             // TODO
@@ -99,6 +102,13 @@ router.post('/reset-password', async function(req, res, next) {
         // TODO
         res.redirect(`/user/reset-password?token=${token}`);
     }
+});
+
+/* GET public user session data. */
+router.get('/session', function(req, res, next) {
+    if(!req.session.loggedIn)
+        res.redirect('/login');
+    res.json({ firstName: req.session.firstName });
 });
 
 module.exports = router;

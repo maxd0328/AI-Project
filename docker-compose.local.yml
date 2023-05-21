@@ -1,0 +1,75 @@
+version: '3'
+
+services:
+  core-service:
+    build: ./core-service
+    ports:
+      - "3000:8080"
+    environment:
+      NODE_ENV: development
+      PORT: 8080
+  user-service:
+    build: ./user-service
+    ports:
+      - "3001:8080"
+    environment:
+      NODE_ENV: development
+      PORT: 8080
+  emr-service:
+    build: ./emr-service
+    ports:
+      - "3002:8080"
+    environment:
+      NODE_ENV: development
+      PORT: 8080
+  bucket-service:
+    build: ./bucket-service
+    ports:
+      - "3003:8080"
+    environment:
+      NODE_ENV: development
+      PORT: 8080
+
+  # AWS substitute services
+  db:
+    image: mysql:8.0
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=ebdb
+    ports:
+      - "3306:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./.local/db-init:/docker-entrypoint-initdb.d
+  cache:
+    image: redis:6.2
+    ports:
+      - "6379:6379"
+    volumes:
+      - cache-data:/data
+  nginx:
+    image: nginx:1.21
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./.local/logs:/etc/nginx/logs
+    ports:
+      - "80:80"
+    depends_on:
+      - core-service
+      - user-service
+      - emr-service
+  minio:
+    image: minio/minio:latest
+    ports:
+      - "9000:9000"
+    environment:
+      MINIO_ACCESS_KEY: AKIALOCALACCESSKEY
+      MINIO_SECRET_KEY: 9T4LAQ+1/LOCALSECRETKEY
+    volumes:
+      - ./.local/data-s3:/data
+      - ./.local/config-s3:/.minio
+    command: server /data
+
+volumes:
+  db-data:
+  cache-data:

@@ -14,5 +14,28 @@
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
 
-# Elastic Beanstalk Build Artifact
-eb-artifact.zip
+# React build outputs
+core-service/public/console/*
+
+# React Dependencies
+core-service/react-client/node_modules
+core-service/react-client/.pnp
+core-service/react-client/.pnp.js
+
+# React Testing
+core-service/react-client/coverage
+
+# React Production
+core-service/react-client/build
+
+# React Misc
+core-service/react-client/.DS_Store
+core-service/react-client/.env.local
+core-service/react-client/.env.development.local
+core-service/react-client/.env.test.local
+core-service/react-client/.env.production.local
+
+core-service/react-client/npm-debug.log*
+core-service/react-client/yarn-debug.log*
+core-service/react-client/yarn-error.log*
+
