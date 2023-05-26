@@ -33,6 +33,12 @@
     margin: 5px 0 5px 0;
 }
 
+.datasets-sidebar-scroll {
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+}
+
 .datasets-primary {
     background-color: #2d2e34;
     border-right: 1px solid #505359;

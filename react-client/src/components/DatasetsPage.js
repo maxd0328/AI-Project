@@ -1,8 +1,10 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import MenuBar from './MenuBar';
 import './DatasetsPage.css';
 import './projectPage/Tabs.css';
 import * as GenController from 'controllers/GeneralController';
+import * as Controller from 'controllers/DatasetController';
 
 const ProvisionalFile = ({ file, remove }) => {
     return (
@@ -23,11 +25,8 @@ const DataLabel = ({ label, callbackEdit, callbackRemove }) => {
     const editField = useRef(null);
 
     useEffect(() => {
-        if(editing) {
-            if(editField.current)
-                editField.current.focus();
-            setProvisionalLabel(label);
-        }
+        if(editing && editField.current)
+            editField.current.select();
     }, [editing, label]);
 
     const updateProvisionalValue = event => setProvisionalLabel(event.target.value);
@@ -36,6 +35,11 @@ const DataLabel = ({ label, callbackEdit, callbackRemove }) => {
         if(event.key === 'Enter')
             saveLabel();
     };
+
+    const editLabel = () => {
+        setEditing(true);
+        setProvisionalLabel(label);
+    }
 
     const saveLabel = () => {
         setEditing(false);
@@ -54,7 +58,7 @@ const DataLabel = ({ label, callbackEdit, callbackRemove }) => {
     return (
         <div className="data-label-item">
             <p>{label}</p>
-            <button className="image-button" style={{width: 20 + 'px', height: 20 + 'px'}} onClick={setEditing.bind(null, true)}>
+            <button className="image-button" style={{width: 20 + 'px', height: 20 + 'px'}} onClick={editLabel}>
                 <img src="/console/images/edit.png" alt="/console/images/edit.png" style={{width: 70 + '%', height: 70 + '%'}} />
             </button>
             <button className="image-button" style={{width: 20 + 'px', height: 20 + 'px'}} onClick={callbackRemove.bind(null, label)}>
@@ -81,7 +85,7 @@ const DataFile = ({ file, dataLabels, callbackRemove }) => {
     );
 };
 
-const DatasetsBody = () => {
+const DatasetsBody = ({ dataset }) => {
     const [dataLabels, setDataLabels] = useState(['Bee', 'Human']);
     const [files, setFiles] = useState([]);
     const [searchFiles, setSearchFiles] = useState('');
@@ -193,7 +197,7 @@ const DatasetsBody = () => {
     return (
         <div style={{display: 'flex', flexDirection: 'column', height: 100 + '%', overflow: 'hidden'}}>
             <div className="page" style={{flexGrow: 1}}>
-                <h1 className="outer-element">Datasets</h1>
+                <h2 className="outer-element" style={{marginBottom: 10 + 'px'}}>{dataset.name}</h2>
 
                 <div className="page-block">
                     <h3 style={{marginTop: 15 + 'px', marginBottom: 10 + 'px'}}>Upload Files</h3>
@@ -256,17 +260,84 @@ const DatasetsBody = () => {
     );
 };
 
+const DatasetItem = ({ dataset, selID, callback }) => {
+    return (
+        <button className="selectable-text-button" disabled={dataset.datasetID === selID} onClick={callback.bind(null, dataset)}>
+            <p style={{margin: '10px 0 10px 0'}}>{dataset.name}</p>
+        </button>
+    );
+};
+
 const DatasetsPage = () => {
+    const [datasets, setDatasets] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(false);
+    const [searchDatasets, setSearchDatasets] = useState('');
+
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    const currentDatasetID = useCallback(() => {
+        let id = searchParams.get('id');
+        return id === null ? null : parseInt(id);
+    }, [searchParams]);
+
+    const currentDataset = useCallback(() => {
+        let datasetID = currentDatasetID();
+        if(datasetID === null)
+            return null;
+        let dataset = datasets.find(e => e.datasetID === datasetID);
+        return !dataset ? { noSuchDataset: true } : dataset;
+    }, [currentDatasetID, datasets]);
+
+    const reload = useCallback(() => {
+        setLoading(true);
+        Controller.fetchDatasets().then(result => {
+            setDatasets(result);
+            setError(false);
+            setLoading(false);
+        }).catch(err => {
+            setError(true);
+            setLoading(false);
+        });
+    }, []);
+
+    useEffect(() => reload(), [reload]);
+
+    const updateSearch = event => setSearchDatasets(event.target.value);
+
+    const selectDataset = dataset => setSearchParams({ id: dataset.datasetID });
+
+    const dataset = currentDataset();
     return (
         <div className="datasets-page">
             <MenuBar />
             <div className="datasets-container">
                 <div className="datasets-sidebar">
                     <h2>Your Datasets</h2>
-                    <input type="text" className="text-field" placeholder="Search" />
+                    <input type="text" className="text-field" placeholder="Search" value={searchDatasets} onChange={updateSearch} />
+                    <div className="datasets-sidebar-scroll">
+                        { datasets.map((dataset, index) => {
+                            if(!dataset.name.toLowerCase().includes(searchDatasets.trim().toLowerCase()))
+                                return null;
+                            return <DatasetItem dataset={dataset} key={index} selID={currentDatasetID()} callback={selectDataset} />;
+                        }) }
+                    </div>
                 </div>
                 <div className="datasets-primary">
-                    <DatasetsBody />
+                    { loading ? (
+                        <div className="centered-container">
+                            <p>Loading datasets...</p>
+                        </div>
+                    ) : error ? (
+                        <div className="centered-container">
+                            <p>Something went wrong, please try again later.</p>
+                            <button className="button blue" onClick={reload}>Reload</button>
+                        </div>
+                    ) : !dataset ? null : dataset.noSuchDataset ? (
+                        <div className="centered-container">
+                            <p>No such dataset exists.</p>
+                        </div>
+                    ) : <DatasetsBody dataset={dataset} /> }
                 </div>
             </div>
         </div>

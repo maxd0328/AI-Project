@@ -57,11 +57,9 @@ const Layer = ({ layerName, value, callbackSet, callbackRemove, callbackRename }
     // When the user presses on the button to edit the layer's name, the text field is automatically focused and filled with the previous name
     const editNameRef = useRef(null);
     useEffect(() => {
-        if(editingName) {
-            if(editNameRef.current) editNameRef.current.focus();
-            setProvisionalName(layerName);
-        }
-    }, [editingName, layerName]);
+        if(editingName && editNameRef.current)
+            editNameRef.current.select();
+    }, [editingName]);
 
     // Remember the available key options, and re-compute when any of the dependencies change (JSON or scope)
     const keyOptions = useMemo(() => computeKeyOptions(value, scope), [value, scope]);
@@ -86,6 +84,16 @@ const Layer = ({ layerName, value, callbackSet, callbackRemove, callbackRename }
 
     const updateProvisionalName = event => setProvisionalName(event.target.value);
 
+    const startEditName = () => {
+        setEditingName(true);
+        setProvisionalName(layerName);
+    };
+
+    const editNameKeyDown = event => {
+        if(event.key === 'Enter')
+            saveName();
+    };
+
     const saveName = () => {
         setEditingName(false);
         callbackRename(layerName, provisionalName);
@@ -96,7 +104,7 @@ const Layer = ({ layerName, value, callbackSet, callbackRemove, callbackRename }
         <div>
             { editingName ? (
                 <div className="config-field">
-                    <input type="text" className="text-field" style={{flexGrow: 1, marginRight: 5 + 'px'}}
+                    <input type="text" className="text-field" style={{flexGrow: 1, marginRight: 5 + 'px'}} onKeyDown={editNameKeyDown}
                            placeholder="Layer Name" value={provisionalName} onChange={updateProvisionalName} ref={editNameRef} />
                     <button className="button red" onClick={setEditingName.bind(null, false)}>Cancel</button>
                     <button className="button green" onClick={saveName}>Save</button>
@@ -107,7 +115,7 @@ const Layer = ({ layerName, value, callbackSet, callbackRemove, callbackRename }
                         <img src="/console/images/delete.png" alt="/console/images/delete.png" style={{width: 70 + '%', height: 70 + '%'}} />
                     </button>
                     <p><b>Layer:</b> {layerName}</p>
-                    <button className="image-button" style={{width: 22 + 'px', height: 22 + 'px'}} onClick={setEditingName.bind(null, true)}>
+                    <button className="image-button" style={{width: 22 + 'px', height: 22 + 'px'}} onClick={startEditName}>
                         <img src="/console/images/edit.png" alt="/console/images/edit.png" style={{width: 70 + '%', height: 70 + '%'}} />
                     </button>
                     <input className="text-field" style={{opacity: 0, pointerEvents: 'none'}} />

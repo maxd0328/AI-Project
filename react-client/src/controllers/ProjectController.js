@@ -1,6 +1,5 @@
 
 export async function fetchProject(projectID) {
-    return { name: 'My Project', type: 'cnn', presetID: 1 };
     const response = await fetch(`/bucket/fetch-project?id=${projectID}`);
 
     if(!response.ok)

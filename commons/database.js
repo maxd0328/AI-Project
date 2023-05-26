@@ -9,4 +9,33 @@ const pool = mysql.createPool({
     connectionLimit: 10
 });
 
-module.exports = pool;
+const query = async(query, values) => await pool.query(query, values);
+
+const transaction = async(callback, errCallback) => {
+    const connection = pool.getConnection();
+    await connection.beginTransaction();
+
+    try {
+        const result = await callback(connection);
+
+        await connection.commit();
+        return result;
+    }
+    catch(err) {
+        await connection.rollback();
+
+        if(errCallback)
+            await errCallback(err);
+
+        throw err;
+    }
+    finally {
+        connection.release();
+    }
+};
+
+module.exports = {
+    pool,
+    query,
+    transaction
+};
