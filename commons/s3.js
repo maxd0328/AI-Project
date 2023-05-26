@@ -83,11 +83,22 @@ async function deleteResource(bucket, filename, callback) {
     }
 }
 
-ensureBucketExists(process.env.S3_USER_BUCKET).then(noAction => {});
+async function getPresignedURL(bucket, filename, expiry = 60 * 60) { // default 1 hour expiry
+    const params = {
+        Bucket: bucket,
+        Key: filename,
+        Expires: expiry
+    };
+
+    return s3.getSignedUrl('getObject', params);
+}
+
+ensureBucketExists(process.env.S3_USER_BUCKET).then(() => {});
 
 module.exports = {
     ensureBucketExists,
     getResource,
     putResource,
-    deleteResource
+    deleteResource,
+    getPresignedURL
 }

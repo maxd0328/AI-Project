@@ -43,6 +43,45 @@ CREATE TABLE scripts (
          ON DELETE CASCADE
 );
 
+CREATE TABLE datasets (
+    datasetID INT PRIMARY KEY AUTO_INCREMENT,
+    userID INT NOT NULL,
+    name VARCHAR(50) NOT NULL,
+    nextLabel INT NOT NULL,
+    nextFile INT NOT NULL,
+    lastModified BIGINT,
+    FOREIGN KEY(userID) REFERENCES users(userID)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+);
+
+CREATE TABLE dataLabels (
+    datasetID INT NOT NULL,
+    labelID INT NOT NULL,
+    string VARCHAR(25) NOT NULL,
+    PRIMARY KEY(datasetID, labelID),
+    FOREIGN KEY(datasetID) REFERENCES datasets(datasetID)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+);
+
+CREATE TABLE datafiles (
+    datasetID INT NOT NULL,
+    datafileID INT NOT NULL,
+    filename VARCHAR(50) NOT NULL,
+    labelID INT NULL,
+    customLabel VARCHAR(25) NULL,
+    dateAdded BIGINT NOT NULL,
+    PRIMARY KEY(datasetID, datafileID),
+    FOREIGN KEY(datasetID) REFERENCES datasets(datasetID)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    FOREIGN KEY(datasetID, labelID) REFERENCES dataLabels(datasetID, labelID)
+        ON UPDATE CASCADE
+        ON DELETE SET NULL,
+    CONSTRAINT CHK_Label CHECK (labelID IS NOT NULL OR customLabel IS NOT NULL)
+);
+
 CREATE TABLE configs (
     projectID INT NOT NULL,
     location INT NOT NULL,
@@ -56,4 +95,16 @@ CREATE TABLE configs (
     FOREIGN KEY(scriptID) REFERENCES scripts(scriptID)
         ON UPDATE CASCADE
         ON DELETE SET NULL
+);
+
+CREATE TABLE projectDatasets (
+    projectID INT NOT NULL,
+    datasetID INT NOT NULL,
+    PRIMARY KEY(projectID, datasetID),
+    FOREIGN KEY(projectID) REFERENCES projects(projectID)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    FOREIGN KEY(datasetID) REFERENCES datasets(datasetID)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 );

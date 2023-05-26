@@ -9,11 +9,7 @@ const genS3InternalConfigKey = (projectID, location) => `config-${projectID}-${l
 
 async function createScript(userID, name, content) {
     // Use a transaction to ensure that the database and s3 bucket are updated before committing
-    const connection = await db.getConnection();
-
-    try {
-        await connection.beginTransaction();
-
+    return db.transaction(async connection => {
         const query = `INSERT INTO scripts (userID, name, lastModified) VALUES (?, ?, ?)`;
         const values = [userID, name, Date.now()];
         let scriptID;
@@ -24,17 +20,9 @@ async function createScript(userID, name, content) {
         // Attempt to add the content to S3
         await s3.putResource(process.env.S3_USER_BUCKET, genS3ScriptKey(userID, scriptID), content);
 
-        // Commit the transaction and return the newID
-        await connection.commit();
+        // Return the new ID
         return scriptID;
-    }
-    catch(err) {
-        await connection.rollback();
-        throw err;
-    }
-    finally {
-        connection.release();
-    }
+    });
 }
 
 async function updateScriptName(userID, scriptID, name) {
@@ -192,25 +180,21 @@ async function saveConfigStages(userID, projectID, presetID, stages) {
     // TODO perhaps switch to a more efficient algorithm in the future, current implementation is bullshit
     // To adhere to table constraints mid-transaction, all configs are deleted and re-inserted
 
-    // Project must exist (and belong to the user)
-    if(!await projectExists(userID, projectID))
-        throw new Error('No such project exists');
-
-    // Create a snapshot of the S3 entries in case transaction fails
-    let query = `SELECT location FROM configs WHERE projectID = ?`;
-    let values = [projectID];
-
-    const [rows] = await db.query(query, values);
     let snapshot = [];
-    for(let i = 0 ; i < rows.length ; ++i) {
-        const key = genS3InternalConfigKey(projectID, rows[i].location); // Snapshot contains key and associated content
-        snapshot.push({ key, content: await s3.getResource(process.env.S3_USER_BUCKET, key) });
-    }
+    await db.transaction(async connection => {
+        // Project must exist (and belong to the user)
+        if(!await projectExists(userID, projectID))
+            throw new Error('No such project exists');
 
-    // Create connection for database transaction
-    const connection = await db.getConnection();
-    try {
-        await connection.beginTransaction();
+        // Create a snapshot of the S3 entries in case transaction fails
+        let query = `SELECT location FROM configs WHERE projectID = ?`;
+        let values = [projectID];
+
+        const [rows] = await connection.query(query, values);
+        for(let i = 0 ; i < rows.length ; ++i) {
+            const key = genS3InternalConfigKey(projectID, rows[i].location); // Snapshot contains key and associated content
+            snapshot.push({ key, content: await s3.getResource(process.env.S3_USER_BUCKET, key) });
+        }
 
         // Delete all config rows from the project
         query = `DELETE FROM configs WHERE projectID = ?`;
@@ -232,23 +216,11 @@ async function saveConfigStages(userID, projectID, presetID, stages) {
         query = `UPDATE projects SET presetID = ?, lastModified = ? WHERE projectID = ?`;
         values = [presetID === undefined ? null : presetID, Date.now(), projectID];
         await connection.query(query, values);
-
-        // Commit the transaction
-        await connection.commit();
-    }
-    catch(err) {
-        // In the event of an error, we roll back the transaction
-        await connection.rollback();
-
-        // We also recover previous S3 entries from the snapshot
+    }, async err => {
+        // We recover previous S3 entries from the snapshot
         for(let i = 0 ; i < snapshot.length ; ++i) // TODO because if any of these put operations fail, the user's data is fucked
             await s3.putResource(process.env.S3_USER_BUCKET, snapshot.key, snapshot.content);
-        // Let the route handler know there was an error
-        throw err;
-    }
-    finally { // Make sure the connection is released
-        connection.release();
-    }
+    });
 }
 
 module.exports = {
