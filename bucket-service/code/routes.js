@@ -222,6 +222,7 @@ router.post('/save-pipeline', async (req, res) => {
         res.status(204).json();
     }
     catch(err) {
+        console.error(err);
         res.status(400).json({ error: 'Something went wrong' });
     }
 });

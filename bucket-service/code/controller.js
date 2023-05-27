@@ -121,12 +121,12 @@ async function getProject(userID, projectID) {
     else throw new Error(`Project with ID ${projectID} does not exist`);
 }
 
-async function projectExists(userID, projectID) {
+async function projectExists(userID, projectID, connection = db) {
     // SELECT 1 is because we don't actually need any columns from the table, we just want to make sure there is at least one row
     const query = `SELECT EXISTS(SELECT 1 FROM projects WHERE projectID = ? AND userID = ?) AS rowExists`;
     const values = [projectID, userID];
 
-    const [result] = await db.query(query, values);
+    const [result] = await connection.query(query, values);
     return result[0].rowExists;
 }
 

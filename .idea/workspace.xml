@@ -5,17 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="654f3128-f368-43a2-bcb5-1fbb6ba99dec" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.local/data-s3/user-bucket/config-1-2.matej/xl.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/dataset-service/.dockerignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/dataset-service/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/dataset-service/app.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/dataset-service/code/controller.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/dataset-service/code/routes.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/dataset-service/commons" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/dataset-service/package-lock.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/dataset-service/package.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/react-client/src/controllers/DatasetController.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.local/data-s3/.minio.sys/buckets/.bloomcycle.bin/xl.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.local/data-s3/.minio.sys/buckets/.bloomcycle.bin/xl.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.local/data-s3/.minio.sys/buckets/.usage-cache.bin/xl.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.local/data-s3/.minio.sys/buckets/.usage-cache.bin/xl.meta" afterDir="false" />
@@ -26,31 +15,13 @@
       <change beforePath="$PROJECT_DIR$/.local/data-s3/.minio.sys/config/iam/format.json/xl.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.local/data-s3/.minio.sys/config/iam/format.json/xl.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.local/data-s3/.minio.sys/format.json" beforeDir="false" afterPath="$PROJECT_DIR$/.local/data-s3/.minio.sys/format.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.local/data-s3/.minio.sys/pool.bin/xl.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.local/data-s3/.minio.sys/pool.bin/xl.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.local/data-s3/.minio.sys/tmp/.trash/350e6d7c-f6a5-4994-ab1a-4be053b28dde" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.local/data-s3/user-bucket/config-1-0.matej/xl.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.local/data-s3/user-bucket/config-1-1.matej/xl.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.local/data-s3/user-bucket/config-1-1.matej/xl.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.local/data-s3/user-bucket/script-1-1.matej/xl.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.local/data-s3/user-bucket/script-1-1.matej/xl.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.local/data-s3/user-bucket/script-1-2.matej/xl.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.local/data-s3/user-bucket/script-1-3.matej/xl.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.local/data-s3/user-bucket/config-1-1.matej/xl.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.local/data-s3/user-bucket/config-1-2.matej/xl.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.local/data-s3/user-bucket/script-1-1.matej/xl.meta" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.local/db-init/init.sql" beforeDir="false" afterPath="$PROJECT_DIR$/.local/db-init/init.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bucket-service/.dockerignore" beforeDir="false" afterPath="$PROJECT_DIR$/bucket-service/.dockerignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bucket-service/code/controller.js" beforeDir="false" afterPath="$PROJECT_DIR$/bucket-service/code/controller.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bucket-service/code/routes.js" beforeDir="false" afterPath="$PROJECT_DIR$/bucket-service/code/routes.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/commons/database.js" beforeDir="false" afterPath="$PROJECT_DIR$/commons/database.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/commons/s3.js" beforeDir="false" afterPath="$PROJECT_DIR$/commons/s3.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core-service/code/routes.js" beforeDir="false" afterPath="$PROJECT_DIR$/core-service/code/routes.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.local.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.local.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nginx.conf" beforeDir="false" afterPath="$PROJECT_DIR$/nginx.conf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/react-client/jsconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/react-client/jsconfig.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/react-client/src/Styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/react-client/src/Styles.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/react-client/src/components/DatasetsPage.css" beforeDir="false" afterPath="$PROJECT_DIR$/react-client/src/components/DatasetsPage.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/react-client/src/components/DatasetsPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/react-client/src/components/DatasetsPage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/react-client/src/components/PresetPage.css" beforeDir="false" afterPath="$PROJECT_DIR$/react-client/src/components/PresetPage.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/react-client/src/components/PresetPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/react-client/src/components/PresetPage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/react-client/src/components/projectPage/ConfigurationTab.js" beforeDir="false" afterPath="$PROJECT_DIR$/react-client/src/components/projectPage/ConfigurationTab.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/react-client/src/components/projectPage/DetailsTab.js" beforeDir="false" afterPath="$PROJECT_DIR$/react-client/src/components/projectPage/DetailsTab.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/react-client/src/components/projectPage/configurationTab/EasyStageBody.js" beforeDir="false" afterPath="$PROJECT_DIR$/react-client/src/components/projectPage/configurationTab/EasyStageBody.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/react-client/src/controllers/ProjectController.js" beforeDir="false" afterPath="$PROJECT_DIR$/react-client/src/controllers/ProjectController.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -68,28 +39,28 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_MARK_IGNORED_FILES_AS_EXCLUDED": "true",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "C:/Users/maxim/Documents/AI-Project/dataset-service",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "database.data.csv.formats",
-    "ts.external.directory.path": "C:\\Program Files\\JetBrains\\IntelliJ IDEA 2022.3.1\\plugins\\javascript-impl\\jsLanguageServicesImpl\\external",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_MARK_IGNORED_FILES_AS_EXCLUDED&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/maxim/Documents/AI-Project/dataset-service&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;database.data.csv.formats&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Program Files\\JetBrains\\IntelliJ IDEA 2022.3.1\\plugins\\javascript-impl\\jsLanguageServicesImpl\\external&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "mysql"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;mysql&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\maxim\Documents\AI-Project\dataset-service" />
@@ -126,6 +97,7 @@
       <workItem from="1684053939015" duration="91196000" />
       <workItem from="1684418652771" duration="39775000" />
       <workItem from="1684675676005" duration="32905000" />
+      <workItem from="1685173951870" duration="2327000" />
     </task>
     <servers />
   </component>
