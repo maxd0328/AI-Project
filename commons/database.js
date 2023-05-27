@@ -12,7 +12,7 @@ const pool = mysql.createPool({
 const query = async(query, values) => await pool.query(query, values);
 
 const transaction = async(callback, errCallback) => {
-    const connection = pool.getConnection();
+    const connection = await pool.getConnection();
     await connection.beginTransaction();
 
     try {

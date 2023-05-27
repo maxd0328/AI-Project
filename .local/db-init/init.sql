@@ -78,8 +78,6 @@ CREATE TABLE datafiles (
         ON DELETE CASCADE,
     FOREIGN KEY(datasetID, labelID) REFERENCES dataLabels(datasetID, labelID)
         ON UPDATE CASCADE
-        ON DELETE SET NULL,
-    CONSTRAINT CHK_Label CHECK (labelID IS NOT NULL OR customLabel IS NOT NULL)
 );
 
 CREATE TABLE configs (
@@ -108,3 +106,17 @@ CREATE TABLE projectDatasets (
         ON UPDATE CASCADE
         ON DELETE CASCADE
 );
+
+-- Database triggers
+DELIMITER //
+CREATE TRIGGER triggerCascadeDataLabelDelete
+    AFTER DELETE ON dataLabels
+    FOR EACH ROW
+BEGIN
+    UPDATE datafiles
+    SET labelID = NULL, customLabel = ""
+    WHERE datasetID = OLD.datasetID
+      AND labelID = OLD.labelID;
+END;
+//
+DELIMITER ;
