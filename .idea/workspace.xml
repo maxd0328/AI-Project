@@ -5,23 +5,23 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="654f3128-f368-43a2-bcb5-1fbb6ba99dec" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/react-client/src/components/datasetsPage/DatasetBody.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/react-client/src/components/datasetsPage/DatasetUtils.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.local/data-s3/.minio.sys/buckets/.bloomcycle.bin/xl.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.local/data-s3/.minio.sys/buckets/.bloomcycle.bin/xl.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.local/data-s3/.minio.sys/buckets/.usage-cache.bin/xl.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.local/data-s3/.minio.sys/buckets/.usage-cache.bin/xl.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.local/data-s3/.minio.sys/buckets/.usage.json/xl.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.local/data-s3/.minio.sys/buckets/.usage.json/xl.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.local/data-s3/.minio.sys/buckets/user-bucket/.metadata.bin/xl.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.local/data-s3/.minio.sys/buckets/user-bucket/.metadata.bin/xl.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.local/data-s3/.minio.sys/buckets/user-bucket/.usage-cache.bin/xl.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.local/data-s3/.minio.sys/buckets/user-bucket/.usage-cache.bin/xl.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.local/data-s3/.minio.sys/config/config.json/xl.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.local/data-s3/.minio.sys/config/config.json/xl.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.local/data-s3/.minio.sys/config/iam/format.json/xl.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.local/data-s3/.minio.sys/config/iam/format.json/xl.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.local/data-s3/.minio.sys/format.json" beforeDir="false" afterPath="$PROJECT_DIR$/.local/data-s3/.minio.sys/format.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.local/data-s3/.minio.sys/pool.bin/xl.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.local/data-s3/.minio.sys/pool.bin/xl.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.local/data-s3/user-bucket/config-1-1.matej/xl.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.local/data-s3/user-bucket/config-1-2.matej/xl.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.local/data-s3/user-bucket/script-1-1.matej/xl.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.local/db-init/init.sql" beforeDir="false" afterPath="$PROJECT_DIR$/.local/db-init/init.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bucket-service/code/controller.js" beforeDir="false" afterPath="$PROJECT_DIR$/bucket-service/code/controller.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bucket-service/code/routes.js" beforeDir="false" afterPath="$PROJECT_DIR$/bucket-service/code/routes.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/commons/database.js" beforeDir="false" afterPath="$PROJECT_DIR$/commons/database.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.local/data-s3/.minio.sys/tmp/.trash/2d5af5eb-93bd-4e17-a2b8-1e53cd1d219b" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset-service/code/controller.js" beforeDir="false" afterPath="$PROJECT_DIR$/dataset-service/code/controller.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset-service/code/routes.js" beforeDir="false" afterPath="$PROJECT_DIR$/dataset-service/code/routes.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/react-client/src/Styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/react-client/src/Styles.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/react-client/src/components/DatasetsPage.css" beforeDir="false" afterPath="$PROJECT_DIR$/react-client/src/components/DatasetsPage.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/react-client/src/components/DatasetsPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/react-client/src/components/DatasetsPage.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/react-client/src/components/HomePage.js" beforeDir="false" afterPath="$PROJECT_DIR$/react-client/src/components/HomePage.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/react-client/src/components/projectPage/Tabs.css" beforeDir="false" afterPath="$PROJECT_DIR$/react-client/src/components/projectPage/Tabs.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/react-client/src/components/script/ScriptEditor.js" beforeDir="false" afterPath="$PROJECT_DIR$/react-client/src/components/script/ScriptEditor.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/react-client/src/controllers/DatasetController.js" beforeDir="false" afterPath="$PROJECT_DIR$/react-client/src/controllers/DatasetController.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -97,7 +97,7 @@
       <workItem from="1684053939015" duration="91196000" />
       <workItem from="1684418652771" duration="39775000" />
       <workItem from="1684675676005" duration="32905000" />
-      <workItem from="1685173951870" duration="2327000" />
+      <workItem from="1685173951870" duration="25352000" />
     </task>
     <servers />
   </component>

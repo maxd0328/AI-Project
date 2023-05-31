@@ -90,104 +90,138 @@ async function uploadFiles(userID, datasetID, files, labelID, customLabel) {
     });
 }
 
-async function updateDataset(userID, datasetID, name, addLabels, editLabels, deleteLabels, editFiles, deleteFiles) {
-    // Keep track of all deleted S3 keys, this is so that if we roll back we can put everything back in the S3
-    const deletedS3 = [];
-
+async function renameDataset(userID, datasetID, name) {
     return await db.transaction(async connection => {
         // Ensure that the dataset exists and is owned by the user
         if(!await datasetExists(userID, datasetID, connection))
             throw new Error('No such dataset exists');
 
-        // We store all new label IDs to return to the user
-        const labelIDs = [];
-
-        // If we want to add labels, then we do something very similar to uploading images
-        if(addLabels.length > 0) {
-            // Get the next available label ID (just like datafile ID) and place a lock on it
-            let query = `SELECT nextLabel FROM datasets WHERE datasetID = ? FOR UPDATE`;
-            let values = [datasetID];
-
-            const [nextLabelResult] = await connection.query(query, values);
-            const nextLabel = nextLabelResult[0].nextLabel;
-
-            // For every new label we want to add, we insert it into the table with IDs starting at the acquired next available one
-            for(let i = 0 ; i < addLabels.length ; ++i) {
-                query = `INSERT INTO dataLabels (datasetID, labelID, string) VALUES (?, ?, ?)`;
-                values = [datasetID, nextLabel + i, addLabels[i].value];
-
-                await connection.query(query, values);
-                labelIDs.push(nextLabel + i);
-            }
-
-            // Now we write back the new next available labelID (note that the lock still isn't released until we commit the transaction)
-            query = `UPDATE datasets SET nextlabel = ? WHERE datasetID = ?`;
-            values = [nextLabel + addLabels.length];
-
-            await connection.query(query, values);
-        }
-
-        // For these next few blocks, we just handle each case for editing the dataset
-        // Firstly, we apply all label edits
-        for(let editLabel of editLabels) {
-            // For each label edit, find the row containing its ID and give the new desired value
-            const query = `UPDATE dataLabels SET string = ? WHERE datasetID = ? AND labelID = ?`;
-            const values = [editLabel.value, datasetID, editLabel.labelID];
-
-            await connection.query(query, values);
-        }
-
-        // Next, we apply all label deletions
-        for(let deleteLabel of deleteLabels) {
-            // For each one, find the row containing that label ID and delete it
-            const query = `DELETE FROM dataLabels WHERE datasetID = ? AND labelID = ?`;
-            const values = [datasetID, deleteLabel.labelID];
-
-            await connection.query(query, values);
-        }
-
-        // Next, we apply all file edits
-        for(let editFile of editFiles) {
-            // Find out if the desired file configuration involves a custom label, and if not we make sure that label exists
-            const usesCustomLabel = editFile.labelID === undefined || editFile.labelID === null;
-            if(!usesCustomLabel && !await labelExists(datasetID, editFile.labelID, connection))
-                throw new Error('No such label exists');
-
-            // Now we just write the new configuration to the correct database row (including new filename and new label reference)
-            const query = `UPDATE datafiles SET filename = ?, labelID = ?, customLabel = ? WHERE datasetID = ? AND datafileID = ?`;
-            const values = [editFile.filename, !usesCustomLabel ? editFile.labelID : null,
-                usesCustomLabel ? editFile.customLabel || '' : null, datasetID, editFile.datafileID];
-
-            await connection.query(query, values);
-        }
-
-        // Finally, we apply all file deletions
-        for(let deleteFile of deleteFiles) {
-            // For each one, we find the row containing that datafile and delete the row
-            const query = `DELETE FROM datafiles WHERE datasetID = ? AND datafileID = ?`;
-            const values = [datasetID, deleteFile.datafileID];
-
-            await connection.query(query, values);
-
-            // Here, we locate the S3 key of this file and create a backup of it
-            // We then delete the resource from S3 and store the backup in our deletedS3 buffer, so it can be restored if the transaction fails
-            const s3Key = genS3DatafileKey(datasetID, deleteFile.datafileID);
-            const backup = { key: s3Key, content: await s3.getResource(process.env.S3_USER_BUCKET, s3Key) };
-            await s3.deleteResource(process.env.S3_USER_BUCKET, s3Key);
-            deletedS3.push(backup);
-        }
-
-        // Set the new name of the dataset (if any) and update the lastModified field
+        // Update name and last modified fields of the dataset in question
         const query = `UPDATE datasets SET name = ?, lastModified = ? WHERE datasetID = ?`;
-        const values = [name, Date.now()];
+        const values = [name, Date.now(), datasetID];
+        await connection.query(query, values);
+    });
+}
 
+async function addLabel(userID, datasetID, string) {
+    return await db.transaction(async connection => {
+        // Ensure that the dataset exists and is owned by the user
+        if(!await datasetExists(userID, datasetID, connection))
+            throw new Error('No such dataset exists');
+
+        // Get the next available label ID (just like datafile ID) and place a lock on it
+        let query = `SELECT nextLabel FROM datasets WHERE datasetID = ? FOR UPDATE`;
+        let values = [datasetID];
+        const [nextLabelResult] = await connection.query(query, values);
+        const nextLabel = nextLabelResult[0].nextLabel;
+
+        // Insert the new label with the next available ID
+        query = `INSERT INTO dataLabels (datasetID, labelID, string) VALUES (?, ?, ?)`;
+        values = [datasetID, nextLabel, string];
         await connection.query(query, values);
 
-        return labelIDs;
+        // Now we write back the new next available labelID (note that the lock still isn't released until we commit the transaction)
+        query = `UPDATE datasets SET nextlabel = ? WHERE datasetID = ?`;
+        values = [nextLabel + 1];
+        await connection.query(query, values);
+
+        // Update the last modified timestamp of the dataset
+        query = `UPDATE datasets SET lastModified = ? WHERE datasetID = ?`;
+        values = [Date.now(), datasetID];
+        await connection.query(query, values);
+
+        // Return the ID of the new label
+        return nextLabel;
+    });
+}
+
+async function editLabel(userID, datasetID, labelID, string) {
+    await db.transaction(async connection => {
+        // Ensure that the dataset exists and is owned by the user
+        if(!await datasetExists(userID, datasetID, connection))
+            throw new Error('No such dataset exists');
+
+        // Find the row containing the label ID and give the new desired value
+        let query = `UPDATE dataLabels SET string = ? WHERE datasetID = ? AND labelID = ?`;
+        let values = [string, datasetID, labelID];
+        await connection.query(query, values);
+
+        // Update the last modified timestamp of the dataset
+        query = `UPDATE datasets SET lastModified = ? WHERE datasetID = ?`;
+        values = [Date.now(), datasetID];
+        await connection.query(query, values);
+    });
+}
+
+async function deleteLabel(userID, datasetID, labelID) {
+    await db.transaction(async connection => {
+        // Ensure that the dataset exists and is owned by the user
+        if(!await datasetExists(userID, datasetID, connection))
+            throw new Error('No such dataset exists');
+
+        // Find the row containing the label ID and delete it
+        let query = `DELETE FROM dataLabels WHERE datasetID = ? AND labelID = ?`;
+        let values = [datasetID, labelID];
+        await connection.query(query, values);
+
+        // Update the last modified timestamp of the dataset
+        query = `UPDATE datasets SET lastModified = ? WHERE datasetID = ?`;
+        values = [Date.now(), datasetID];
+        await connection.query(query, values);
+    });
+}
+
+async function updateDatafile(userID, datasetID, datafileID, name, labelID, customLabel) {
+    await db.transaction(async connection => {
+        // Ensure that the dataset exists and is owned by the user
+        if(!await datasetExists(userID, datasetID, connection))
+            throw new Error('No such dataset exists');
+
+        // Find out if the desired file configuration involves a custom label, and if not we make sure that label exists
+        const usesCustomLabel = labelID === undefined || labelID === null;
+        if(!usesCustomLabel && !await labelExists(datasetID, labelID, connection))
+            throw new Error('No such label exists');
+
+        // Now we just write the new configuration to the correct database row (including new filename and new label reference)
+        let query = `UPDATE datafiles SET filename = ?, labelID = ?, customLabel = ? WHERE datasetID = ? AND datafileID = ?`;
+        let values = [name, !usesCustomLabel ? labelID : null, usesCustomLabel ? customLabel || '' : null, datasetID, datafileID];
+        await connection.query(query, values);
+
+        // Update the last modified timestamp of the dataset
+        query = `UPDATE datasets SET lastModified = ? WHERE datasetID = ?`;
+        values = [Date.now(), datasetID];
+        await connection.query(query, values);
+    });
+}
+
+async function deleteDatafile(userID, datasetID, datafileID) {
+    // Keep track of the deleted S3 key, this is so that if we roll back we can put it back in the S3
+    let deletedS3;
+
+    await db.transaction(async connection => {
+        // Ensure that the dataset exists and is owned by the user
+        if(!await datasetExists(userID, datasetID, connection))
+            throw new Error('No such dataset exists');
+
+        // Find the row containing the datafile and delete the row
+        let query = `DELETE FROM datafiles WHERE datasetID = ? AND datafileID = ?`;
+        let values = [datasetID, datafileID];
+        await connection.query(query, values);
+
+        // Here, we locate the S3 key of this file and create a backup of it
+        // We then delete the resource from S3 and store the backup in deletedS3, so it can be restored if the transaction fails
+        const s3Key = genS3DatafileKey(datasetID, datafileID);
+        const backup = { key: s3Key, content: await s3.getResource(process.env.S3_USER_BUCKET, s3Key) };
+        await s3.deleteResource(process.env.S3_USER_BUCKET, s3Key);
+        deletedS3 = backup;
+
+        // Update the last modified timestamp of the dataset
+        query = `UPDATE datasets SET lastModified = ? WHERE datasetID = ?`;
+        values = [Date.now(), datasetID];
+        await connection.query(query, values);
     }, async err => {
-        // If the transaction fails and rolls back, we go through every created S3 backup and restore it
-        for(let backup of deletedS3)
-            await s3.putResource(process.env.S3_USER_BUCKET, backup.key, backup.content);
+        if(deletedS3)
+            await s3.putResource(process.env.S3_USER_BUCKET, deletedS3.key, deletedS3.content);
     });
 }
 
@@ -234,6 +268,30 @@ async function getDatasets(userID) {
     });
 }
 
+async function getDatasetDetails(userID, datasetID) {
+    return await db.transaction(async connection => {
+        // First we select the name of the dataset and the time it was last modified
+        let query = `SELECT name, lastModified FROM datasets WHERE userID = ? AND datasetID = ?`;
+        let values = [userID, datasetID];
+        const [rows] = await connection.query(query, values);
+
+        // Validate that it actually exists
+        if(rows.length > 0) {
+            const dataset = rows[0];
+
+            // Next, we select all labels associated this dataset
+            query = `SELECT labelID, string FROM dataLabels WHERE datasetID = ?`;
+            values = [datasetID];
+            const [labels] = await connection.query(query, values);
+
+            // Assign the labels to the dataset so that it can be returned
+            dataset.labels = labels;
+            return dataset;
+        }
+        else throw new Error(`No such dataset exists`);
+    });
+}
+
 async function getFiles(userID, datasetID, searchQuery, page) {
     return await db.transaction(async connection => {
         // We define a constant page size, we can export this somewhere else later on, maybe as an environment variable
@@ -248,7 +306,7 @@ async function getFiles(userID, datasetID, searchQuery, page) {
                                                   WHERE datasetID = ? AND filename LIKE ?
                                                   ORDER BY dateAdded DESC
                                                   LIMIT ? OFFSET ?`;
-        const values = [datasetID, '%' + searchQuery.trim() + '%', pageSize, page * pageSize];
+        const values = [datasetID, '%' + searchQuery.trim() + '%', pageSize, (page - 1) * pageSize];
 
         // Execute the query to get all file entries
         const [rows] = await connection.query(query, values);
@@ -266,8 +324,14 @@ module.exports = {
     datasetExists,
     createDataset,
     uploadFiles,
-    updateDataset,
+    renameDataset,
+    addLabel,
+    editLabel,
+    deleteLabel,
+    updateDatafile,
+    deleteDatafile,
     deleteDataset,
     getDatasets,
+    getDatasetDetails,
     getFiles
 };

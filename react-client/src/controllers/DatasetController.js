@@ -1,7 +1,14 @@
 
 export async function fetchDatasets() {
-    return [{ datasetID: 1, name: 'Hello' }, { datasetID: 2, name: 'Another' }];
     const response = await fetch('/dataset/fetch');
+
+    if(!response.ok)
+        throw new Error('BAD_REQUEST');
+    return await response.json();
+}
+
+export async function fetchDetails(datasetID) {
+    const response = await fetch(`/dataset/fetch-details?id=${datasetID}`);
 
     if(!response.ok)
         throw new Error('BAD_REQUEST');
@@ -15,8 +22,6 @@ export async function fetchDatasetFiles(datasetID, query, page) {
         throw new Error('BAD_REQUEST');
     return await response.json();
 }
-
-// TODO write request method to upload files using multipart/form
 
 export async function sendNewDataset(name) {
     const response = await fetch('/dataset/create', {
@@ -54,28 +59,28 @@ export async function sendNewFiles(datasetID, files, labelID, customLabel) {
     return await response.json();
 }
 
-export async function sendDatasetChanges(datasetID, name, addLabels, editLabels,
-                                         deleteLabels, editFiles, deleteFiles) {
-    const response = await fetch('/dataset/submit', {
+async function updateDataset(route, body, results) {
+    const response = await fetch(`/dataset/${route}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-            datasetID,
-            name,
-            addLabels,
-            editLabels,
-            deleteLabels,
-            editFiles,
-            deleteFiles
-        })
+        body
     });
 
     if(!response.ok)
         throw new Error('BAD_REQUEST');
-    return await response.json();
+    if(results)
+        return await response.json();
 }
+
+export const sendDatasetName = async (datasetID, name) => updateDataset('rename', { datasetID, name });
+export const sendNewLabel = async (datasetID, string) => updateDataset('add-label', { datasetID, string }, true);
+export const sendEditLabel = async (datasetID, labelID, string) => updateDataset('edit-label', { datasetID, labelID, string });
+export const sendDeleteLabel = async (datasetID, labelID) => updateDataset('delete-label', { datasetID, labelID });
+export const sendUpdateDatafile = async (datasetID, datafileID, name, labelID, customLabel) =>
+    updateDataset('update-datafile', { datasetID, datafileID, name, labelID, customLabel });
+export const sendDeleteDatafile = async (datasetID, datafileID) => updateDataset('delete-datafile', { datasetID, datafileID });
 
 export async function sendDeleteDataset(datasetID) {
     const response = await fetch('/dataset/delete', {

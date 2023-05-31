@@ -104,6 +104,6 @@
     padding: 10px;
 }
 
-.datasets-sidebar input, .data-label-item input {
+.datasets-sidebar input, .data-label-item input, .datasets-file input, .datasets-file select {
     background-color: #2d2e34;
 }
