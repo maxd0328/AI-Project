@@ -91,3 +91,11 @@ h3.outer-element {
     margin: 0;
     font-size: 14px;
 }
+
+.selected-dataset {
+    border-top: 1px solid #4d4d5d;
+}
+
+.selected-dataset:last-child {
+    border-bottom: 1px solid #4d4d5d;
+}

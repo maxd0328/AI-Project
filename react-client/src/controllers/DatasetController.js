@@ -1,44 +1,11 @@
+import { get, post, postForm } from './GeneralController';
 
-export async function fetchDatasets() {
-    const response = await fetch('/dataset/fetch');
+export const fetchDatasets = async () => await get('/dataset/fetch');
+export const fetchDetails = async datasetID => await get(`/dataset/fetch-details?id=${datasetID}`);
+export const fetchDatasetFiles = async (datasetID, query, page) => await get(`/dataset/fetch-datafiles?id=${datasetID}&query=${query}&page=${page}`);
 
-    if(!response.ok)
-        throw new Error('BAD_REQUEST');
-    return await response.json();
-}
-
-export async function fetchDetails(datasetID) {
-    const response = await fetch(`/dataset/fetch-details?id=${datasetID}`);
-
-    if(!response.ok)
-        throw new Error('BAD_REQUEST');
-    return await response.json();
-}
-
-export async function fetchDatasetFiles(datasetID, query, page) {
-    const response = await fetch(`/dataset/fetch-datafiles?id=${datasetID}&query=${query}&page=${page}`);
-
-    if(!response.ok)
-        throw new Error('BAD_REQUEST');
-    return await response.json();
-}
-
-export async function sendNewDataset(name) {
-    const response = await fetch('/dataset/create', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ name })
-    });
-
-    if(!response.ok)
-        throw new Error('BAD_REQUEST');
-    const data = await response.json();
-    return data.datasetID;
-}
-
-export async function sendNewFiles(datasetID, files, labelID, customLabel) {
+export const sendNewDataset = async name => (await post('/dataset/create', { name }, true)).datasetID;
+export const sendNewFiles = async (datasetID, files, labelID, customLabel) => {
     const form = new FormData();
     form.append('datasetID', datasetID);
     form.append('labelID', labelID);
@@ -46,51 +13,13 @@ export async function sendNewFiles(datasetID, files, labelID, customLabel) {
     for(let file of files)
         form.append('files', file);
 
-    const response = await fetch('/dataset/upload', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'multipart/form-data'
-        },
-        body: form
-    });
-
-    if(!response.ok)
-        throw new Error('BAD_REQUEST');
-    return await response.json();
-}
-
-async function updateDataset(route, body, results) {
-    const response = await fetch(`/dataset/${route}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body
-    });
-
-    if(!response.ok)
-        throw new Error('BAD_REQUEST');
-    if(results)
-        return await response.json();
-}
-
-export const sendDatasetName = async (datasetID, name) => updateDataset('rename', { datasetID, name });
-export const sendNewLabel = async (datasetID, string) => updateDataset('add-label', { datasetID, string }, true);
-export const sendEditLabel = async (datasetID, labelID, string) => updateDataset('edit-label', { datasetID, labelID, string });
-export const sendDeleteLabel = async (datasetID, labelID) => updateDataset('delete-label', { datasetID, labelID });
+    return await postForm('/dataset/upload', form, true);
+};
+export const sendDatasetName = async (datasetID, name) => await post('/dataset/rename', { datasetID, name });
+export const sendNewLabel = async (datasetID, string) => await post('/dataset/add-label', { datasetID, string }, true);
+export const sendEditLabel = async (datasetID, labelID, string) => await post('/dataset/edit-label', { datasetID, labelID, string });
+export const sendDeleteLabel = async (datasetID, labelID) => await post('/dataset/delete-label', { datasetID, labelID });
 export const sendUpdateDatafile = async (datasetID, datafileID, name, labelID, customLabel) =>
-    updateDataset('update-datafile', { datasetID, datafileID, name, labelID, customLabel });
-export const sendDeleteDatafile = async (datasetID, datafileID) => updateDataset('delete-datafile', { datasetID, datafileID });
-
-export async function sendDeleteDataset(datasetID) {
-    const response = await fetch('/dataset/delete', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ datasetID })
-    });
-
-    if(!response.ok)
-        throw new Error('BAD_REQUEST');
-}
+    await post('/dataset/update-datafile', { datasetID, datafileID, name, labelID, customLabel });
+export const sendDeleteDatafile = async (datasetID, datafileID) => await post('/dataset/delete-datafile', { datasetID, datafileID });
+export const sendDeleteDataset = async datasetID => await post('/dataset/delete', { datasetID });

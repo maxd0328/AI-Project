@@ -90,7 +90,18 @@ async function getPresignedURL(bucket, filename, expiry = 60 * 60) { // default 
         Expires: expiry
     };
 
-    return s3.getSignedUrl('getObject', params);
+    return new Promise((resolve, reject) => {
+        s3.getSignedUrl('getObject', params, (err, url) => {
+            if(err)
+                reject(err);
+            else {
+                if(process.env.NODE_ENV === 'development') // Development server only (use the exposed URL, not the internal one)
+                    url = url.replace('minio', 'localhost');
+
+                resolve(url);
+            }
+        });
+    });
 }
 
 ensureBucketExists(process.env.S3_USER_BUCKET).then(() => {});

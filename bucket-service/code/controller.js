@@ -78,6 +78,7 @@ async function createProject(userID, name, type, presetID) {
     const values = [userID, name, type, presetID === undefined ? null : presetID, Date.now()];
 
     const [result] = await db.query(query, values);
+    console.log(JSON.stringify(result));
 
     return result.insertId;
 }
@@ -125,6 +126,16 @@ async function projectExists(userID, projectID, connection = db) {
     // SELECT 1 is because we don't actually need any columns from the table, we just want to make sure there is at least one row
     const query = `SELECT EXISTS(SELECT 1 FROM projects WHERE projectID = ? AND userID = ?) AS rowExists`;
     const values = [projectID, userID];
+
+    const [result] = await connection.query(query, values);
+    return result[0].rowExists;
+}
+
+async function datasetExists(userID, datasetID, connection = db) {
+    // Use an 'exists' query to see if a dataset with the matching userID is found
+    // (SELECT 1 is because we don't actually care *what* we're selecting, just whether it exists)
+    const query = `SELECT EXISTS(SELECT 1 FROM datasets WHERE datasetID = ? AND userID = ?) AS rowExists`;
+    const values = [datasetID, userID];
 
     const [result] = await connection.query(query, values);
     return result[0].rowExists;
@@ -223,6 +234,37 @@ async function saveConfigStages(userID, projectID, presetID, stages) {
     });
 }
 
+async function addProjectDataset(userID, projectID, datasetID) {
+    if(!await projectExists(userID, projectID))
+        throw new Error('No such project exists');
+    if(!await datasetExists(userID, datasetID))
+        throw new Error('No such dataset exists');
+
+    const query = `INSERT INTO projectDatasets (projectID, datasetID) VALUES (?, ?)`;
+    const values = [projectID, datasetID];
+    await db.query(query, values);
+}
+
+async function removeProjectDataset(userID, projectID, datasetID) {
+    if(!await projectExists(userID, projectID))
+        throw new Error('No such project exists');
+
+    const query = `DELETE FROM projectDatasets WHERE projectID = ? and datasetID = ?`;
+    const values = [projectID, datasetID];
+    await db.query(query, values);
+}
+
+async function getProjectDatasets(userID, projectID) {
+    if(!await projectExists(userID, projectID))
+        throw new Error('No such project exists');
+
+    const query = `SELECT d.datasetID, d.name, d.lastModified FROM projectDatasets p INNER JOIN datasets d ON p.datasetID = d.datasetID WHERE projectID = ?`;
+    const values = [projectID];
+
+    const [rows] = await db.query(query, values);
+    return rows;
+}
+
 module.exports = {
     genS3ScriptKey,
     genS3PresetKey,
@@ -241,5 +283,8 @@ module.exports = {
     getPresets,
     getPresetContent,
     getConfigStages,
-    saveConfigStages
+    saveConfigStages,
+    addProjectDataset,
+    removeProjectDataset,
+    getProjectDatasets
 };

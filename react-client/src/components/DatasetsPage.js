@@ -59,12 +59,23 @@ const DatasetsPage = () => {
         return newDatasets;
     });
 
-    const createDataset = () => Controller.sendNewDataset('New Dataset').then(datasetID => setDatasets(datasets => {
-        const newDatasets = [...datasets];
-        newDatasets.push({ datasetID, name: 'New Dataset', lastModified: Date.now() });
-    })).catch(err => setError(true));
+    const createDataset = () => Controller.sendNewDataset('New Dataset').then(datasetID => {
+        console.log(datasetID);
+        const dataset = { datasetID, name: 'New Dataset', lastModified: Date.now() };
+        setDatasets(datasets => {
+            const newDatasets = [...datasets];
+            newDatasets.splice(0, 0, dataset);
+            return newDatasets;
+        });
+        selectDataset(dataset);
+    }).catch(err => setError(true));
 
-    const leaveDataset = () => setSearchParams({});
+    const deleteDataset = datasetID => Controller.sendDeleteDataset(datasetID).then(() => {
+        setDatasets(datasets => {
+            return datasets.filter(e => e.datasetID !== datasetID);
+        });
+        setSearchParams({});
+    }).catch(err => setError(true));
 
     const dataset = currentDataset();
     return (
@@ -98,7 +109,7 @@ const DatasetsPage = () => {
                         <div className="centered-container">
                             <p>No such dataset exists.</p>
                         </div>
-                    ) : <DatasetBody datasetID={dataset.datasetID} updateName={updateDatasetName.bind(null, dataset.datasetID)} leave={leaveDataset} /> }
+                    ) : <DatasetBody datasetID={dataset.datasetID} updateName={updateDatasetName.bind(null, dataset.datasetID)} remove={deleteDataset} /> }
                 </div>
             </div>
         </div>

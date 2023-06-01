@@ -78,7 +78,7 @@ async function uploadFiles(userID, datasetID, files, labelID, customLabel) {
         // Now we update the next available datafileID pointer and lastModified info for the dataset
         // Note that the lock on the available datafileID pointer isn't released until the transaction commits (so after this callback)
         query = `UPDATE datasets SET nextFile = ?, lastModified = ? WHERE datasetID = ?`;
-        values = [nextFile + files.length, Date.now()];
+        values = [nextFile + files.length, Date.now(), datasetID];
 
         await connection.query(query, values);
 
@@ -122,7 +122,7 @@ async function addLabel(userID, datasetID, string) {
 
         // Now we write back the new next available labelID (note that the lock still isn't released until we commit the transaction)
         query = `UPDATE datasets SET nextlabel = ? WHERE datasetID = ?`;
-        values = [nextLabel + 1];
+        values = [nextLabel + 1, datasetID];
         await connection.query(query, values);
 
         // Update the last modified timestamp of the dataset
@@ -240,30 +240,11 @@ async function deleteDataset(userID, datasetID) {
 
 async function getDatasets(userID) {
     return await db.transaction(async connection => {
-        // First we select all datasets that the user owns, ordered by last modified as always
+        // We select all datasets that the user owns, ordered by last modified as always
         let query = `SELECT datasetID, name, lastModified FROM datasets WHERE userID = ? ORDER BY lastModified DESC`;
         let values = [userID];
 
         const [datasets] = await connection.query(query, values);
-
-        // Next, we select all labels associated with datasets owned by the user
-        query = `SELECT l.datasetID, l.labelID, l.string FROM dataLabels l JOIN datasets d ON l.datasetID = d.datasetID WHERE d.userID = ?`;
-        values = [userID];
-
-        const [labels] = await connection.query(query, values);
-
-        // Now with all the data fetched, we create a map of dataset IDs to a list of all its labels
-        const labelMap = {};
-        for(let label of labels) {
-            if(!labelMap[label.datasetID])
-                labelMap[label.datasetID] = [];
-            labelMap[label.datasetID].push({ labelID: label.labelID, value: label.string });
-        }
-
-        // Finally, for each dataset we add a property for its labels from the label map
-        for(let dataset of datasets)
-            dataset.labels = labelMap[dataset.datasetID] || [];
-
         return datasets;
     });
 }
@@ -314,7 +295,7 @@ async function getFiles(userID, datasetID, searchQuery, page) {
         // For every row, we figure out where it's stored in S3 and generate a pre-signed URL (valid for the default amount of time, 1 hour at the
         // time of writing this comment) so that the user can view the image
         for(const row of rows)
-            row.url = s3.getPresignedURL(process.env.S3_USER_BUCKET, genS3DatafileKey(datasetID, row.datafileID));
+            row.url = await s3.getPresignedURL(process.env.S3_USER_BUCKET, genS3DatafileKey(datasetID, row.datafileID));
         return rows;
     });
 }

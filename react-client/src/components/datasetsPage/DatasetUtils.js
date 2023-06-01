@@ -71,7 +71,7 @@ export const LabelChooser = ({ labels, value, callback }) => {
     const [provisionalCustomLabel, setProvisionalCustomLabel] = useState('');
     const customField = useRef(null);
 
-    useEffect(() => setProvisionalCustomLabel(value.customValue ? value.customValue : ''), [value]);
+    useEffect(() => setProvisionalCustomLabel(value.customLabel ? value.customLabel : ''), [value]);
 
     const updateChoice = event => {
         if(event.target.value === '')
