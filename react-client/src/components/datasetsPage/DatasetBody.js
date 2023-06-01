@@ -3,7 +3,7 @@ import { DataLabel, DataFile, ProvisionalFile, LabelChooser } from './DatasetUti
 import * as Controller from 'controllers/DatasetController';
 import * as GenController from 'controllers/GeneralController';
 
-const DatasetBody = ({ datasetID, updateName, leave }) => {
+const DatasetBody = ({ datasetID, updateName, remove }) => {
     const [dataset, setDataset] = useState(null);
     const [loadingDataset, setLoadingDataset] = useState(false);
     const [datasetError, setDatasetError] = useState(false);
@@ -31,6 +31,7 @@ const DatasetBody = ({ datasetID, updateName, leave }) => {
             setDatasetError(false);
             if(callback) callback(result);
         }).catch(err => {
+            console.error(err);
             setLoadingDataset(false);
             setDatasetError(true);
         });
@@ -123,7 +124,7 @@ const DatasetBody = ({ datasetID, updateName, leave }) => {
 
     const saveName = event => {
         if(!event.key || event.key === 'Enter') Controller.sendDatasetName(datasetID, provisionalName)
-            .then(reloadSilent.bind(null, dataset => updateName(dataset.name))).catch(err => setDatasetError(true));
+            .then(() => reloadSilent(dataset => updateName(dataset.name))).catch(err => setDatasetError(true));
     };
 
     const uploadFiles = () => Controller.sendNewFiles(datasetID, provisionalFiles, defaultLabel.labelID, defaultLabel.customLabel).then(() => {
@@ -131,9 +132,9 @@ const DatasetBody = ({ datasetID, updateName, leave }) => {
         reloadFilesSilent();
     }).catch(err => setDatasetError(true));
 
-    const addDataLabel = () => Controller.sendNewLabel(datasetID, 'New Label').then(reloadSilent).catch(err => setDatasetError(true));
+    const addDataLabel = () => Controller.sendNewLabel(datasetID, 'New Label').then(() => reloadSilent()).catch(err => setDatasetError(true));
 
-    const updateDataLabel = (labelID, string) => Controller.sendEditLabel(datasetID, labelID, string).then(reloadSilent).catch(err => setDatasetError(true));
+    const updateDataLabel = (labelID, string) => Controller.sendEditLabel(datasetID, labelID, string).then(() => reloadSilent()).catch(err => setDatasetError(true));
 
     const removeDataLabel = (labelID) => Controller.sendDeleteLabel(datasetID, labelID).then(() => {
         reloadSilent();
@@ -144,8 +145,6 @@ const DatasetBody = ({ datasetID, updateName, leave }) => {
         .then(reloadFilesSilent).catch(err => setFileError(true));
 
     const removeFile = datafileID => Controller.sendDeleteDatafile(datasetID, datafileID).then(reloadFilesSilent).catch(err => setFileError(true));
-
-    const deleteDataset = () => Controller.sendDeleteDataset(datasetID).then(leave).catch(err => setDeleteFailed(true));
 
     if(!dataset) return null;
     if(loadingDataset) return (
@@ -165,7 +164,7 @@ const DatasetBody = ({ datasetID, updateName, leave }) => {
             <div className="row" style={{marginTop: 20 + 'px', marginBottom: 10 + 'px'}}>
                 <input type="text" placeholder="Name" className="outer-element text-field" style={{margin: 0, flexGrow: 1, fontSize: 18 + 'px'}}
                        value={provisionalName} onChange={updateProvisionalName} onKeyDown={saveName} onBlur={saveName} />
-                <button className="button red" onClick={deleteDataset} style={{marginLeft: 10 + 'px'}}>Delete</button>
+                <button className="button red" onClick={remove.bind(null, datasetID)} style={{marginLeft: 10 + 'px'}}>Delete</button>
             </div>
             { deleteFailed ? <p className="outer-element" style={{color: '#ff3333'}}>Failed to delete dataset</p> : null }
             <p className="outer-element">Last Modified: {GenController.getRelativeTimeString(dataset.lastModified)}</p>

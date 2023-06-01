@@ -22,6 +22,7 @@ const ProjectTab = (props) => {
 
 const ProjectPage = () => {
     const [project, setProject] = useState({ name: 'Loading...', type: '', presetID: null });
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
 
     const [searchParams] = useSearchParams();
@@ -31,7 +32,7 @@ const ProjectPage = () => {
     const pages = useMemo(() => [
         { hash: 'details', gen: () => <DetailsTab project={project} setProject={setProject} raiseError={setError.bind(null, true)}/> },
         { hash: 'configuration', gen: () => <ConfigurationTab project={project} setProject={setProject}/> },
-        { hash: 'datasets', gen: () => <DatasetsTab/> },
+        { hash: 'datasets', gen: () => <DatasetsTab project={project} /> },
         { hash: 'training', gen: () => <TrainingTab/> },
         { hash: 'results', gen: () => <ResultsTab/> }
     ], [project]);
@@ -40,11 +41,18 @@ const ProjectPage = () => {
         const projectID = searchParams.get('id');
         if(projectID === null)
             navigate('/console/home');
-        else Controller.fetchProject(projectID).then((project) => {
-            project.projectID = projectID;
-            setProject(project);
-            setError(false);
-        }).catch((err) => setError(true));
+        else {
+            setLoading(true);
+            Controller.fetchProject(projectID).then((project) => {
+                project.projectID = projectID;
+                setProject(project);
+                setError(false);
+                setLoading(false);
+            }).catch((err) => {
+                setError(true);
+                setLoading(false);
+            });
+        }
     }, [searchParams, navigate]);
 
     useEffect(() => reload(), [reload]);
@@ -70,9 +78,16 @@ const ProjectPage = () => {
                 </div>
                 <div className="project-primary">
                     { (() => {
+                        if(loading)
+                            return (
+                                <div className="centered-container">
+                                    <p className="small-header">Loading...</p>
+                                </div>
+                            );
+
                         if(error)
                             return (
-                                <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: 100 + '%'}}>
+                                <div className="centered-container">
                                     <p className="small-header" style={{marginBottom: 10 + 'px'}}>Something went wrong, please try again.</p>
                                     <button className="button blue" onClick={reload}>Reload</button>
                                 </div>

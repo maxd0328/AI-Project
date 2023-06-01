@@ -26,7 +26,7 @@ const ConfigurationPreset = ({ preset, apply }) => {
             <button className="image-button text-button" onClick={apply.bind(null, preset)}>Use</button>
             <button className="image-button text-button" onClick={openPresetPage}>View</button>
         </div>
-    )
+    );
 };
 
 /* Represents a single pipeline stage, including the header */

@@ -281,7 +281,7 @@ const HomePage = () => {
             { renderScripts() }
             <div className="script-header-container">
                 <h2 style={{flexGrow: 1}}>Recent Datasets</h2>
-                <button className="button green" onClick={openDatasetEditor}>Open Dataset List</button>
+                <button className="button green" onClick={openDatasetEditor}>Open Dataset Editor</button>
             </div>
             { renderDatasets() }
             <h2 style={{marginLeft: 15 + 'vw', marginTop: 60 + 'px', marginBottom: 5 + 'px'}}>Account Actions</h2>

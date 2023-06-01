@@ -31,15 +31,18 @@ router.post('/create', async (req, res) => {
 /* POST submit new files to dataset. */
 router.post('/upload', upload.array('files'), async (req, res) => {
     if(!ensureLoggedIn(req, res)) return;
-    const datasetID = req.body['datasetID'];
-    const labelID = req.body['labelID'];
-    const customLabel = req.body['customLabel'];
+    let datasetID = req.body['datasetID'];
+    let labelID = req.body['labelID'];
+    let customLabel = req.body['customLabel'];
+
+    if(!labelID || labelID === 'null') labelID = null;
 
     try {
         const datafileIDs = await controller.uploadFiles(req.session.userID, datasetID, req.files, labelID, customLabel);
         res.status(201).json(datafileIDs);
     }
     catch(err) {
+        console.error(err);
         res.status(400).json({ error: 'Something went wrong' });
     }
 });
@@ -70,6 +73,7 @@ router.post('/add-label', async (req, res) => {
         res.status(201).json({ labelID });
     }
     catch(err) {
+        console.error(err);
         res.status(400).json({ error: 'Something went wrong' });
     }
 });
@@ -113,6 +117,8 @@ router.post('/update-datafile', async (req, res) => {
     const name = req.body['name'];
     const labelID = req.body['labelID'];
     const customLabel = req.body['customLabel'];
+
+    console.log(labelID + ', ' + customLabel);
 
     try {
         await controller.updateDatafile(req.session.userID, datasetID, datafileID, name, labelID, customLabel);
@@ -188,6 +194,8 @@ router.get('/fetch-datafiles', async (req, res) => {
 
     try {
         const files = await controller.getFiles(req.session.userID, datasetID, query, page);
+        if(files.length > 0)
+            console.log(files[0].labelID + ', ' + files[0].customLabel);
         res.status(200).json(files);
     }
     catch(err) {
