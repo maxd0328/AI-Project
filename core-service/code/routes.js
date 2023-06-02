@@ -38,5 +38,6 @@ router.get('/console/home', serveApp);
 router.get('/console/scripts', serveApp);
 router.get('/console/project', serveApp);
 router.get('/console/presets', serveApp);
+router.get('/console/datasets', serveApp);
 
 module.exports = router;

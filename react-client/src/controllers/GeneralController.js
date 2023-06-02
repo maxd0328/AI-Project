@@ -49,3 +49,38 @@ export function getFileSizeString(sizeBytes) {
         }
     }
 }
+
+export async function get(route) {
+    const response = await fetch(route);
+
+    if(!response.ok)
+        throw new Error('BAD_REQUEST');
+    return await response.json();
+}
+
+export async function post(route, body, results) {
+    const response = await fetch(route, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+    });
+
+    if(!response.ok)
+        throw new Error('BAD_REQUEST');
+    if(results)
+        return await response.json();
+}
+
+export async function postForm(route, form, results) {
+    const response = await fetch(route, {
+        method: 'POST',
+        body: form
+    });
+
+    if(!response.ok)
+        throw new Error('BAD_REQUEST');
+    if(results)
+        return await response.json();
+}

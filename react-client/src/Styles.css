@@ -105,6 +105,74 @@ button:focus {
     background-color: #02458c;
 }
 
+.centered-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.centered-container p {
+    margin: 10px;
+}
+
+.selectable-text-button {
+    background-color: rgba(255, 255, 255, 0);
+    border: none;
+    color: #eee;
+    font-size: 16px;
+    text-align: left;
+    border-radius: 10px;
+    padding-left: 10px;
+}
+
+.selectable-text-button:not(:active) {
+    transition: background-color 0.15s;
+    outline: none;
+}
+
+.selectable-text-button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.selectable-text-button:active, .selectable-text-button:disabled {
+    background-color: rgba(255, 255, 255, 0.3);
+    outline: none;
+}
+
+.image-button {
+    padding: 0;
+    border: none;
+    background-color: rgba(200, 200, 200, 0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.image-button:not(:active) {
+    outline: none;
+    transition: background-color 0.15s;
+}
+
+.image-button:hover {
+    background-color: rgba(200, 200, 200, 0.3);
+}
+
+.image-button:active {
+    outline: none;
+    background-color: rgba(200, 200, 200, 0.7);
+}
+
+.text-button {
+    color: #eee;
+    padding: 10px;
+    font-weight: bold;
+    border-radius: 10px;
+}
+
 ::-webkit-scrollbar {
     width: 8px;
 }

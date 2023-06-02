@@ -29,6 +29,13 @@ services:
     environment:
       NODE_ENV: development
       PORT: 8080
+  dataset-service:
+    build: ./dataset-service
+    ports:
+      - "3004:8080"
+    environment:
+      NODE_ENV: development
+      PORT: 8080
 
   # AWS substitute services
   db:

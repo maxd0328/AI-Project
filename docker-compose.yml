@@ -29,3 +29,10 @@ services:
     environment:
       NODE_ENV: production
       PORT: 8080
+  dataset-service:
+    image: 863286959775.dkr.ecr.us-east-1.amazonaws.com/ai-project-dataset-service:latest
+    ports:
+      - "3004:8080"
+    environment:
+      NODE_ENV: production
+      PORT: 8080

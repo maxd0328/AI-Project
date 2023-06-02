@@ -5,6 +5,7 @@ import { SessionContext } from 'controllers/SessionContext';
 import * as GenController from 'controllers/GeneralController';
 import * as Controller from 'controllers/HomeController';
 import * as ScriptController from 'controllers/ScriptController';
+import * as DatasetController from 'controllers/DatasetController';
 import MenuBar from './MenuBar';
 
 const ProjectType = (props) => {
@@ -40,7 +41,6 @@ const Project = (props) => {
 };
 
 const ScriptLink = (props) => {
-
     if(props.seeAll) {
         return (
             <button className="home-list-item" style={{height: 50 + 'px'}} onClick={props.open}>
@@ -57,26 +57,41 @@ const ScriptLink = (props) => {
             <p style={{color: '#aaa'}}>Last modified: {GenController.getRelativeTimeString(props.lastModified)}</p>
         </button>
     );
-}
+};
+
+const DatasetLink = (props) => {
+    return (
+        <button className="home-list-item" style={{height: 50 + 'px'}} onClick={props.open}>
+            <img src="/console/images/data.png" alt="/console/images/data.png"/>
+            <p style={{marginLeft: 10, flexGrow: 1, textAlign: 'left'}}>{props.name}</p>
+            <p style={{color: '#aaa'}}>Last modified: {GenController.getRelativeTimeString(props.lastModified)}</p>
+        </button>
+    );
+};
 
 const HomePage = () => {
     const [projects, setProjects] = useState([]);
     const [scripts, setScripts] = useState([]);
+    const [datasets, setDatasets] = useState([]);
     const [searchProjects, setSearchProjects] = useState('');
     const [errorProjects, setErrorProjects] = useState(false);
     const [loadingProjects, setLoadingProjects] = useState(true);
     const [errorScripts, setErrorScripts] = useState(false);
     const [loadingScripts, setLoadingScripts] = useState(true);
+    const [errorDatasets, setErrorDatasets] = useState(false);
+    const [loadingDatasets, setLoadingDatasets] = useState(true);
     const [logoutError, setLogoutError] = useState(false);
 
     const navigate = useNavigate();
     const location = useLocation();
     const session = useContext(SessionContext);
     const scriptMax = 5;
+    const datasetMax = 5;
 
     useEffect(() => {
         reloadProjects();
         reloadScripts();
+        reloadDatasets();
     }, []);
 
     useEffect(() => { window.location.hash = ''; }, [location]);
@@ -107,6 +122,20 @@ const HomePage = () => {
         });
     };
 
+    const reloadDatasets = () => {
+        setLoadingDatasets(true);
+        DatasetController.fetchDatasets().then(datasets => {
+            if(datasets.length > datasetMax)
+                setDatasets(datasets.slice(0, datasetMax));
+            else setDatasets(datasets);
+            setErrorDatasets(false);
+            setLoadingDatasets(false);
+        }).catch(err => {
+            setErrorDatasets(true);
+            setLoadingDatasets(false);
+        });
+    };
+
     const updateSearchProjects = (event) => {
         setSearchProjects(event.target.value);
     };
@@ -121,6 +150,14 @@ const HomePage = () => {
 
     const openScript = (scriptID) => {
         navigate(`/console/scripts?id=${scriptID}`);
+    };
+
+    const openDatasetEditor = () => {
+        navigate('/console/datasets');
+    };
+
+    const openDataset = (datasetID) => {
+        navigate(`/console/datasets?id=${datasetID}`);
     };
 
     const logout = () => {
@@ -149,10 +186,10 @@ const HomePage = () => {
 
         return (
             <div className="home-vertical-container">
-                { projects.map(project => {
+                { projects.map((project, index) => {
                     if(project.name.toLowerCase().includes(searchProjects.trim().toLowerCase()))
                         return <Project type={project.type} name={project.name} lastModified={project.lastModified}
-                                        open={openProject.bind(null, project.projectID)} />;
+                                        open={openProject.bind(null, project.projectID)} key={index} />;
                     else return null;
                 }) }
             </div>
@@ -181,10 +218,39 @@ const HomePage = () => {
 
         return (
             <div className="home-vertical-container" style={{marginRight: 15 + 'vw'}}>
-                { scripts.map(script => (
-                    <ScriptLink name={script.name} lastModified={script.lastModified} open={openScript.bind(null, script.scriptID)} />
+                { scripts.map((script, index) => (
+                    <ScriptLink name={script.name} lastModified={script.lastModified} open={openScript.bind(null, script.scriptID)} key={index} />
                 )) }
                 { scripts.length > scriptMax ? <ScriptLink seeAll open={openScriptEditor}/> : null }
+            </div>
+        );
+    };
+
+    const renderDatasets = () => {
+        if(loadingDatasets) return (
+            <div style={{textAlign: 'center'}}>
+                <p>Loading datasets...</p>
+            </div>
+        );
+
+        if(errorDatasets) return (
+            <div style={{textAlign: 'center'}}>
+                <p>Something went wrong, please try again later.</p>
+                <button className="button blue" onClick={reloadDatasets}>Reload</button>
+            </div>
+        );
+
+        if(datasets.length === 0) return (
+            <div style={{textAlign: 'center'}}>
+                <p>You don't have any datasets yet. Get started by creating one!</p>
+            </div>
+        );
+
+        return (
+            <div className="home-vertical-container">
+                { datasets.map((dataset, index) => (
+                    <DatasetLink name={dataset.name} lastModified={dataset.lastModified} open={openDataset.bind(null, dataset.datasetID)} key={index} />
+                )) }
             </div>
         );
     };
@@ -213,6 +279,11 @@ const HomePage = () => {
                 <button className="button green" onClick={openScriptEditor}>Open Script Editor</button>
             </div>
             { renderScripts() }
+            <div className="script-header-container">
+                <h2 style={{flexGrow: 1}}>Recent Datasets</h2>
+                <button className="button green" onClick={openDatasetEditor}>Open Dataset Editor</button>
+            </div>
+            { renderDatasets() }
             <h2 style={{marginLeft: 15 + 'vw', marginTop: 60 + 'px', marginBottom: 5 + 'px'}}>Account Actions</h2>
             <div style={{marginLeft: 15 + 'vw', display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
                 <button className="button red" style={{marginTop: 15, marginBottom: 15}} onClick={logout}>Log Out</button>

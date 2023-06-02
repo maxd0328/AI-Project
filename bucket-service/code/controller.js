@@ -9,11 +9,7 @@ const genS3InternalConfigKey = (projectID, location) => `config-${projectID}-${l
 
 async function createScript(userID, name, content) {
     // Use a transaction to ensure that the database and s3 bucket are updated before committing
-    const connection = await db.getConnection();
-
-    try {
-        await connection.beginTransaction();
-
+    return db.transaction(async connection => {
         const query = `INSERT INTO scripts (userID, name, lastModified) VALUES (?, ?, ?)`;
         const values = [userID, name, Date.now()];
         let scriptID;
@@ -24,17 +20,9 @@ async function createScript(userID, name, content) {
         // Attempt to add the content to S3
         await s3.putResource(process.env.S3_USER_BUCKET, genS3ScriptKey(userID, scriptID), content);
 
-        // Commit the transaction and return the newID
-        await connection.commit();
+        // Return the new ID
         return scriptID;
-    }
-    catch(err) {
-        await connection.rollback();
-        throw err;
-    }
-    finally {
-        connection.release();
-    }
+    });
 }
 
 async function updateScriptName(userID, scriptID, name) {
@@ -90,6 +78,7 @@ async function createProject(userID, name, type, presetID) {
     const values = [userID, name, type, presetID === undefined ? null : presetID, Date.now()];
 
     const [result] = await db.query(query, values);
+    console.log(JSON.stringify(result));
 
     return result.insertId;
 }
@@ -133,12 +122,22 @@ async function getProject(userID, projectID) {
     else throw new Error(`Project with ID ${projectID} does not exist`);
 }
 
-async function projectExists(userID, projectID) {
+async function projectExists(userID, projectID, connection = db) {
     // SELECT 1 is because we don't actually need any columns from the table, we just want to make sure there is at least one row
     const query = `SELECT EXISTS(SELECT 1 FROM projects WHERE projectID = ? AND userID = ?) AS rowExists`;
     const values = [projectID, userID];
 
-    const [result] = await db.query(query, values);
+    const [result] = await connection.query(query, values);
+    return result[0].rowExists;
+}
+
+async function datasetExists(userID, datasetID, connection = db) {
+    // Use an 'exists' query to see if a dataset with the matching userID is found
+    // (SELECT 1 is because we don't actually care *what* we're selecting, just whether it exists)
+    const query = `SELECT EXISTS(SELECT 1 FROM datasets WHERE datasetID = ? AND userID = ?) AS rowExists`;
+    const values = [datasetID, userID];
+
+    const [result] = await connection.query(query, values);
     return result[0].rowExists;
 }
 
@@ -192,25 +191,21 @@ async function saveConfigStages(userID, projectID, presetID, stages) {
     // TODO perhaps switch to a more efficient algorithm in the future, current implementation is bullshit
     // To adhere to table constraints mid-transaction, all configs are deleted and re-inserted
 
-    // Project must exist (and belong to the user)
-    if(!await projectExists(userID, projectID))
-        throw new Error('No such project exists');
-
-    // Create a snapshot of the S3 entries in case transaction fails
-    let query = `SELECT location FROM configs WHERE projectID = ?`;
-    let values = [projectID];
-
-    const [rows] = await db.query(query, values);
     let snapshot = [];
-    for(let i = 0 ; i < rows.length ; ++i) {
-        const key = genS3InternalConfigKey(projectID, rows[i].location); // Snapshot contains key and associated content
-        snapshot.push({ key, content: await s3.getResource(process.env.S3_USER_BUCKET, key) });
-    }
+    await db.transaction(async connection => {
+        // Project must exist (and belong to the user)
+        if(!await projectExists(userID, projectID))
+            throw new Error('No such project exists');
 
-    // Create connection for database transaction
-    const connection = await db.getConnection();
-    try {
-        await connection.beginTransaction();
+        // Create a snapshot of the S3 entries in case transaction fails
+        let query = `SELECT location FROM configs WHERE projectID = ?`;
+        let values = [projectID];
+
+        const [rows] = await connection.query(query, values);
+        for(let i = 0 ; i < rows.length ; ++i) {
+            const key = genS3InternalConfigKey(projectID, rows[i].location); // Snapshot contains key and associated content
+            snapshot.push({ key, content: await s3.getResource(process.env.S3_USER_BUCKET, key) });
+        }
 
         // Delete all config rows from the project
         query = `DELETE FROM configs WHERE projectID = ?`;
@@ -232,23 +227,42 @@ async function saveConfigStages(userID, projectID, presetID, stages) {
         query = `UPDATE projects SET presetID = ?, lastModified = ? WHERE projectID = ?`;
         values = [presetID === undefined ? null : presetID, Date.now(), projectID];
         await connection.query(query, values);
-
-        // Commit the transaction
-        await connection.commit();
-    }
-    catch(err) {
-        // In the event of an error, we roll back the transaction
-        await connection.rollback();
-
-        // We also recover previous S3 entries from the snapshot
+    }, async err => {
+        // We recover previous S3 entries from the snapshot
         for(let i = 0 ; i < snapshot.length ; ++i) // TODO because if any of these put operations fail, the user's data is fucked
             await s3.putResource(process.env.S3_USER_BUCKET, snapshot.key, snapshot.content);
-        // Let the route handler know there was an error
-        throw err;
-    }
-    finally { // Make sure the connection is released
-        connection.release();
-    }
+    });
+}
+
+async function addProjectDataset(userID, projectID, datasetID) {
+    if(!await projectExists(userID, projectID))
+        throw new Error('No such project exists');
+    if(!await datasetExists(userID, datasetID))
+        throw new Error('No such dataset exists');
+
+    const query = `INSERT INTO projectDatasets (projectID, datasetID) VALUES (?, ?)`;
+    const values = [projectID, datasetID];
+    await db.query(query, values);
+}
+
+async function removeProjectDataset(userID, projectID, datasetID) {
+    if(!await projectExists(userID, projectID))
+        throw new Error('No such project exists');
+
+    const query = `DELETE FROM projectDatasets WHERE projectID = ? and datasetID = ?`;
+    const values = [projectID, datasetID];
+    await db.query(query, values);
+}
+
+async function getProjectDatasets(userID, projectID) {
+    if(!await projectExists(userID, projectID))
+        throw new Error('No such project exists');
+
+    const query = `SELECT d.datasetID, d.name, d.lastModified FROM projectDatasets p INNER JOIN datasets d ON p.datasetID = d.datasetID WHERE projectID = ?`;
+    const values = [projectID];
+
+    const [rows] = await db.query(query, values);
+    return rows;
 }
 
 module.exports = {
@@ -269,5 +283,8 @@ module.exports = {
     getPresets,
     getPresetContent,
     getConfigStages,
-    saveConfigStages
+    saveConfigStages,
+    addProjectDataset,
+    removeProjectDataset,
+    getProjectDatasets
 };

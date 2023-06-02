@@ -83,11 +83,33 @@ async function deleteResource(bucket, filename, callback) {
     }
 }
 
-ensureBucketExists(process.env.S3_USER_BUCKET).then(noAction => {});
+async function getPresignedURL(bucket, filename, expiry = 60 * 60) { // default 1 hour expiry
+    const params = {
+        Bucket: bucket,
+        Key: filename,
+        Expires: expiry
+    };
+
+    return new Promise((resolve, reject) => {
+        s3.getSignedUrl('getObject', params, (err, url) => {
+            if(err)
+                reject(err);
+            else {
+                if(process.env.NODE_ENV === 'development') // Development server only (use the exposed URL, not the internal one)
+                    url = url.replace('minio', 'localhost');
+
+                resolve(url);
+            }
+        });
+    });
+}
+
+ensureBucketExists(process.env.S3_USER_BUCKET).then(() => {});
 
 module.exports = {
     ensureBucketExists,
     getResource,
     putResource,
-    deleteResource
+    deleteResource,
+    getPresignedURL
 }

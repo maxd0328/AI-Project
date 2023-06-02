@@ -226,4 +226,49 @@ router.post('/save-pipeline', async (req, res) => {
     }
 });
 
+/* POST link dataset to project. */
+router.post('/link-dataset', async (req, res) => {
+    if(!ensureLoggedIn(req, res)) return;
+    const projectID = req.body['projectID'];
+    const datasetID = req.body['datasetID'];
+
+    try {
+        await controller.addProjectDataset(req.session.userID, projectID, datasetID);
+        res.status(204).json();
+    }
+    catch(err) {
+        res.status(400).json({ error: 'Something went wrong' });
+    }
+});
+
+/* POST link dataset to project. */
+router.post('/unlink-dataset', async (req, res) => {
+    if(!ensureLoggedIn(req, res)) return;
+    const projectID = req.body['projectID'];
+    const datasetID = req.body['datasetID'];
+
+    try {
+        await controller.removeProjectDataset(req.session.userID, projectID, datasetID);
+        res.status(204).json();
+    }
+    catch(err) {
+        res.status(400).json({ error: 'Something went wrong' });
+    }
+});
+
+/* GET project's linked datasets. */
+router.get('/fetch-linked-datasets', async (req, res) => {
+    if(!ensureLoggedIn(req, res)) return;
+    const projectID = req.query.id;
+
+    try {
+        const datasets = await controller.getProjectDatasets(req.session.userID, projectID);
+        res.status(200).json(datasets);
+    }
+    catch(err) {
+        console.error(err);
+        res.status(400).json({ error: 'Something went wrong' });
+    }
+});
+
 module.exports = router;

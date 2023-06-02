@@ -26,7 +26,7 @@ const PresetPage = () => {
     // If there is no preset object corresponding to the ID, an object containing a truthy value for the field 'noSuchPreset' is returned
     const currentPreset = useCallback(() => {
         let presetID = currentPresetID();
-        if(presetID == null)
+        if(presetID === null)
             return null;
         let preset = presets.find(e => e.presetID === presetID);
         return !preset ? { noSuchPreset: true } : preset;
@@ -68,7 +68,7 @@ const PresetPage = () => {
                            onChange={updateSearchPresets} value={searchPresets} style={{marginBottom: 10 + 'px'}}/>
                     <div className="preset-page-sidebar-scroll">
                         { presets.filter(e => e.name.toLowerCase().includes(searchPresets.trim().toLowerCase())).map((preset, index) => (
-                            <button key={index} className="preset-button" disabled={currentPresetID() === preset.presetID} onClick={select.bind(null, preset)}>
+                            <button key={index} className="selectable-text-button" disabled={currentPresetID() === preset.presetID} onClick={select.bind(null, preset)}>
                                 <p>{preset.name}</p>
                             </button>
                         )) }

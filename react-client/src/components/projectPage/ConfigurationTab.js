@@ -26,7 +26,7 @@ const ConfigurationPreset = ({ preset, apply }) => {
             <button className="image-button text-button" onClick={apply.bind(null, preset)}>Use</button>
             <button className="image-button text-button" onClick={openPresetPage}>View</button>
         </div>
-    )
+    );
 };
 
 /* Represents a single pipeline stage, including the header */
@@ -38,16 +38,22 @@ const PipelineStage = ({ stage, set, remove, swap }) => {
 
     // When clicking edit name, focus the text field and set the initial text equal to the current name
     useEffect(() => {
-        if(editingName) {
-            editNameField.current.focus();
-            setProvisionalName(stage.name);
-        }
-    }, [editingName, stage]);
+        if(editingName && editNameField.current)
+            editNameField.current.select();
+    }, [editingName]);
 
     // Handler functions
     const toggleExpanded = () => setExpanded(expanded => !expanded);
 
-    const editName = () => setEditingName(true);
+    const editName = () => {
+        setEditingName(true);
+        setProvisionalName(stage.name);
+    }
+
+    const editNameKeyDown = event => {
+        if(event.key === 'Enter')
+            saveName();
+    };
 
     const saveName = () => {
         setEditingName(false);
@@ -93,7 +99,7 @@ const PipelineStage = ({ stage, set, remove, swap }) => {
                         <img src="/console/images/arrow.png" alt="/console/images/arrow.png" style={{width: 70 + '%', height: 70 + '%'}}/>
                     </button>
                     <input type="text" placeholder="Stage Name" className="text-field" style={{flexGrow: 1, marginRight: 10 + 'px'}}
-                           ref={editNameField} onChange={updateProvisionalName} value={provisionalName}/>
+                           ref={editNameField} onChange={updateProvisionalName} value={provisionalName} onKeyDown={editNameKeyDown}/>
                     <button className="button red" onClick={cancelName}>Cancel</button>
                     <button className="button green" onClick={saveName}>Save</button>
                 </div>

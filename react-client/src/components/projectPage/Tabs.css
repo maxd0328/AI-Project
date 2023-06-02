@@ -54,37 +54,6 @@ h3.outer-element {
     background-color: #3b3b42;
 }
 
-.image-button {
-    padding: 0;
-    border: none;
-    background-color: rgba(200, 200, 200, 0);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-}
-
-.image-button:not(:active) {
-    outline: none;
-    transition: background-color 0.15s;
-}
-
-.image-button:hover {
-    background-color: rgba(200, 200, 200, 0.3);
-}
-
-.image-button:active {
-    outline: none;
-    background-color: rgba(200, 200, 200, 0.7);
-}
-
-.text-button {
-    color: #eee;
-    padding: 10px;
-    font-weight: bold;
-    border-radius: 10px;
-}
-
 .page-block {
     margin-top: 10px;
     background-color: #383a42;
@@ -97,7 +66,7 @@ h3.outer-element {
     box-sizing: border-box;
 }
 
-.page-block input {
+.page-block input, .page-block select {
     background-color: #2d2e34;
 }
 
@@ -121,4 +90,12 @@ h3.outer-element {
 .page-list-item p {
     margin: 0;
     font-size: 14px;
+}
+
+.selected-dataset {
+    border-top: 1px solid #4d4d5d;
+}
+
+.selected-dataset:last-child {
+    border-bottom: 1px solid #4d4d5d;
 }

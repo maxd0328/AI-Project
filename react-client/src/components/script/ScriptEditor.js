@@ -83,7 +83,7 @@ const ScriptEditor = (props) => {
 
         clearTimeout(compileTimeout.current);
         compileTimeout.current = setTimeout(later, 3000); // 3 seconds
-    }, []); // 3 seconds
+    }, []);
 
     useEffect(() => {
         if(props.children !== compiledContent)

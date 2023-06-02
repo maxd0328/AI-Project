@@ -12,13 +12,21 @@ const DetailsTab = (props) => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        if(editName) {
-            editNameField.current.focus();
-            setProvisionalName(props.project.name);
-        }
-    }, [editName, props.project.name]);
+        if(editName && editNameField.current)
+            editNameField.current.select();
+    }, [editName]);
 
     const updateProvisionalName = (event) => setProvisionalName(event.target.value);
+
+    const startEditName = () => {
+        setEditName(true);
+        setProvisionalName(props.project.name);
+    };
+
+    const editNameKeyDown = event => {
+        if(event.key === 'Enter')
+            saveName();
+    };
 
     const saveName = () => {
         setEditName(false);
@@ -45,7 +53,7 @@ const DetailsTab = (props) => {
                 if(editName) return (
                     <div className="row">
                         <input type="text" placeholder="Project Name" className="text-field" style={{flexGrow: 1, marginRight: 10 + 'px'}}
-                               ref={editNameField} value={provisionalName} onChange={updateProvisionalName}/>
+                               ref={editNameField} value={provisionalName} onChange={updateProvisionalName} onKeyDown={editNameKeyDown}/>
                         <button className="button red" onClick={cancelName}>Cancel</button>
                         <button className="button green" onClick={saveName}>Save</button>
                     </div>
@@ -54,7 +62,7 @@ const DetailsTab = (props) => {
                     <div className="row">
                         <p style={{marginTop: 0, marginBottom: 0}}>{props.project.name}</p>
                         <button className="image-button" style={{marginLeft: 10 + 'px', width: 25 + 'px', height: 25 + 'px'}}
-                                onClick={setEditName.bind(null, true)}>
+                                onClick={startEditName}>
                             <img src="/console/images/edit.png" alt="/console/images/edit.png" style={{width: 70 + '%', height: 70 + '%'}}/>
                         </button>
                     </div>
