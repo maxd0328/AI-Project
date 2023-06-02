@@ -21,5 +21,3 @@ export function compile(source) {
 
     return { output, annotations };
 }
-
-export default compile;

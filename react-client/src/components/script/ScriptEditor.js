@@ -4,8 +4,7 @@ import './ScriptEditor.css';
 import ace from 'ace-builds';
 import 'ace-builds/src-noconflict/theme-dracula';
 import 'ace-builds/src-noconflict/ext-language_tools';
-import * as Definitions from 'compiler/Definitions';
-import compile from 'compiler/Compiler';
+import * as Compiler from 'ms-compiler';
 
 // This only defines high-level behaviour of the Mode like folding etc.
 ace.define('ace/mode/custom', ['require', 'exports', 'ace/lib/oop', 'ace/mode/text', 'ace/mode/custom_highlight_rules'], (acequire, exports) => {
@@ -40,8 +39,8 @@ ace.define('ace/mode/custom_highlight_rules', ['require', 'exports', 'ace/lib/oo
         this.$rules = {
             start: [
                 { token: 'annotation', regex: /(?:^|\s)@[A-Za-z_][A-Za-z0-9_]*\b/ },
-                { token: 'field', regex: '\\b' + Definitions.getKeyRegex() + '\\b' },
-                { token: 'enum', regex: '\\b' + Definitions.getEnumRegex() + '\\b' },
+                { token: 'field', regex: '\\b' + Compiler.getKeyRegex() + '\\b' },
+                { token: 'enum', regex: '\\b' + Compiler.getEnumRegex() + '\\b' },
                 { token: 'empty', regex: '\\b(empty)\\b' },
                 { token: 'identifier', regex: '\\b[A-Za-z_][A-Za-z0-9_]*\\b' },
                 { token: 'operator', regex: '[=\\{\\},\\(\\)]' },
@@ -74,7 +73,7 @@ const ScriptEditor = (props) => {
     const compileDebounce = useCallback((content) => {
         const later = () => {
             clearTimeout(compileTimeout.current);
-            const { annotations } = compile(content);
+            const { annotations } = Compiler.compile(content);
             annotations.sort((a, b) => a.row !== b.row ? a.row - b.row : a.col - b.col);
 
             setCompiledContent(content);

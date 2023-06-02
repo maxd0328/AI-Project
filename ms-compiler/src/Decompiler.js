@@ -53,5 +53,3 @@ export function decompile(json, includeAnnotations = true, showOnly = false, ind
 
     return lines.map(line => '\t'.repeat(indent) + line).join('\n');
 }
-
-export default decompile;

@@ -1,4 +1,5 @@
 const aws = require('./aws').aws;
+const { Readable } = require('stream');
 
 const s3 = process.env.NODE_ENV !== 'development' ? new aws.S3()
     : new aws.S3({
@@ -66,6 +67,33 @@ async function putResource(bucket, filename, body, callback) {
     }
 }
 
+async function putResourceStream(bucket, filename, streamCallback, callback) {
+    const upload = s3.upload({
+        Bucket: bucket,
+        Key: filename,
+        Body: new Readable({
+            read() {
+                return streamCallback(this);
+            }
+        })
+    });
+
+    try {
+        const data = await upload.response();
+        const location = data.Location;
+
+        if(callback)
+            callback(null, location);
+
+        return location;
+    }
+    catch(err) {
+        if(callback)
+            callback(err);
+        else throw err;
+    }
+}
+
 /* Callback only for err */
 async function deleteResource(bucket, filename, callback) {
     const params = {
@@ -110,6 +138,7 @@ module.exports = {
     ensureBucketExists,
     getResource,
     putResource,
+    putResourceStream,
     deleteResource,
     getPresignedURL
 }

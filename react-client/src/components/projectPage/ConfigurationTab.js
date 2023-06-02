@@ -3,8 +3,7 @@ import * as Controller from 'controllers/ProjectController';
 import ScriptStageBody from './configurationTab/ScriptStageBody';
 import InlineStageBody from './configurationTab/InlineStageBody';
 import EasyStageBody from './configurationTab/EasyStageBody';
-import compile from 'compiler/Compiler';
-import decompile from 'compiler/Decompiler';
+import * as Compiler from 'ms-compiler';
 import './Tabs.css';
 import './ConfigurationTab.css';
 
@@ -213,8 +212,8 @@ const ConfigurationTab = ({ project, setProject }) => {
     const addStarterStage = () => {
         if(currentPresetID !== null) {
             Controller.fetchPresetContent(currentPresetID).then(content => {
-                const { output } = compile(content);
-                const showContentOnly = decompile(output, false, true);
+                const { output } = Compiler.compile(content);
+                const showContentOnly = Compiler.decompile(output, false, true);
                 addStage({ name: 'Starter Configuration', type: 'gen', content: showContentOnly, key: stageKey.current++ });
             }).catch(err => setPresetError(true));
         }
