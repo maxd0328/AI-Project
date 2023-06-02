@@ -1,7 +1,7 @@
 const db = require('../commons/database');
 const s3 = require('../commons/s3');
 
-const genS3ScriptKey = (userID, scriptID) => `script-${userID}-${scriptID}.matej`;
+const genS3ScriptKey = (scriptID) => `script-${scriptID}.matej`;
 
 const genS3PresetKey = (presetID) => `preset-${presetID}.matej`;
 
@@ -18,7 +18,7 @@ async function createScript(userID, name, content) {
         scriptID = result.insertId;
 
         // Attempt to add the content to S3
-        await s3.putResource(process.env.S3_USER_BUCKET, genS3ScriptKey(userID, scriptID), content);
+        await s3.putResource(process.env.S3_USER_BUCKET, genS3ScriptKey(scriptID), content);
 
         // Return the new ID
         return scriptID;
@@ -41,7 +41,7 @@ async function updateScriptContent(userID, scriptID, content) {
     const [result] = await db.query(query, values);
     if(result.affectedRows === 0)
         throw new Error('No such script exists');
-    await s3.putResource(process.env.S3_USER_BUCKET, genS3ScriptKey(userID, scriptID), content);
+    await s3.putResource(process.env.S3_USER_BUCKET, genS3ScriptKey(scriptID), content);
 }
 
 async function deleteScript(userID, scriptID) {
@@ -51,7 +51,7 @@ async function deleteScript(userID, scriptID) {
     const [result] = await db.query(query, values);
     if(result.affectedRows === 0)
         throw new Error('No such script exists');
-    await s3.deleteResource(process.env.S3_USER_BUCKET, genS3ScriptKey(userID, scriptID));
+    await s3.deleteResource(process.env.S3_USER_BUCKET, genS3ScriptKey(scriptID));
 }
 
 async function getScripts(userID) {
@@ -70,7 +70,7 @@ async function getScriptContent(userID, scriptID) {
     if(!rows[0].rowExists)
         throw new Error('No such script exists');
 
-    return await s3.getResource(process.env.S3_USER_BUCKET, genS3ScriptKey(userID, scriptID));
+    return await s3.getResource(process.env.S3_USER_BUCKET, genS3ScriptKey(scriptID));
 }
 
 async function createProject(userID, name, type, presetID) {

@@ -1,13 +1,11 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import 'components/projectPage/Tabs.css';
 import 'components/projectPage/ConfigurationTab.css';
-import { compile, matejScriptType } from 'compiler/Compiler';
-import decompile from 'compiler/Decompiler';
-import { KEYS } from 'compiler/Definitions';
+import * as Compiler from 'ms-compiler';
 
 /* Converts from that key's MatejScript type to the UIs internal representation */
 const computeValueType = (key) => {
-    const details = KEYS.find(e => e.name === key);
+    const details = Compiler.KEYS.find(e => e.name === key);
     switch(details ? details.type : null) {
         case 'number': return 1;
         case 'array': return details.length;
@@ -17,7 +15,7 @@ const computeValueType = (key) => {
 };
 
 /* Get the list of all available keys in a given scope minus the ones already in the JSON */
-const computeKeyOptions = (json, scope) => KEYS.filter(key => key.scopes.includes(scope) && json[key.name] === undefined).map(key => key.name);
+const computeKeyOptions = (json, scope) => Compiler.KEYS.filter(key => key.scopes.includes(scope) && json[key.name] === undefined).map(key => key.name);
 
 /* Beautify camelCasePhrases, used to display the keys as regular (spaced) text */
 const beautifyCamelCase = str => str.split(/(?=[A-Z])/).map(word => word[0].toUpperCase() + word.substring(1)).join(' ');
@@ -29,7 +27,7 @@ const beautifyScreamingSnakeCase = str => str.split('_').map(word => word[0].toU
 const generateFields = (json, update, remove, rename) => Object.entries(json).map(([keyName, value], index) => {
     if(keyName === 'annotations') // Skip special annotations object of course
         return null;
-    if(matejScriptType(value) === 'layer')
+    if(Compiler.matejScriptType(value) === 'layer')
         return (<Layer layerName={keyName} value={value} key={index} callbackSet={update} callbackRemove={remove} callbackRename={rename} />);
     else {
         const valueType = computeValueType(keyName, value); // Get internal type representation
@@ -203,7 +201,7 @@ const EasyStageBody = ({ stage, set }) => {
 
     // Changes to the state always go through the MatejScript content (stored in the parent, updated through 'set' callback)
     // As such, this effect updates the internal JSON representation needed by the UI whenever the MatejScript changes
-    useEffect(() => setJson(compile(stage.content).output), [stage.content]);
+    useEffect(() => setJson(Compiler.compile(stage.content).output), [stage.content]);
 
     // Remember available keys, and recalculate when JSON (or technically, but not practically, scope) changes
     const keyOptions = useMemo(() => computeKeyOptions(json, scope), [json, scope]);
@@ -215,7 +213,7 @@ const EasyStageBody = ({ stage, set }) => {
     // the internal JSON representation used by the UI
     const apply = newJson => set({
         ...stage,
-        content: decompile(newJson)
+        content: Compiler.decompile(newJson)
     });
 
     // As in the layers, these are the 3 callbacks that the children of the global scope call to update their info (update, remove, or rename)
