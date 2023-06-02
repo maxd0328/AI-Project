@@ -1,7 +1,7 @@
-const definitions = require('./src/definitions');
+const definitions = require('./src/Definitions');
 
-const compiler = require('./src/compiler');
-const decompiler = require('./src/decompiler');
+const compiler = require('./src/Compiler');
+const decompiler = require('./src/Decompiler');
 
 const compile = compiler.compile;
 const decompile = decompiler.decompile;

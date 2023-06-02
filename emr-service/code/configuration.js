@@ -128,7 +128,13 @@ async function createEMRConfiguration(userID, projectID) {
     return [cfgKey, csvKey];
 }
 
-async function deleteEMRConfiguration(projectID) {
+async function deleteEMRConfiguration(userID, projectID) {
+    const query = `SELECT EXISTS(SELECT 1 FROM projects WHERE userID = ? AND projectID = ?) AS rowExists`;
+    const values = [userID, projectID];
+    const [result] = await db.query(query, values);
+    if(!result[0].rowExists)
+        throw new Error('No such project exists');
+
     const cfgKey = genS3EMRConfigurationKey(projectID);
     const csvKey = genS3EMR_CSVKey(projectID);
 
