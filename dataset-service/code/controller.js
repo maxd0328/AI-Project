@@ -2,7 +2,7 @@ const db = require('../commons/database');
 const s3 = require('../commons/s3');
 
 // Unique keys for locating datafiles within the S3
-const genS3DatafileKey = (datasetID, datafileID) => `datafile-${datasetID}-${datafileID}.matej`;
+const genS3DatafileKey = (datasetID, datafileID) => `datafile-${datasetID}-${datafileID}.png`; // TODO don't infer file extension as png
 
 async function datasetExists(userID, datasetID, connection = db) {
     // Use an 'exists' query to see if a dataset with the matching userID is found

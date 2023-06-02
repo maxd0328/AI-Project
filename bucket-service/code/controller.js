@@ -131,6 +131,7 @@ async function projectExists(userID, projectID, connection = db) {
     return result[0].rowExists;
 }
 
+// TODO this is a duplicate method from another service, condense this when redoing the server architecture
 async function datasetExists(userID, datasetID, connection = db) {
     // Use an 'exists' query to see if a dataset with the matching userID is found
     // (SELECT 1 is because we don't actually care *what* we're selecting, just whether it exists)

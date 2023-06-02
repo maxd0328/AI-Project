@@ -8,6 +8,7 @@ for /d %%d in (*-service) do (
     if exist "!link!" (
         echo Deleting existing symbolic link: !link!
         rmdir /Q /S "!link!"
+        del "!link!"
     )
     echo Creating new symbolic link: !link! ^>^> !commons!
     mklink /D "!link!" "!commons!"
