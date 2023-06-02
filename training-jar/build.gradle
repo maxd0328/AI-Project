@@ -1,0 +1,30 @@
+plugins {
+    id 'java'
+}
+
+group 'org.trainingJAR'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
+    implementation 'org.apache.spark:spark-core_2.11:2.4.8'
+    implementation 'org.apache.spark:spark-sql_2.11:2.4.8'
+    implementation 'org.apache.spark:spark-mllib_2.11:2.4.8'
+    implementation 'com.amazonaws:aws-java-sdk-s3:1.12.470'
+    implementation 'org.deeplearning4j:deeplearning4j-core:1.0.0-beta7'
+    implementation "org.nd4j:nd4j-native-platform:1.0.0-beta7"
+    implementation 'org.deeplearning4j:dl4j-spark-parameterserver_2.11:1.0.0-beta7'
+    implementation 'org.nd4j:nd4j-api:1.0.0-beta7'
+    implementation 'org.nd4j:nd4j-common:1.0.0-beta7'
+    implementation 'org.deeplearning4j:deeplearning4j-common:1.0.0-beta7'
+    implementation 'org.springframework.boot:spring-boot-starter-web:2.5.4'
+}
+
+test {
+    useJUnitPlatform()
+}

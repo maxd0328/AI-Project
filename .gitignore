@@ -39,3 +39,7 @@ react-client/npm-debug.log*
 react-client/yarn-debug.log*
 react-client/yarn-error.log*
 
+# Training Jar Ignore
+training-jar/.gradle
+training-jar/build
+
