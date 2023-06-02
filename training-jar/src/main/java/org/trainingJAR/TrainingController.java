@@ -13,4 +13,9 @@ public class TrainingController {
         Main.keepTraining = false;
         return "Training stopped";
     }
+
+    @PostMapping("/score")
+    public double checkScore() {
+        return Main.sparkNetwork.getScore();
+    }
 }

@@ -25,6 +25,7 @@ public class Main {
 
     public static boolean keepTraining;
 
+    public static SparkDl4jMultiLayer sparkNetwork;
     public static void main(String[] args) {
         /*
         args[0] = directory which contains the training data
@@ -91,9 +92,7 @@ public class Main {
                 network = ModelSerializer.restoreMultiLayerNetwork(s3Fetcher.downloadPath(args[7]));
             }
 
-            SparkDl4jMultiLayer sparkNetwork = new SparkDl4jMultiLayer(sc, network, master);
-
-
+            sparkNetwork = new SparkDl4jMultiLayer(sc, network, master);
 
             while(keepTraining) {
                 sparkNetwork.fit(dataRDD);
