@@ -82,6 +82,32 @@ services:
       - ./.local/config-s3:/.minio
     command: server /data
 
+  spark-master:
+    image: bitnami/spark:latest
+    environment:
+      - SPARK_MODE=master
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+    ports:
+      - "7077:7077"
+      - "6060:6060"
+
+  spark-worker:
+      image: bitnami/spark:latest
+      environment:
+        - SPARK_MODE=worker
+        - SPARK_MASTER_URL=spark://spark-master:7077
+        - SPARK_WORKER_MEMORY=1G
+        - SPARK_WORKER_CORES=1
+        - SPARK_RPC_AUTHENTICATION_ENABLED=no
+        - SPARK_RPC_ENCRYPTION_ENABLED=no
+        - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+        - SPARK_SSL_ENABLED=no
+      depends_on:
+        - spark-master
+
 volumes:
   db-data:
   cache-data:
