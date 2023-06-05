@@ -40,30 +40,90 @@ class ActionSequence {
 
     // Built-in actions
 
-    withQueryParameters(required = []) {
+    remap(oldName, newName) {
+        return this.append(async (seq, props) => {
+            seq.putResource(newName, props[oldName]);
+            seq.deleteResource(oldName);
+            await seq.proceed();
+        });
+    }
+
+    remapMany(oldNames, newNames) {
+        return this.append(async (seq, props) => {
+            for(let i = 0 ; i < oldNames.length ; ++i) {
+                seq.putResource(newNames[i], props[oldNames[i]]);
+                seq.deleteResource(oldNames[i]);
+            }
+            await seq.proceed();
+        });
+    }
+
+    assert(assertions, ...values) {
+        return this.append(async (seq, props) => {
+            for(let i = 0 ; i < values.length ; ++i) {
+                if(!assertions.assert(props[values[i]])) {
+                    seq.terminate(400, {message: `Bad value given for field '${values[i]}'`});
+                    return;
+                }
+            }
+            await seq.proceed();
+        });
+    }
+
+    assertDynamic(assertions, generator) {
+        return this.append(async (seq, props) => {
+            const values = generator(props);
+            for(let i = 0 ; i < values.length ; ++i) {
+                if(!assertions.assert(values[i])) {
+                    seq.terminate(400, {message: `Bad value given in request'`});
+                    return;
+                }
+            }
+            await seq.proceed();
+        });
+    }
+
+    intermediate(func) {
+        return this.append(async (seq, props) => {
+            func(props);
+            await seq.proceed();
+        });
+    }
+
+    withQueryParameters(required, optional = []) {
         return this.append(async seq => {
             for(const query of required) {
                 if(!seq.request.query.hasOwnProperty(query)) {
                     seq.terminate(400, { message: `Missing query parameter: '${query}'` });
                     return;
                 }
+                else seq.putResource(query, seq.request.query[query]);
             }
 
-            seq.putResource('reqQuery', seq.request.query);
+            for(const query of optional) {
+                if(seq.request.query.hasOwnProperty(query))
+                    seq.putResource(query, seq.request.query[query]);
+                else seq.putResource(query, null);
+            }
             await seq.proceed();
         });
     }
 
-    withRequestBody(required = []) {
+    withRequestBody(required, optional = []) {
         return this.append(async seq => {
-            for(const entry of required) {
-                if(!seq.request.body.hasOwnProperty(entry)) {
-                    seq.terminate(400, { message: `Missing request property: '${entry}'` });
+            for(const field of required) {
+                if(!seq.request.body.hasOwnProperty(field)) {
+                    seq.terminate(400, { message: `Missing field: '${field}'` });
                     return;
                 }
+                else seq.putResource(field, seq.request.query[field]);
             }
 
-            seq.putResource('reqBody', seq.request.body);
+            for(const field of optional) {
+                if(seq.request.body.hasOwnProperty(field))
+                    seq.putResource(field, seq.request.body[field]);
+                else seq.putResource(field, null);
+            }
             await seq.proceed();
         });
     }
@@ -117,17 +177,27 @@ class ActionSequence {
 
     transaction() {
         return this.append(async (seq, { connection }) => {
+            const rollbackEvents = [];
+            seq.putResource('rollbackEvents', rollbackEvents);
             await connection.transaction(async () => {
                 await seq.proceed();
+            }, async () => {
+                for(const event of rollbackEvents)
+                    await event();
             });
         });
     }
 
     openTransaction() {
         return this.append(async (seq, { db }) => {
+            const rollbackEvents = [];
+            seq.putResource('rollbackEvents', rollbackEvents);
             await db.transaction(async connection => {
                 seq.putResource('connection', connection);
                 await seq.proceed();
+            }, async () => {
+                for(const event of rollbackEvents)
+                    await event();
             });
         });
     }
@@ -141,12 +211,38 @@ class ActionSequence {
         });
     }
 
-    withResource(name, generator) {
+    withDynamic(name, generator) {
         return this.append(async (seq, props) => {
             const result = await generator(props);
             seq.putResource(name, result);
             await seq.proceed();
         });
+    }
+
+    entityFunction(func, name, entityClass, fields) {
+        return this.append(async (seq, props) => {
+            const config = {};
+            for(const field of fields)
+                config[field] = props[field];
+            const entity = await new entityClass(config)[func](props.connection);
+            seq.putResource(name, entity);
+        });
+    }
+
+    createEntity(name, entityClass, fields) {
+        return this.entityFunction('create', name, entityClass, fields);
+    }
+
+    withEntity(name, entityClass, fields) {
+        return this.entityFunction('fetchOne', name, entityClass, fields);
+    }
+
+    withOptionalEntity(name, entityClass, fields) {
+        return this.entityFunction('fetch', name, entityClass, fields);
+    }
+
+    withAllEntities(name, entityClass, fields) {
+        return this.entityFunction('fetchAll', name, entityClass, fields);
     }
 
     authorize(resource) {
@@ -157,9 +253,45 @@ class ActionSequence {
         });
     }
 
+    withS3Content(name, entity) {
+        return this.append(async (seq, props) => {
+            seq.putResource(name, await props[entity].fetchContent());
+            await seq.proceed();
+        });
+    }
+
+    createS3Content(content, entity, stream = false) {
+        return this.append(async (seq, props) => {
+            if(stream)
+                await props[entity].saveContentStream(props[content]);
+            else await props[entity].saveContent(props[content]);
+            if(props.rollbackEvents)
+                props.rollbackEvents.push(async () => await props[entity].deleteContent());
+            await seq.proceed();
+        });
+    }
+
+    saveS3Content(content, entity, stream = false) {
+        return this.append(async (seq, props) => {
+            const backup = props.rollbackEvents ? await props[entity].fetchContent() : null;
+            if(stream)
+                await props[entity].saveContentStream(props[content]);
+            else await props[entity].saveContent(props[content]);
+            if(props.rollbackEvents)
+                props.rollbackEvents.push(async () => await props[entity].saveContent(backup));
+            await seq.proceed();
+        });
+    }
+
     terminate(code, json = {}) {
         return this.append(seq => {
             seq.terminate(code, json);
+        });
+    }
+
+    redirect(code, url) {
+        return this.append(seq => {
+            seq.redirect(code, url);
         });
     }
 
@@ -167,7 +299,7 @@ class ActionSequence {
 
 class SequenceExecutor {
 
-    static PRELOADED_RESOURCES = Object.freeze({ db });
+    static PRELOADED_RESOURCES = Object.freeze({ db, connection: db });
 
     #response = null;
     #actions = null;
@@ -239,6 +371,10 @@ class SequenceExecutor {
 
     putResource(name, resource) {
         this.#resources[name] = resource;
+    }
+
+    deleteResource(name) {
+        delete this.#resources[name];
     }
 
 }
