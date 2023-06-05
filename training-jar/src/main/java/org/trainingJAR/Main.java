@@ -36,6 +36,7 @@ public class Main {
         args[5] = the private key
         args[6] = newTraining boolean
         args[7] = pathToNetwork
+        args[8] = serverIp
         */
 
         SpringApplication.run(Main.class, args);
@@ -96,6 +97,7 @@ public class Main {
 
             while(keepTraining) {
                 sparkNetwork.fit(dataRDD);
+                TrainingController.sendUpdate(sparkNetwork.getScore(), args[8]);
             }
 
             String modelFileName = "newModel.zip";
