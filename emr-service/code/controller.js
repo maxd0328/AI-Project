@@ -120,6 +120,9 @@ class EMRParams {
   }
 }
 
-async function setUpEMRParams() {
-    //this has to talk to the database
+async function setUpEMRParams(projectID) {
+    const [cfgKey, csvKey] = createEMRConfiguration(projectID);
+    return new EMRParams(projectID, process.env.JAR_LOCATION, csvKey, cfgKey, process.env.S3_USER_BUCKET,
+        process.env.AWS_REGION, process.env.AWS_ACCESS_KEY_ID, process.env.AWS_SECRET_ACCESS_KEY, true, null,
+        process.env.EMR_CORES, process.env.EMR_TYPE, process.env.SERVER_IP);
 }
