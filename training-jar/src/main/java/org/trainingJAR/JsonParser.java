@@ -29,6 +29,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class JsonParser {
+
+    public static OutputLayer outputLayer;
     public static MultiLayerConfiguration parseNetworkFile(Map<String, Object> params) throws IOException {
         List<Map<String, Object>> listLayers = getLayerMaps(params);
         List<Map<String, Object>> listPreProcessors = new ArrayList<Map<String, Object>>();
@@ -59,6 +61,8 @@ public class JsonParser {
         }
 
         MultiLayerConfiguration configuration = listBuilder.build();
+
+        configuration.getConf(configuration.getConfs().size()).setLayer(outputLayer);
 
         return configuration;
     }
@@ -231,7 +235,7 @@ public class JsonParser {
                 layerBuilder.l2((double) layerMap.get("regularisationRateL2"));
             }
 
-            listBuilder.layer(index, layerBuilder.build());
+            outputLayer = layerBuilder.build();
         }
         return preprocessor;
     }

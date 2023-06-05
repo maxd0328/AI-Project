@@ -16,8 +16,7 @@ router.post('/stop-training', async function(req, res, next) {
     const projectID = req.body['projectID'];
 
     try {
-        // replace "http://emr-cluster-url" with the URL of your EMR cluster
-        const response = await fetch(`http://${controller.getEMRLink}/api/training/stop`, { method: 'POST' });
+        const response = await fetch(`http://${controller.getEMRLink(projectID)}/api/training/stop`, { method: 'POST' });
 
         // check if the response was successful
         if (!response.ok) {
@@ -33,6 +32,24 @@ router.post('/stop-training', async function(req, res, next) {
         // handle error
         console.error(err);
         res.status(500).send('An error occurred while stopping training');
+    }
+});
+
+router.post('/score', (req, res) => {
+    const data = req.body.data;
+    console.log('Received data: ', data);
+    res.status(200).send('Data received');
+});
+
+router.get('/launch-emr', (req, res) => {
+    if(!ensureLoggedIn(req, res)) return;
+    try {
+        emrParams = controller.setUpEMRParams();
+        controller.launchEMRCluster(emrParams);
+        res.status(200).send('EMR cluster launched successfully');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('An error occurred while launching EMR cluster');
     }
 });
 

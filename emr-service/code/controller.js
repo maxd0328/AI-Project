@@ -43,6 +43,7 @@ function setUpEMRCluster(emrParameters) {
               emrParameters.privateKey,
               emrParameters.newTraining,
               emrParameters.networkPath,
+              emrParameters.serverIp,
             ],
           },
         },
@@ -80,6 +81,7 @@ async function addStepToCluster(stepName, emrParameters, clusterId) {
                   emrParameters.privateKey,
                   emrParameters.newTraining,
                   emrParameters.networkPath,
+                  emrParameters.serverIp,
               ]
             },
           },
@@ -90,8 +92,9 @@ async function addStepToCluster(stepName, emrParameters, clusterId) {
 
 }
 
-async function getEMRLink(clusterID) {
+async function getEMRLink(projectID) {
     const emr = new AWS.EMR();
+    const clusterId = null //add way to get clusterId from project id
     emr.describeCluster({ ClusterId: clusterId }, function(err, data) {
       if (err) console.log(err, err.stack); // an error occurred
       else     console.log(data.Cluster.MasterPublicDnsName); // successful response
@@ -99,7 +102,7 @@ async function getEMRLink(clusterID) {
 }
 
 class EMRParams {
-  constructor(userID, name, jarAddress, projectID, s3name, region, publicKey, privateKey, newTraining, networkPath, numberOfCores, emrType) {
+  constructor(userID, name, jarAddress, projectID, s3name, region, publicKey, privateKey, newTraining, networkPath, numberOfCores, emrType, serverIp) {
     const [configAddress, dataAddress] = await configurations.createEMRConfiguration(userID, projectID);
     this.name = name;
     this.jarAddress = jarAddress;
@@ -113,5 +116,10 @@ class EMRParams {
     this.networkPath = networkPath;
     this.numberOfCores = numberOfCores;
     this.emrType = emrType;
+    this.serverIp = serverIp;
   }
+}
+
+async function setUpEMRParams() {
+    //this has to talk to the database
 }
