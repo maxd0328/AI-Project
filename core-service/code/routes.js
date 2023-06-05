@@ -1,39 +1,28 @@
-let express = require('express');
-let path = require('path');
-let router = express.Router();
+const router = require('express').Router();
+const path = require('path');
+const { ActionBuilder } = require('server-lib');
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
-    res.render('index');
-});
+router.get('/', new ActionBuilder().render('index').export());
 
 /* GET login page. */
-router.get('/login', function(req, res, next) {
-    if(req.session.loggedIn)
-        res.redirect('/console/home');
-    else res.render('login');
-});
+router.get('/login', new ActionBuilder().redirectIfAuthenticated().render('login').export());
 
 /* GET register page. */
-router.get('/register', function(req, res, next) {
-    if(req.session.loggedIn)
-        res.redirect('/console/home');
-    else res.render('register');
-});
+router.get('/register', new ActionBuilder().redirectIfAuthenticated().render('register').export());
 
 /* GET forgot password page. */
-router.get('/forgot-password', function(req, res, next) {
-    if(req.session.loggedIn)
-        res.redirect('/console/home');
-    else res.render('forgot-password', { submitted: req.query.submitted==='true', email: req.query.email ? req.query.email : '' });
-});
+router.get('/forgot-password', new ActionBuilder()
+    .redirectIfAuthenticated()
+    .withQueryParameters([], ['submitted', 'email'])
+    .append((seq, { submitted, email }) => seq.terminateWithRender(submitted === 'true', email || ''))
+    .export());
 
 /* GET react client routes. */
-function serveApp(req, res, next) {
-    if(!req.session.loggedIn)
-        res.redirect('/login');
-    else res.sendFile(path.join(__dirname, '../public/console/index.html'));
-}
+const serveApp = new ActionBuilder().authenticateOrRedirect().sendFile(path.join(__dirname, '../public/console/index.html')).export();
+
+router.get('/console', new ActionBuilder().redirect(301, '/console/home').export());
+router.get('/console/index.html', new ActionBuilder().redirect(301, '/console/home').export());
 router.get('/console/home', serveApp);
 router.get('/console/scripts', serveApp);
 router.get('/console/project', serveApp);

@@ -90,42 +90,35 @@ class ActionSequence {
         });
     }
 
-    withQueryParameters(required, optional = []) {
+    withParameters(type, required, optional = []) {
         return this.append(async seq => {
-            for(const query of required) {
-                if(!seq.request.query.hasOwnProperty(query)) {
-                    seq.terminate(400, { message: `Missing query parameter: '${query}'` });
+            for(const field of required) {
+                if(!seq.request[type].hasOwnProperty(field)) {
+                    seq.terminate(400, { message: `Missing field in ${type}: '${field}'` });
                     return;
                 }
-                else seq.putResource(query, seq.request.query[query]);
+                else seq.putResource(field, seq.request[type][field]);
             }
 
-            for(const query of optional) {
-                if(seq.request.query.hasOwnProperty(query))
-                    seq.putResource(query, seq.request.query[query]);
-                else seq.putResource(query, null);
+            for(const field of optional) {
+                if(seq.request[type].hasOwnProperty(field))
+                    seq.putResource(field, seq.request[type][field]);
+                else seq.putResource(field, null);
             }
             await seq.proceed();
         });
     }
 
-    withRequestBody(required, optional = []) {
-        return this.append(async seq => {
-            for(const field of required) {
-                if(!seq.request.body.hasOwnProperty(field)) {
-                    seq.terminate(400, { message: `Missing field: '${field}'` });
-                    return;
-                }
-                else seq.putResource(field, seq.request.query[field]);
-            }
+    withPathParameters(required, optional = []) {
+        return this.withParameters('params', required, optional);
+    }
 
-            for(const field of optional) {
-                if(seq.request.body.hasOwnProperty(field))
-                    seq.putResource(field, seq.request.body[field]);
-                else seq.putResource(field, null);
-            }
-            await seq.proceed();
-        });
+    withQueryParameters(required, optional = []) {
+        return this.withParameters('query', required, optional);
+    }
+
+    withRequestBody(required, optional = []) {
+        return this.withParameters('body', required, optional);
     }
 
     withSession() {
@@ -146,16 +139,24 @@ class ActionSequence {
         });
     }
 
-    authenticateOrRedirect() {
+    authenticateOrRedirect(route = '/login') {
         return this.append(async seq => {
             if(!seq.request.session.loggedIn) {
                 seq.request.session.returnURL = seq.request.originalUrl;
-                seq.redirect(302, '/login');
+                seq.redirect(302, route);
             }
             else {
                 seq.putResource('userID', seq.request.session.userID);
                 await seq.proceed();
             }
+        });
+    }
+
+    redirectIfAuthenticated(route = '/console/home') {
+        return this.append(async seq => {
+            if(seq.request.session.loggedIn)
+                seq.redirect(302, route);
+            else await seq.proceed();
         });
     }
 
@@ -289,6 +290,18 @@ class ActionSequence {
         });
     }
 
+    render(view, options = {}) {
+        return this.append(seq => {
+            seq.terminateWithRender(view, options);
+        });
+    }
+
+    sendFile(path) {
+        return this.append(seq => {
+            seq.terminateWithFile(path);
+        });
+    }
+
     redirect(code, url) {
         return this.append(seq => {
             seq.redirect(code, url);
@@ -360,6 +373,18 @@ class SequenceExecutor {
     terminate(code, json = {}) {
         this.ensureNotTerminated();
         this.#response.status(code).json(json);
+        this.#terminated = true;
+    }
+
+    terminateWithRender(view, options = {}) {
+        this.ensureNotTerminated();
+        this.#response.render(view, options);
+        this.#terminated = true;
+    }
+
+    terminateWithFile(path) {
+        this.ensureNotTerminated();
+        this.#response.sendFile(path);
         this.#terminated = true;
     }
 

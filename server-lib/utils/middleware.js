@@ -34,6 +34,20 @@ class ViewEngineMiddleware extends Middleware {
 
 }
 
+class RouterMiddleware extends Middleware {
+
+    constructor(route, router) {
+        super();
+        this.route = route;
+        this.router = router;
+    }
+
+    apply(app) {
+        app.use(this.route, this.router);
+    }
+
+}
+
 class MiddlewareRepository {
 
     static basic(loggerMode) {
@@ -53,7 +67,7 @@ class MiddlewareRepository {
         return new Middleware(express.static(directory));
     }
 
-    static session(timeout) {
+    static session(timeout = 1000 * 60 * 60 * 24) { // in ms
         return new Middleware(
             exprsession({
                 store: new RedisStore({ client: redisClient }),
@@ -85,10 +99,15 @@ class MiddlewareRepository {
         );
     }
 
+    static router(route, router) {
+        return new RouterMiddleware(route, router);
+    }
+
 }
 
 module.exports = {
     Middleware,
     ViewEngineMiddleware,
+    RouterMiddleware,
     MiddlewareRepository
 };

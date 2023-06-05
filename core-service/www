@@ -1,18 +1,25 @@
 #!/usr/bin/env node
 
 /**
- * Load environment variables first
- */
-
-const path = require('path');
-require('dotenv').config({ path: path.join(__dirname, `.env.${process.env.NODE_ENV}`) });
-
-/**
  * Module dependencies.
  */
 
-let app = require('../app');
 let http = require('http');
+let path = require('path');
+
+/**
+ * Load app from server library
+ */
+
+const library = require('server-lib');
+const repo = library.utils.middleware.MiddlewareRepository;
+
+library.init();
+const app = library.app.createExpressApp(
+    repo.viewEJS(path.join(__dirname, 'views/')),
+    repo.serveStatic(path.join(__dirname, 'public/')),
+    repo.session(),
+    repo.router('/', require('./code/routes')));
 
 /**
  * Get port from environment and store in Express.

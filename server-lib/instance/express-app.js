@@ -14,6 +14,7 @@ function createExpressApp(...middleware) {
         middleware[i].apply(app);
 
     MiddlewareRepository.errorHandler().apply(app);
+    return app;
 }
 
 module.exports = createExpressApp;
