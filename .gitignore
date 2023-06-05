@@ -42,3 +42,6 @@ react-client/yarn-error.log*
 # Training Jar Ignore
 training-jar/.gradle
 training-jar/build
+
+# S3 Bucket Storage
+.local/data-s3/*

@@ -7,6 +7,7 @@ services:
       - "3000:8080"
     environment:
       NODE_ENV: development
+      SERVICE: core-service
       PORT: 8080
   user-service:
     build: ./user-service
@@ -14,6 +15,7 @@ services:
       - "3001:8080"
     environment:
       NODE_ENV: development
+      SERVICE: user-service
       PORT: 8080
   emr-service:
     build: ./emr-service
@@ -21,6 +23,7 @@ services:
       - "3002:8080"
     environment:
       NODE_ENV: development
+      SERVICE: emr-service
       PORT: 8080
   bucket-service:
     build: ./bucket-service
@@ -28,6 +31,7 @@ services:
       - "3003:8080"
     environment:
       NODE_ENV: development
+      SERVICE: bucket-service
       PORT: 8080
   dataset-service:
     build: ./dataset-service
@@ -35,6 +39,7 @@ services:
       - "3004:8080"
     environment:
       NODE_ENV: development
+      SERVICE: dataset-service
       PORT: 8080
 
   # AWS substitute services

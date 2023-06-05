@@ -1,7 +1,6 @@
 const db = require('../commons/database');
 const s3 = require('../commons/s3');
 const compiler = require('ms-compiler');
-const {matejScriptType} = require("ms-compiler");
 
 // TODO these are all duplicates from a different service, condense this when redoing the server architecture
 const genS3ScriptKey = (scriptID) => `script-${scriptID}.matej`;
@@ -50,7 +49,7 @@ function combinate(base, next, templates = {}) {
         }
         else {
             const keyInfo = compiler.KEYS.find(e => e.name === key);
-            if(!keyInfo || keyInfo.type !== matejScriptType(value))
+            if(!keyInfo || keyInfo.type !== compiler.matejScriptType(value))
                 continue;
 
             base[key] = value;
