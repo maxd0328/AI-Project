@@ -59,52 +59,50 @@ class S3Client {
         });
     }
 
-    async getResource(bucket, filename, callback) {
+    async resourceExists(bucket, filename) {
+        const params = {
+            Bucket: bucket,
+            Key: filename
+        };
+
+        try {
+            await this.client.headObject(params).promise();
+            return true;
+        }
+        catch(err) {
+            if(err.code === 'NotFound')
+                return false;
+
+            throw err;
+        }
+    }
+
+    async getResource(bucket, filename) {
         const params = {
             Bucket: bucket,
             Key: filename,
         };
 
-        try {
-            const data = await this.client.getObject(params).promise();
-            const body = data.Body.toString();
+        const data = await this.client.getObject(params).promise();
+        const body = data.Body.toString();
 
-            if(callback)
-                callback(null, body);
-
-            return body;
-        }
-        catch(err) {
-            if(callback)
-                callback(err);
-            else throw err;
-        }
+        return body;
     }
 
-    async putResource(bucket, filename, body, callback) {
+    async putResource(bucket, filename, body) {
         const params = {
             Bucket: bucket,
             Key: filename,
             Body: body
         };
 
-        try {
-            const data = await this.client.putObject(params).promise();
-            const location = data.Location;
+        const data = await this.client.putObject(params).promise();
+        const location = data.Location;
 
-            if(callback)
-                callback(null, location);
-
-            return location;
-        }
-        catch(err) {
-            if(callback)
-                callback(err);
-            else throw err;
-        }
+        return location;
     }
 
-    async putResourceStream(bucket, filename, streamCallback, callback) {
+    async putResourceStream(bucket, filename, streamCallback) {
         const upload = this.client.upload({
             Bucket: bucket,
             Key: filename,
@@ -115,37 +113,20 @@ class S3Client {
             })
         });
 
-        try {
-            const data = await upload.response();
-            const location = data.Location;
+        const data = await upload.response();
+        const location = data.Location;
 
-            if(callback)
-                callback(null, location);
-
-            return location;
-        }
-        catch(err) {
-            if(callback)
-                callback(err);
-            else throw err;
-        }
+        return location;
     }
 
     /* Callback only for err */
-    async deleteResource(bucket, filename, callback) {
+    async deleteResource(bucket, filename) {
         const params = {
             Bucket: bucket,
             Key: filename
         };
 
-        try {
-            await this.client.deleteObject(params).promise();
-        }
-        catch(err) {
-            if(callback)
-                callback(err);
-            else throw err;
-        }
+        await this.client.deleteObject(params).promise();
     }
 
     async createPresignedURL(bucket, filename, expiry = 60 * 60) { // default 1 hour expiry

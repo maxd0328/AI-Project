@@ -2,14 +2,19 @@ const { S3Entity } = require('./entity');
 
 class Datafile extends S3Entity {
 
-    constructor({ datasetID, datafileID, filename, labelID = null, customLabel = '', dateAdded = Date.now() }) {
+    constructor({ datasetID, datafileID, filename, labelID, customLabel, dateAdded }) {
         super(Datafile, process.env.S3_USER_BUCKET, 'datafiles', ['datasetID', 'datafileID'], ['filename', 'labelID', 'customLabel', 'dateAdded']);
+        super.setOrdering('dateAdded', false);
         this.datasetID = datasetID;
         this.datafileID = datafileID;
         this.filename = filename;
         this.labelID = labelID;
         this.customLabel = customLabel;
         this.dateAdded = dateAdded;
+    }
+
+    defaultParams() {
+        return { filename: '[no name]', labelID: null, customLabel: '', dateAdded: Date.now() };
     }
 
     genS3Key() {

@@ -1,274 +1,240 @@
-const express = require('express');
-const router = express.Router();
-const controller = require('./controller');
-
-function ensureLoggedIn(req, res) {
-    if(!req.session.loggedIn) {
-        res.redirect('/login');
-        return false;
-    }
-    return true;
-}
+const router = require('express').Router();
+const { ActionSequence, Assertions } = require('server-lib').utils;
+const { Script, Project, Preset, Dataset } = require('server-lib').entities;
 
 /* POST submit new script. */
-router.post('/create-script', async (req, res) => {
-    if(!ensureLoggedIn(req, res)) return;
-    const name = req.body['name'];
-    const content = req.body['content'];
+router.post('/scripts', new ActionSequence()
+    .authenticate()
+    .withRequestBody(['name', 'content'])
+    .assert(Assertions.isString(), 'name', 'content')
+    .openTransaction()
+    .createEntity('script', Script, ['userID', 'name'])
+    .saveS3Content('content', 'script')
+    .append((seq, { script }) => seq.terminate(201, { scriptID: script.scriptID }))
+    .export()
+);
 
-    try {
-        const scriptID = await controller.createScript(req.session.userID, name, content);
-        res.status(201).json({ scriptID });
-    }
-    catch(err) {
-        res.status(400).json({ error: 'Something went wrong' });
-    }
-});
+/* PUT submit script data. */
+router.put('/scripts/:scriptID', new ActionSequence()
+    .authenticate()
+    .withPathParameters(['scriptID'])
+    .assert(Assertions.isInt(), 'scriptID')
+    .withRequestBody([], ['name', 'content'])
+    .assert(Assertions.disjunction().isString().isUndefined().isNull(), 'name', 'content')
+    .openTransaction()
+    .withEntity('script', Script, ['scriptID'])
+    .authorize('script')
+    .intermediate(async ({ script, name, connection, content, rollbackEvents }) => {
+        if(typeof name === 'string')
+            script.name = name;
+        await script.save(connection);
+        if(typeof content === 'string')
+            await script.saveContent(content, rollbackEvents);
+    })
+    .terminate(204)
+    .export()
+);
 
-/* POST submit script name. */
-router.post('/rename-script', async (req, res) => {
-    if(!ensureLoggedIn(req, res)) return;
-    const scriptID = req.body['scriptID'];
-    const name = req.body['name'];
-
-    try {
-        await controller.updateScriptName(req.session.userID, scriptID, name);
-        res.status(204).json();
-    }
-    catch(err) {
-        res.status(400).json({ error: 'Something went wrong' });
-    }
-});
-
-/* POST submit script content. */
-router.post('/save-script', async (req, res) => {
-    if(!ensureLoggedIn(req, res)) return;
-    const scriptID = req.body['scriptID'];
-    const content = req.body['content'];
-
-    try {
-        await controller.updateScriptContent(req.session.userID, scriptID, content);
-        res.status(204).json();
-    }
-    catch(err) {
-        res.status(400).json({ error: 'Something went wrong' });
-    }
-});
-
-/* POST delete script. */
-router.post('/delete-script', async (req, res) => {
-    if(!ensureLoggedIn(req, res)) return;
-    const scriptID = req.body['scriptID'];
-
-    try {
-        await controller.deleteScript(req.session.userID, scriptID);
-        res.status(204).json();
-    }
-    catch(err) {
-        res.status(400).json({ error: 'Something went wrong' });
-    }
-});
+/* DELETE delete script. */
+router.delete('/scripts/:scriptID', new ActionSequence()
+    .authenticate()
+    .withPathParameters(['scriptID'])
+    .assert(Assertions.isInt(), 'scriptID')
+    .openTransaction()
+    .withEntity('script', Script, ['scriptID'])
+    .authorize('script')
+    .deleteEntity('script')
+    .terminate(204)
+    .export()
+);
 
 /* GET request scripts. */
-router.get('/fetch-scripts', async (req, res) => {
-    if(!ensureLoggedIn(req, res)) return;
+router.get('/scripts', new ActionSequence()
+    .authenticate()
+    .withAllEntities('scripts', Script, ['userID'])
+    .append((seq, { scripts }) => seq.terminate(200, scripts.map(({ scriptID, name, lastModified }) => ({ scriptID, name, lastModified }))))
+    .export()
+);
 
-    try {
-        const scripts = await controller.getScripts(req.session.userID);
-        res.status(200).json(scripts);
-    }
-    catch(err) {
-        res.status(400).json({ error: 'Something went wrong' });
-    }
-});
-
-/* GET request script content. */
-router.get('/script-content', async (req, res) => {
-    if(!ensureLoggedIn(req, res)) return;
-    const scriptID = req.query.id;
-
-    try {
-        const content = await controller.getScriptContent(req.session.userID, scriptID);
-        res.status(200).json({ content });
-    }
-    catch(err) {
-        res.status(400).json({ error: 'Something went wrong' });
-    }
-});
+/* GET request script data. */
+router.get('/scripts/:scriptID', new ActionSequence()
+    .authenticate()
+    .withPathParameters(['scriptID'])
+    .assert(Assertions.isInt(), 'scriptID')
+    .openTransaction()
+    .withEntity('script', Script, ['scriptID'])
+    .authorize('script')
+    .withS3Content('content', 'script')
+    .append((seq, { script: { name, lastModified }, content }) => seq.terminate(200, { name, lastModified, content }))
+    .export()
+);
 
 /* POST submit new project. */
-router.post('/create-project', async (req, res) => {
-    if(!ensureLoggedIn(req, res)) return;
-    const name = req.body['name'];
-    const type = req.body['type'];
-    const presetID = req.body['presetID'];
+router.post('/projects', new ActionSequence()
+    .authenticate()
+    .withRequestBody(['name', 'type', 'presetID'])
+    .assert(Assertions.isString(), 'name')
+    .assert(Assertions.isOneOf('cnn'), 'type')
+    .assert(Assertions.disjunction().isInt().isNull(), 'presetID')
+    .openTransaction()
+    .createEntity('project', Project, ['userID', 'name', 'type', 'presetID'])
+    .append((seq, { project }) => seq.terminate(201, { projectID: project.projectID }))
+    .export()
+);
 
-    try {
-        const projectID = await controller.createProject(req.session.userID, name, type, presetID);
-        res.status(201).json({ projectID });
-    }
-    catch(err) {
-        res.status(400).json({ error: 'Something went wrong' });
-    }
-});
+/* POST submit project details. */
+router.put('/projects/:projectID', new ActionSequence()
+    .authenticate()
+    .withPathParameters(['projectID'])
+    .assert(Assertions.isInt(), 'projectID')
+    .withRequestBody(['name'])
+    .assert(Assertions.isString(), 'name')
+    .openTransaction()
+    .withEntity('project', Project, ['projectID'])
+    .authorize('project')
+    .intermediate(async ({ project, name, connection }) => {
+        project.name = name;
+        await project.save(connection);
+    })
+    .terminate(204)
+    .export()
+);
 
-/* POST submit project name. */
-router.post('/rename-project', async (req, res) => {
-    if(!ensureLoggedIn(req, res)) return;
-    const projectID = req.body['projectID'];
-    const name = req.body['name'];
+/* PUT submit project pipeline. */
+router.put('/projects/:projectID/pipeline', new ActionSequence()
+    .authenticate()
+    .withPathParameters(['projectID'])
+    .withRequestBody(['presetID', 'stages'])
+    .assert(Assertions.isInt(), 'projectID', 'presetID')
+    .assert(Assertions.isArray(), 'stages')
+    .openTransaction()
+    .withEntity('project', Project, ['projectID'])
+    .authorize('project')
+    .append(async (seq, { project, stages, presetID, connection, rollbackEvents }) => {
+        await project.clearStages(connection, rollbackEvents);
+        for(let i = 0 ; i < stages[i].length ; ++i) {
+            const { name, type, scriptID, content } = stages[i];
+            const stageObj = project.newStage(i, { name, type, scriptID });
+            await stageObj.create(connection);
+            if(stageObj.type !== 'ext')
+                await stageObj.saveContent(content || '', rollbackEvents);
+        }
+        project.presetID = presetID;
+        await project.save(connection);
+        seq.terminate(204);
+    })
+    .export()
+);
 
-    try {
-        await controller.updateProjectName(req.session.userID, projectID, name);
-        res.status(204).json();
-    }
-    catch(err) {
-        res.status(400).json({ error: 'Something went wrong' });
-    }
-});
-
-/* POST delete project. */
-router.post('/delete-project', async (req, res) => {
-    if(!ensureLoggedIn(req, res)) return;
-    const projectID = req.body['projectID'];
-
-    try {
-        await controller.deleteProject(req.session.userID, projectID);
-        res.status(204).json();
-    }
-    catch(err) {
-        res.status(400).json({ error: 'Something went wrong' });
-    }
-});
+/* DELETE delete project. */
+router.delete('/projects/:projectID', new ActionSequence()
+    .authenticate()
+    .withPathParameters(['projectID'])
+    .assert(Assertions.isInt(), 'projectID')
+    .openTransaction()
+    .withEntity('project', Project, ['projectID'])
+    .authorize('project')
+    .deleteEntity('project')
+    .terminate(204)
+    .export()
+);
 
 /* GET request projects. */
-router.get('/fetch-projects', async (req, res) => {
-    if(!ensureLoggedIn(req, res)) return;
+router.get('/projects', new ActionSequence()
+    .authenticate()
+    .openTransaction()
+    .withAllEntities('projects', Project, ['userID'], true)
+    .append((seq, { projects }) => seq.terminate(200, projects.map(({ projectID, name, type, lastModified }) => ({ projectID, name, type, lastModified }))))
+    .export()
+);
 
-    try {
-        const projects = await controller.getProjects(req.session.userID);
-        res.status(200).json(projects);
-    }
-    catch(err) {
-        res.status(400).json({ error: 'Something went wrong' });
-    }
-});
-
-/* GET request specific project. */
-router.get('/fetch-project', async (req, res) => {
-    if(!ensureLoggedIn(req, res)) return;
-    const projectID = req.query.id;
-
-    try {
-        const project = await controller.getProject(req.session.userID, projectID);
-        res.status(200).json(project);
-    }
-    catch(err) {
-        res.status(400).json({ error: 'Something went wrong' });
-    }
-});
-
-/* GET request presets. */
-router.get('/fetch-presets', async (req, res) => {
-    if(!ensureLoggedIn(req, res)) return;
-
-    try {
-        const presets = await controller.getPresets();
-        res.status(200).json(presets);
-    }
-    catch(err) {
-        res.status(400).json({ error: 'Something went wrong' });
-    }
-});
-
-/* GET request preset content. */
-router.get('/preset-content', async (req, res) => {
-    if(!ensureLoggedIn(req, res)) return;
-    const presetID = req.query.id;
-
-    try {
-        const content = await controller.getPresetContent(presetID);
-        res.status(200).json({ content });
-    }
-    catch(err) {
-        res.status(400).json({ error: 'Something went wrong' });
-    }
-});
+/* GET request project details. */
+router.get('/projects/:projectID', new ActionSequence()
+    .authenticate()
+    .withPathParameters(['projectID'])
+    .assert(Assertions.isInt(), 'projectID')
+    .openTransaction()
+    .withEntity('project', Project, ['projectID'])
+    .authorize('project')
+    .append((seq, { project: { name, type, lastModified, datasetIDs } }) => seq.terminate(200, { name, type, lastModified, datasetIDs }))
+    .export()
+);
 
 /* GET project pipeline stages. */
-router.get('/fetch-pipeline', async (req, res) => {
-    if(!ensureLoggedIn(req, res)) return;
-    const projectID = req.query.id;
-
-    try {
-        const stages = await controller.getConfigStages(req.session.userID, projectID);
-        res.status(200).json(stages);
-    }
-    catch(err) {
-        console.error(err);
-        res.status(400).json({ error: 'Something went wrong' });
-    }
-});
-
-/* POST submit project pipeline stages. */
-router.post('/save-pipeline', async (req, res) => {
-    if(!ensureLoggedIn(req, res)) return;
-    const projectID = req.body['projectID'];
-    const presetID = req.body['presetID'];
-    const stages = req.body['stages'];
-
-    try {
-        await controller.saveConfigStages(req.session.userID, projectID, presetID, stages);
-        res.status(204).json();
-    }
-    catch(err) {
-        res.status(400).json({ error: 'Something went wrong' });
-    }
-});
+router.get('/projects/:projectID/pipeline', new ActionSequence()
+    .authenticate()
+    .withPathParameters(['projectID'])
+    .assert(Assertions.isInt(), 'projectID')
+    .openTransaction()
+    .withEntity('project', Project, ['projectID'])
+    .authorize('project')
+    .withDynamic('stages', async ({ project, connection }) => await project.fetchStages(connection))
+    .append(async (seq, { stages }) => {
+        const results = [];
+        for(let i = 0 ; i < stages.length ; ++i)
+            results.push(stages[i].type === 'ext' ? { name: stages[i].name, type: stages[i].type, scriptID: stages[i].scriptID }
+                : { name: stages[i].name, type: stages[i].type, content: await stages[i].fetchContent() || '' });
+        seq.terminate(200, results);
+    })
+    .export()
+);
 
 /* POST link dataset to project. */
-router.post('/link-dataset', async (req, res) => {
-    if(!ensureLoggedIn(req, res)) return;
-    const projectID = req.body['projectID'];
-    const datasetID = req.body['datasetID'];
+router.post('/projects/:projectID/datasets/:datasetID', new ActionSequence()
+    .authenticate()
+    .withPathParameters(['projectID', 'datasetID'])
+    .assert(Assertions.isInt(), 'projectID', 'datasetID')
+    .openTransaction()
+    .withEntity('project', Project, ['projectID'])
+    .authorize('project')
+    .withEntity('dataset', Dataset, ['datasetID'])
+    .authorize('dataset')
+    .append(async (seq, { project, datasetID, connection }) => {
+        project.datasetIDs.push(datasetID);
+        await project.save(connection);
+        seq.terminate(204);
+    })
+    .export()
+);
 
-    try {
-        await controller.addProjectDataset(req.session.userID, projectID, datasetID);
-        res.status(204).json();
-    }
-    catch(err) {
-        res.status(400).json({ error: 'Something went wrong' });
-    }
-});
+/* DELETE unlink dataset from project. */
+router.delete('/projects/:projectID/datasets/:datasetID', new ActionSequence()
+    .authenticate()
+    .withPathParameters(['projectID', 'datasetID'])
+    .assert(Assertions.isInt(), 'projectID', 'datasetID')
+    .openTransaction()
+    .withEntity('project', Project, ['projectID'])
+    .authorize('project')
+    .append(async (seq, { project, datasetID, connection }) => {
+        const index = project.datasetIDs.indexOf(datasetID);
+        if(index >= 0) {
+            project.datasetIDs.splice(index, 1);
+            await project.save(connection);
+            seq.terminate(204);
+        }
+        else seq.terminate(404, { message: 'Requested dataset ID is not linked to the project' });
+    })
+    .export()
+);
 
-/* POST link dataset to project. */
-router.post('/unlink-dataset', async (req, res) => {
-    if(!ensureLoggedIn(req, res)) return;
-    const projectID = req.body['projectID'];
-    const datasetID = req.body['datasetID'];
+/* GET request presets. */
+router.get('/presets', new ActionSequence()
+    .authenticate()
+    .withAllEntities('presets', Preset, [])
+    .append((seq, { presets }) => seq.terminate(200, presets.map(({ presetID, name, description }) => ({ presetID, name, description }))))
+    .export()
+);
 
-    try {
-        await controller.removeProjectDataset(req.session.userID, projectID, datasetID);
-        res.status(204).json();
-    }
-    catch(err) {
-        res.status(400).json({ error: 'Something went wrong' });
-    }
-});
-
-/* GET project's linked datasets. */
-router.get('/fetch-linked-datasets', async (req, res) => {
-    if(!ensureLoggedIn(req, res)) return;
-    const projectID = req.query.id;
-
-    try {
-        const datasets = await controller.getProjectDatasets(req.session.userID, projectID);
-        res.status(200).json(datasets);
-    }
-    catch(err) {
-        console.error(err);
-        res.status(400).json({ error: 'Something went wrong' });
-    }
-});
+/* GET request preset details. */
+router.get('/presets/:presetID', new ActionSequence()
+    .authenticate()
+    .withPathParameters(['presetID'])
+    .assert(Assertions.isInt(), 'presetID')
+    .openTransaction()
+    .withEntity('preset', Preset, ['presetID'])
+    .withS3Content('content', 'preset')
+    .append((seq, { preset: { presetID, name, description }, content }) => seq.terminate(200, { presetID, name, description, content }))
+    .export()
+);
 
 module.exports = router;

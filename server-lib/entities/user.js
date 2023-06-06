@@ -21,10 +21,10 @@ class User extends Entity {
         session.firstName = this.firstName;
     }
 
-    async cascade(action, connection) {
-        await super.forward(Project, action, connection);
-        await super.forward(Script, action, connection);
-        await super.forward(Dataset, action, connection);
+    async cascade(action, connection, rollbackEvents) {
+        await super.forward(Project, action, connection, rollbackEvents);
+        await super.forward(Script, action, connection, rollbackEvents);
+        await super.forward(Dataset, action, connection, rollbackEvents);
     }
 
 }

@@ -1,6 +1,7 @@
 const { db, logger } = require('../instance/services');
 const { DatabaseError } = require('./database');
 const { ServerError } = require('./error');
+const assert = require('assert');
 
 class ActionSequence {
 
@@ -86,6 +87,13 @@ class ActionSequence {
     intermediate(func) {
         return this.append(async (seq, props) => {
             func(props);
+            await seq.proceed();
+        });
+    }
+
+    withRequestProperty(name) {
+        return this.append(async seq => {
+            seq.putResource(name, seq.request[name]);
             await seq.proceed();
         });
     }
@@ -176,29 +184,16 @@ class ActionSequence {
         });
     }
 
-    transaction() {
+    openTransaction() {
         return this.append(async (seq, { connection }) => {
             const rollbackEvents = [];
             seq.putResource('rollbackEvents', rollbackEvents);
-            await connection.transaction(async () => {
+            await connection.transaction(async newConnection => {
+                seq.putResource('connection', newConnection);
                 await seq.proceed();
             }, async () => {
-                for(const event of rollbackEvents)
-                    await event();
-            });
-        });
-    }
-
-    openTransaction() {
-        return this.append(async (seq, { db }) => {
-            const rollbackEvents = [];
-            seq.putResource('rollbackEvents', rollbackEvents);
-            await db.transaction(async connection => {
-                seq.putResource('connection', connection);
-                await seq.proceed();
-            }, async () => {
-                for(const event of rollbackEvents)
-                    await event();
+                for(let i = 0 ; i < rollbackEvents.length ; ++i)
+                    await rollbackEvents[rollbackEvents.length - i - 1]();
             });
         });
     }
@@ -220,30 +215,47 @@ class ActionSequence {
         });
     }
 
-    entityFunction(func, name, entityClass, fields) {
+    entityGenFunction(func, name, entityClass, fields, useDefault, enableQuickFetch = false) {
         return this.append(async (seq, props) => {
             const config = {};
             for(const field of fields)
                 config[field] = props[field];
-            const entity = await new entityClass(config)[func](props.connection);
-            seq.putResource(name, entity);
+            const entity = new entityClass(config);
+            if(enableQuickFetch)
+                entity.quickFetch = true;
+            if(useDefault)
+                entity.useDefault();
+            const result = await entity[func](props.connection);
+            seq.putResource(name, result);
         });
     }
 
     createEntity(name, entityClass, fields) {
-        return this.entityFunction('create', name, entityClass, fields);
+        return this.entityGenFunction('create', name, entityClass, fields, true);
     }
 
-    withEntity(name, entityClass, fields) {
-        return this.entityFunction('fetchOne', name, entityClass, fields);
+    withEntity(name, entityClass, fields, enableQuickFetch = false) {
+        return this.entityGenFunction('fetchOne', name, entityClass, fields, false, enableQuickFetch);
     }
 
-    withOptionalEntity(name, entityClass, fields) {
-        return this.entityFunction('fetch', name, entityClass, fields);
+    withOptionalEntity(name, entityClass, fields, enableQuickFetch = false) {
+        return this.entityGenFunction('fetch', name, entityClass, fields, false, enableQuickFetch);
     }
 
-    withAllEntities(name, entityClass, fields) {
-        return this.entityFunction('fetchAll', name, entityClass, fields);
+    withAllEntities(name, entityClass, fields, enableQuickFetch = false) {
+        return this.entityGenFunction('fetchAll', name, entityClass, fields, false, enableQuickFetch);
+    }
+
+    saveEntity(name) {
+        return this.append(async (seq, props) => {
+            await props[name].save(props.connection);
+        });
+    }
+
+    deleteEntity(name) {
+        return this.append(async (seq, props) => {
+            await props[name].delete(props.connection, props.rollbackEvents);
+        });
     }
 
     authorize(resource) {
@@ -261,25 +273,18 @@ class ActionSequence {
         });
     }
 
-    createS3Content(content, entity, stream = false) {
+    saveS3Content(content, entity, stream = false) {
         return this.append(async (seq, props) => {
             if(stream)
-                await props[entity].saveContentStream(props[content]);
-            else await props[entity].saveContent(props[content]);
-            if(props.rollbackEvents)
-                props.rollbackEvents.push(async () => await props[entity].deleteContent());
+                await props[entity].saveContentStream(props[content], props.rollbackEvents);
+            else await props[entity].saveContent(props[content], props.rollbackEvents);
             await seq.proceed();
         });
     }
 
-    saveS3Content(content, entity, stream = false) {
+    deleteS3Content(content, entity) {
         return this.append(async (seq, props) => {
-            const backup = props.rollbackEvents ? await props[entity].fetchContent() : null;
-            if(stream)
-                await props[entity].saveContentStream(props[content]);
-            else await props[entity].saveContent(props[content]);
-            if(props.rollbackEvents)
-                props.rollbackEvents.push(async () => await props[entity].saveContent(backup));
+            await props[entity].deleteContent(props.rollbackEvents);
             await seq.proceed();
         });
     }
@@ -290,9 +295,41 @@ class ActionSequence {
         });
     }
 
+    terminateIfExists(name, code, json = {}) {
+        return this.append(async (seq, props) => {
+            if(props[name] !== undefined && props[name] !== null)
+                seq.terminate(code, json);
+            else await seq.proceed();
+        });
+    }
+
+    terminateIfNotExists(name, code, json = {}) {
+        return this.append(async (seq, props) => {
+            if(props[name] === undefined || props[name] === null)
+                seq.terminate(code, json);
+            else await seq.proceed();
+        });
+    }
+
     render(view, options = {}) {
         return this.append(seq => {
             seq.terminateWithRender(view, options);
+        });
+    }
+
+    renderIfExists(name, view, options = {}) {
+        return this.append(async (seq, props) => {
+            if(props[name] !== undefined && props[name] !== null)
+                seq.terminateWithRender(view, options);
+            else await seq.proceed();
+        });
+    }
+
+    renderIfNotExists(name, view, options = {}) {
+        return this.append(async (seq, props) => {
+            if(props[name] === undefined || props[name] === null)
+                seq.terminateWithRender(view, options);
+            else await seq.proceed();
         });
     }
 
@@ -302,9 +339,41 @@ class ActionSequence {
         });
     }
 
+    sendFileIfExists(name, path) {
+        return this.append(async (seq, props) => {
+            if(props[name] !== undefined && props[name] !== null)
+                seq.terminateWithFile(path);
+            else await seq.proceed();
+        });
+    }
+
+    sendFileIfNotExists(name, path) {
+        return this.append(async (seq, props) => {
+            if(props[name] === undefined || props[name] === null)
+                seq.terminateWithFile(path);
+            else await seq.proceed();
+        });
+    }
+
     redirect(code, url) {
         return this.append(seq => {
             seq.redirect(code, url);
+        });
+    }
+
+    redirectIfExists(name, code, url) {
+        return this.append(async (seq, props) => {
+            if(props[name] !== undefined && props[name] !== null)
+                seq.redirect(code, url);
+            else await seq.proceed();
+        });
+    }
+
+    redirectIfNotExists(name, code, url) {
+        return this.append(async (seq, props) => {
+            if(props[name] === undefined || props[name] === null)
+                seq.redirect(code, url);
+            else await seq.proceed();
         });
     }
 
@@ -345,9 +414,13 @@ class SequenceExecutor {
                         this.terminate(err.httpStatus(), err.httpMessage());
                     else if(err instanceof ServerError)
                         this.terminate(err.status, err.externalMessage);
+                    else if(err instanceof assert.AssertionError)
+                        this.terminate(400, { message: 'Request failed server preconditions' })
                     else this.terminate(500, { message: 'An unexpected server fault has occurred' });
                 }
-                if(err.getLog)
+                if(err instanceof assert.AssertionError)
+                    logger.error(`A precondition failed resulting in HTTP status code 400\n${err.stack}`);
+                else if(err.getLog)
                     logger.error(err.getLog());
                 else logger.error(`An unexpected server fault has occurred resulting in HTTP status code 500\n${err.stack}`);
             }
@@ -361,6 +434,10 @@ class SequenceExecutor {
     ensureNotTerminated() {
         if(this.#terminated)
             throw new Error('This action sequence has been terminated');
+    }
+
+    isTerminated() {
+        return this.#terminated;
     }
 
     async proceed() {

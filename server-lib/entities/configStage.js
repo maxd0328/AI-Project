@@ -6,11 +6,16 @@ class ConfigStage extends S3Entity {
 
     constructor({ projectID, location, name, type, scriptID }) {
         super(ConfigStage, process.env.S3_USER_BUCKET, 'configs', ['projectID', 'location'], ['name', 'type', 'scriptID']);
+        super.setOrdering('location', true);
         this.projectID = projectID;
         this.location = location;
         this.name = name;
         this.type = type;
         this.scriptID = scriptID;
+    }
+
+    defaultParams() {
+        return { name: 'New Stage', type: 'ext', scriptID: null };
     }
 
     genS3Key() {

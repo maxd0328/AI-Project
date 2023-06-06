@@ -1,114 +1,79 @@
-const express = require('express');
+const router = require('express').Router();
 const controller = require('./controller');
-const router = express.Router();
+const { ActionSequence, Assertions } = require('server-lib').utils;
+const { User } = require('server-lib').entities;
+
+/* GET user info. */
+router.get('/', new ActionSequence()
+    .authenticateOrRedirect()
+    .withSession()
+    .append((seq, { session }) => seq.terminate(200, { firstName: session.firstName }))
+    .export()
+);
 
 /* POST create new user. */
-router.post('/create', async function(req, res, next) {
-    const firstName = req.body['firstName'];
-    const lastName = req.body['lastName'];
-    const email = req.body['email'];
-    const phoneNumber = req.body['phone'];
-    const password = req.body['password'];
+router.post('/', new ActionSequence()
+    .withRequestBody(['firstName', 'lastName', 'email', 'phoneNumber', 'password'])
+    .assert(Assertions.isString().isNotEmpty(), 'firstName', 'lastName', 'email', 'phoneNumber', 'password')
+    .withSession()
+    .createEntity('user', User, ['firstName', 'lastName', 'email', 'phoneNumber', 'password'])
+    .intermediate(({ user, session }) => user.makeCurrent(session))
+    .redirect(302, '/console/home')
+    .export()
+);
 
-    try {
-        const userID = await controller.addUser(email, firstName, lastName, phoneNumber, password);
-        controller.enterSession(req.session, { userID, email: email, firstName: firstName,
-            lastName: lastName, phoneNumber: phoneNumber, password: password });
-        res.redirect('/console/home');
-    }
-    catch(err) {
-        // TODO
-        console.log(JSON.stringify(err));
-        res.redirect('/register');
-    }
-});
+/* POST log in. */
+router.post('/login', new ActionSequence()
+    .withRequestBody(['email', 'password'])
+    .assert(Assertions.isString().isNotEmpty(), 'email', 'password')
+    .withSession()
+    .withOptionalEntity('user', User, ['email', 'password'])
+    .terminateIfNotExists('user', 401, { message: 'Invalid email/password' })
+    .intermediate(({ user, session }) => user.makeCurrent(session))
+    .redirect(302, '/console/home')
+    .export()
+);
 
-/* POST login request. */
-router.post('/login', async function(req, res, next) {
-    const email = req.body['email'];
-    const password = req.body['password'];
+/* POST log out. */
+router.post('/logout', new ActionSequence()
+    .withSession()
+    .intermediate(async ({ session }) => await session.destroy())
+    .redirect(302, '/')
+    .export()
+);
 
-    try {
-        const userRow = await controller.authenticateUser(email, password);
-        controller.enterSession(req.session, userRow);
-        res.redirect('/console/home');
-    }
-    catch(err) {
-        // TODO
-        console.log(JSON.stringify(err));
-        res.redirect('/login');
-    }
-});
-
-/* GET logout request. */
-router.get('/logout', async function(req, res, next) {
-    req.session.destroy((err) => {
-        if(!err)
-            res.redirect('/');
+/* POST submit forgot password. */
+router.post('/forgot-password', new ActionSequence()
+    .withRequestBody(['email'])
+    .assert(Assertions.isString().isNotEmpty(), 'email')
+    .withEntity('user', User, ['email'])
+    .append(async (seq, { email, user }) => {
+        await controller.sendResetPasswordToken(user);
+        seq.redirect(302, `/forgot-password?submitted=true&email=${email}`);
     })
-});
-
-/* POST forgot password request. */
-router.post('/forgot-password', async function(req, res, next) {
-    const email = req.body['email'];
-
-    try {
-        const user = controller.fetchUserByEmail(email);
-        if(user) {
-            await controller.sendResetPasswordToken(user);
-            res.redirect(`/forgot-password?submitted=true&email=${email}`);
-        }
-        else {
-            // TODO
-            res.redirect('/forgot-password');
-        }
-    }
-    catch(err) {
-        // TODO
-        res.redirect('/forgot-password');
-    }
-});
+    .export()
+);
 
 /* GET reset password page. */
-router.get('/reset-password', async function(req, res, next) {
-    try {
-        const user = await controller.validateResetPasswordToken(req.query.token, false);
-        if(user) res.render('reset-password', { email: user.email, token: req.query.token });
-        else res.render('invalid-token');
-    }
-    catch(err) {
-        res.render('invalid-token');
-    }
-});
+router.get('/reset-password', new ActionSequence()
+    .withQueryParameters([], ['token'])
+    .withDynamic('userID', async ({ token }) => await controller.validateResetPasswordToken(token, false))
+    .renderIfNotExists('userID', 'invalid-token')
+    .withEntity('user', User, ['userID'])
+    .append((seq, { user, token }) => seq.render('reset-password', { email: user.email, token }))
+    .export()
+);
 
-/* POST reset password request. */
-router.post('/reset-password', async function(req, res, next) {
-    const password = req.body['password'];
-    const token = req.body['token'];
-
-    try {
-        const user = await controller.validateResetPasswordToken(token, true);
-        if(user) {
-            await controller.updateUserPassword(user, password);
-            controller.enterSession(req.session, user);
-            res.redirect('/console/home');
-        }
-        else {
-            // TODO
-            res.redirect(`/user/reset-password?token=${token}`);
-        }
-    }
-    catch(err) {
-        // TODO
-        res.redirect(`/user/reset-password?token=${token}`);
-    }
-});
-
-/* GET public user session data. */
-router.get('/session', function(req, res, next) {
-    if(!req.session.loggedIn)
-        res.redirect('/login');
-    res.json({ firstName: req.session.firstName });
-});
+/* POST submit password reset. */
+router.post('/reset-password', new ActionSequence()
+    .withRequestBody(['password', 'token'])
+    .withDynamic('userID', async ({ token }) => await controller.validateResetPasswordToken(token, true))
+    .terminateIfNotExists('userID', 401, { message: 'Invalid token' })
+    .withEntity('user', User, ['userID'])
+    .intermediate(({ user, password }) => user.password = password)
+    .saveEntity('user')
+    .redirect(302, '/console/home')
+    .export()
+);
 
 module.exports = router;

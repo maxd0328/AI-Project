@@ -2,7 +2,6 @@ const db = require('../commons/database');
 const s3 = require('../commons/s3');
 const compiler = require('ms-compiler');
 
-// TODO these are all duplicates from a different service, condense this when redoing the server architecture
 const genS3ScriptKey = (scriptID) => `script-${scriptID}.matej`;
 
 const genS3PresetKey = (presetID) => `preset-${presetID}.matej`;

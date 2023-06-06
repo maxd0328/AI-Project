@@ -6,8 +6,9 @@ class Project extends Entity {
 
     static PROJECT_TYPES = Object.freeze(['cnn']);
 
-    constructor({ projectID, userID, name, type, presetID = null, lastModified = Date.now(), datasetIDs = [] }) {
+    constructor({ projectID, userID, name, type, presetID, lastModified, datasetIDs }) {
         super(Project, 'projects', ['projectID'], ['userID', 'name', 'type', 'presetID', 'lastModified'], true);
+        super.setOrdering('lastModified', false);
         this.project = projectID;
         this.userID = userID;
         this.name = name;
@@ -15,6 +16,10 @@ class Project extends Entity {
         this.presetID = presetID;
         this.lastModified = lastModified;
         this.datasetIDs = datasetIDs;
+    }
+
+    defaultParams() {
+        return { name: 'New Project', type: 'cnn', presetID: null, lastModified: Date.now(), datasetIDs: [] };
     }
 
     preconditions() {
@@ -30,7 +35,11 @@ class Project extends Entity {
         return await new ConfigStage({ projectID: this.projectID }).fetchAll(connection);
     }
 
-    async clearStages(connection = db) {
+    // A workaround to be more efficient, this will fail to account for changes to the finalization cascades
+    async clearStages(connection = db, rollbackEvents = null) {
+        const stages = await fetchStages(connection);
+        for(const stage of stages)
+            await stage.deleteContent(rollbackEvents);
         await connection.executeAny({
             query: `DELETE FROM configs WHERE projectID = ?`,
             values: [this.projectID]
@@ -85,8 +94,8 @@ class Project extends Entity {
         })).map(obj => obj.datasetID);
     }
 
-    async cascade(action, connection) {
-        await super.forward(ConfigStage, action, connection);
+    async cascade(action, connection, rollbackEvents) {
+        await super.forward(ConfigStage, action, connection, rollbackEvents);
     }
 
 }

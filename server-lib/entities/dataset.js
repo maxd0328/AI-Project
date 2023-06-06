@@ -1,6 +1,7 @@
 const { Entity } = require('./entity');
 const Datafile = require('./datafile');
 const { db } = require('../instance/services');
+const ServerError = require('../utils/error');
 
 class DataLabel {
 
@@ -13,8 +14,9 @@ class DataLabel {
 
 class Dataset extends Entity {
 
-    constructor({ datasetID, userID, name, nextLabel = 1, nextFile = 1, lastModified = Date.now(), labels = [] }) {
+    constructor({ datasetID, userID, name, nextLabel, nextFile, lastModified, labels }) {
         super(Dataset, 'datasets', ['datasetID'], ['userID', 'name', 'lastModified'], true);
+        super.setOrdering('lastModified', false);
         this.datasetID = datasetID;
         this.userID = userID;
         this.name = name;
@@ -32,28 +34,34 @@ class Dataset extends Entity {
                 label.labelID = this.nextLabel++;
     }
 
+    defaultParams() {
+        return { name: 'New Dataset', nextLabel: 1, nextFile: 1, lastModified: Date.now(), labels: [] };
+    }
+
     getLabel(labelID) {
         const label = this.labels.find(e => e.labelID === labelID);
         if(!label)
-            throw new Error('No such label exists');
+            throw new ServerError(404, `Label with ID ${labelID} does not exist`);
         return label.string;
     }
 
     addLabel(string) {
-        this.labels.push(new DataLabel({ labelID: this.nextLabel++, string }));
+        const label = new DataLabel({ labelID: this.nextLabel++, string });
+        this.labels.push(label);
+        return label;
     }
 
     updateLabel(labelID, string) {
         const label = this.labels.find(e => e.labelID === labelID);
         if(!label)
-            throw new Error('No such label exists');
+            throw new ServerError(404, `Label with ID ${labelID} does not exist`);
         label.string = string;
     }
 
     deleteLabel(labelID) {
         const label = this.labels.find(e => e.labelID === labelID);
         if(!label)
-            throw new Error('No such label exists');
+            throw new ServerError(404, `Label with ID ${labelID} does not exist`);
         this.labels.splice(this.labels.indexOf(label), 1);
     }
 
@@ -64,16 +72,23 @@ class Dataset extends Entity {
     async searchDatafiles(query, page, pageSize = 20, connection = db) {
         return (await connection.queryAny({
             query: `SELECT * FROM datafiles WHERE datasetID = ? AND filename LIKE ? ORDER BY dateAdded DESC LIMIT ? OFFSET ?`,
-            values: [this.datasetID, query, pageSize, page * pageSize]
+            values: [this.datasetID, query || '', pageSize, ((page || 1) - 1) * pageSize]
         })).map(e => new Datafile(e));
     }
 
-    newDatafile(params) {
-        return new Datafile({
+    newDatafile(filename, labelID, customLabel) {
+        if(labelID !== undefined && labelID !== null)
+            this.getLabel(labelID);
+
+        const datafile = new Datafile({
             datasetID: this.datasetID,
             datafileID: this.nextFile++,
-            ...params
+            filename,
+            labelID,
+            customLabel
         });
+        datafile.useDefault();
+        return datafile;
     }
 
     preconditions() {
@@ -129,8 +144,8 @@ class Dataset extends Entity {
         })).map(e => new DataLabel(e));
     }
 
-    async cascade(action, connection) {
-        await super.forward(Datafile, action, connection);
+    async cascade(action, connection, rollbackEvents) {
+        await super.forward(Datafile, action, connection, rollbackEvents);
     }
 
 }

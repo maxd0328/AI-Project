@@ -1,6 +1,7 @@
 const { Entity, S3Entity } = require('./entities/entity');
 const ConfigStage = require('./entities/configStage');
-const Datafile = require('./entities/dataset');
+const Datafile = require('./entities/datafile');
+const Dataset = require('./entities/dataset');
 const Preset = require('./entities/preset');
 const Project = require('./entities/project');
 const Script = require('./entities/script');
@@ -26,6 +27,7 @@ module.exports = {
         S3Entity,
         ConfigStage,
         Datafile,
+        Dataset,
         Preset,
         Project,
         Script,

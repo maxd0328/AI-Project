@@ -1,206 +1,208 @@
-const express = require('express');
-const router = express.Router();
-const controller = require('./controller');
+const router = require('express').Router();
 const multer = require('multer');
+const { ActionSequence, Assertions } = require('server-lib').utils;
+const { Dataset } = require('server-lib').entities;
 
 // TODO maybe switch to disk storage later on, but this shouldn't be a huge issue right now at least, maybe we look into max memory of EC2
 const upload = multer({ storage: multer.memoryStorage() });
 
-function ensureLoggedIn(req, res) {
-    if(!req.session.loggedIn) {
-        res.redirect('/login');
-        return false;
-    }
-    return true;
-}
-
 /* POST create new dataset. */
-router.post('/create', async (req, res) => {
-    if(!ensureLoggedIn(req, res)) return;
-    const name = req.body['name'];
+router.post('/', new ActionSequence()
+    .authenticate()
+    .withRequestBody(['name'])
+    .assert(Assertions.isString(), 'name')
+    .openTransaction()
+    .createEntity('dataset', Dataset, ['userID', 'name'])
+    .append((seq, { dataset }) => seq.terminate(201, { datasetID: dataset.datasetID }))
+    .export()
+);
 
-    try {
-        const datasetID = await controller.createDataset(req.session.userID, name);
-        res.status(201).json({ datasetID });
-    }
-    catch(err) {
-        res.status(400).json({ error: 'Something went wrong' });
-    }
-});
+/* PUT submit dataset details. */
+router.put('/:datasetID', new ActionSequence()
+    .authenticate()
+    .withPathParameters(['datasetID'])
+    .assert(Assertions.isInt(), 'datasetID')
+    .withRequestBody(['name'])
+    .assert(Assertions.isString(), 'name')
+    .openTransaction()
+    .withEntity('dataset', Dataset, ['datasetID'])
+    .authorize('dataset')
+    .intermediate(async ({ dataset, name, connection }) => {
+        dataset.name = name;
+        await dataset.save(connection);
+    })
+    .terminate(204)
+    .export()
+);
 
-/* POST submit new files to dataset. */
-router.post('/upload', upload.array('files'), async (req, res) => {
-    if(!ensureLoggedIn(req, res)) return;
-    let datasetID = req.body['datasetID'];
-    let labelID = req.body['labelID'];
-    let customLabel = req.body['customLabel'];
+/* DELETE delete dataset. */
+router.delete('/:datasetID', new ActionSequence()
+    .authenticate()
+    .withPathParameters(['datasetID'])
+    .assert(Assertions.isInt(), 'datasetID')
+    .openTransaction()
+    .withEntity('dataset', Dataset, ['datasetID'])
+    .authorize('dataset')
+    .deleteEntity('dataset')
+    .terminate(204)
+    .export()
+);
 
-    if(!labelID || labelID === 'null') labelID = null;
+/* GET request datasets. */
+router.get('/', new ActionSequence()
+    .authenticate()
+    .openTransaction()
+    .withAllEntities('datasets', Dataset, ['userID'], true)
+    .append((seq, { datasets }) => seq.terminate(200, datasets.map(({ datasetID, name, lastModified }) => ({ datasetID, name, lastModified }))))
+    .export()
+);
 
-    try {
-        const datafileIDs = await controller.uploadFiles(req.session.userID, datasetID, req.files, labelID, customLabel);
-        res.status(201).json(datafileIDs);
-    }
-    catch(err) {
-        console.error(err);
-        res.status(400).json({ error: 'Something went wrong' });
-    }
-});
+/* GET request dataset details. */
+router.get('/:datasetID', new ActionSequence()
+    .authenticate()
+    .withPathParameters(['datasetID'])
+    .assert(Assertions.isInt(), 'datasetID')
+    .openTransaction()
+    .withEntity('dataset', Dataset, ['datasetID'])
+    .authorize('dataset')
+    .append((seq, { dataset: { name, lastModified, labels } }) => seq.terminate(200, { name, lastModified, labels: labels.map(({ labelID, string }) => ({ labelID, string })) }))
+    .export()
+);
 
-/* POST rename dataset. */
-router.post('/rename', async (req, res) => {
-    if(!ensureLoggedIn(req, res)) return;
-    const datasetID = req.body['datasetID'];
-    const name = req.body['name'];
+/* POST add dataset label. */
+router.post('/:datasetID/label', new ActionSequence()
+    .authenticate()
+    .withPathParameters(['datasetID'])
+    .assert(Assertions.isInt(), 'datasetID')
+    .withRequestBody(['string'])
+    .assert(Assertions.isString(), 'string')
+    .openTransaction()
+    .withEntity('dataset', Dataset, ['datasetID'])
+    .authorize('dataset')
+    .append(async (seq, { dataset, string, connection }) => {
+        const label = dataset.addLabel(string);
+        await dataset.save(connection);
+        seq.terminate(201, { labelID: label.labelID });
+    })
+    .export()
+);
 
-    try {
-        await controller.renameDataset(req.session.userID, datasetID, name);
-        res.status(204).json();
-    }
-    catch(err) {
-        res.status(400).json({ error: 'Something went wrong' });
-    }
-});
+/* PUT edit dataset label. */
+router.put('/:datasetID/label/:labelID', new ActionSequence()
+    .authenticate()
+    .withPathParameters(['datasetID', 'labelID'])
+    .assert(Assertions.isInt(), 'datasetID', 'labelID')
+    .withRequestBody(['string'])
+    .assert(Assertions.isString(), 'string')
+    .openTransaction()
+    .withEntity('dataset', Dataset, ['datasetID'])
+    .authorize('dataset')
+    .intermediate(async ({ dataset, labelID, string, connection }) => {
+        dataset.updateLabel(labelID, string);
+        await dataset.save(connection);
+    })
+    .terminate(204)
+    .export()
+);
 
-/* POST add label to dataset. */
-router.post('/add-label', async (req, res) => {
-    if(!ensureLoggedIn(req, res)) return;
-    const datasetID = req.body['datasetID'];
-    const string = req.body['string'];
+/* DELETE delete dataset label. */
+router.delete('/:datasetID/label/:labelID', new ActionSequence()
+    .authenticate()
+    .withPathParameters(['datasetID', 'labelID'])
+    .assert(Assertions.isInt(), 'datasetID', 'labelID')
+    .openTransaction()
+    .withEntity('dataset', Dataset, ['datasetID'])
+    .authorize('dataset')
+    .intermediate(async ({ dataset, labelID, connection }) => {
+        dataset.deleteLabel(labelID);
+        await dataset.save(connection);
+    })
+    .terminate(204)
+    .export()
+);
 
-    try {
-        const labelID = await controller.addLabel(req.session.userID, datasetID, string);
-        res.status(201).json({ labelID });
-    }
-    catch(err) {
-        console.error(err);
-        res.status(400).json({ error: 'Something went wrong' });
-    }
-});
+/* POST upload new datafiles. */
+router.post('/:datasetID/files', upload.array('files'), new ActionSequence()
+    .authenticate()
+    .withPathParameters(['datasetID'])
+    .assert(Assertions.isInt(), 'datasetID')
+    .withRequestBody([], ['labelID', 'customLabel'])
+    .assert(Assertions.disjunction().isString().isNull().isUndefined(), 'labelID', 'customLabel')
+    .withDynamic('labelID', ({ labelID }) => typeof labelID === 'undefined' || labelID === null || labelID === 'null' ? null : parseInt(labelID))
+    .withRequestProperty('files')
+    .openTransaction()
+    .withEntity('dataset', Dataset, ['datasetID'])
+    .authorize('dataset')
+    .append(async (seq, { dataset, files, labelID, customLabel, connection, rollbackEvents }) => {
+        const datafileIDs = [];
+        for(let i = 0 ; i < files.length ; ++i) {
+            const datafile = dataset.newDatafile(files[i].originalname, labelID, customLabel);
+            await datafile.create(connection);
+            await datafile.saveContent(files[i].buffer, rollbackEvents);
+            datafileIDs.push(datafile.datafileID);
+        }
+        await dataset.save(connection);
+        seq.terminate(201, datafileIDs);
+    })
+    .export()
+);
 
-/* POST edit label value. */
-router.post('/edit-label', async (req, res) => {
-    if(!ensureLoggedIn(req, res)) return;
-    const datasetID = req.body['datasetID'];
-    const labelID = req.body['labelID'];
-    const string = req.body['string'];
+/* PUT update datafile details. */
+router.put('/:datasetID/files/:datafileID', new ActionSequence()
+    .authenticate()
+    .withPathParameters(['datasetID', 'datafileID'])
+    .assert(Assertions.isInt(), 'datasetID', 'datafileID')
+    .withRequestBody(['name', 'labelID', 'customLabel'])
+    .assert(Assertions.isString(), 'name')
+    .assert(Assertions.disjunction().isInt().isNull().isUndefined(), 'labelID')
+    .assert(Assertions.disjunction().isString().isNull().isUndefined(), 'customLabel')
+    .openTransaction()
+    .withEntity('dataset', Dataset, ['datasetID'])
+    .authorize('dataset')
+    .withDynamic('datafile', async ({ dataset, datafileID, connection }) => await dataset.fetchDatafile(datafileID, connection))
+    .terminateIfNotExists('datafile', 404, { message: 'Requested datafile does not exist' })
+    .intermediate(async ({ dataset, datafile, name, labelID, customLabel, connection }) => {
+        datafile.filename = name;
+        datafile.labelID = labelID;
+        datafile.customLabel = customLabel;
+        await datafile.save(connection);
+        await dataset.save(connection);
+    })
+    .terminate(204)
+    .export()
+);
 
-    try {
-        await controller.editLabel(req.session.userID, datasetID, labelID, string);
-        res.status(204).json();
-    }
-    catch(err) {
-        res.status(400).json({ error: 'Something went wrong' });
-    }
-});
+/* DELETE delete datafile. */
+router.delete('/:datasetID/files/:datafileID', new ActionSequence()
+    .authenticate()
+    .withPathParameters(['datasetID', 'datafileID'])
+    .assert(Assertions.isInt(), 'datasetID', 'datafileID')
+    .openTransaction()
+    .withEntity('dataset', Dataset, ['datasetID'])
+    .authorize('dataset')
+    .withDynamic('datafile', async ({ dataset, datafileID, connection }) => await dataset.fetchDatafile(datafileID, connection))
+    .terminateIfNotExists('datafile', 404, { message: 'Requested datafile does not exist' })
+    .deleteEntity('datafile')
+    .saveEntity('dataset')
+    .terminate(204)
+    .export()
+);
 
-/* POST delete label from dataset. */
-router.post('/delete-label', async (req, res) => {
-    if(!ensureLoggedIn(req, res)) return;
-    const datasetID = req.body['datasetID'];
-    const labelID = req.body['labelID'];
-
-    try {
-        await controller.deleteLabel(req.session.userID, datasetID, labelID);
-        res.status(204).json();
-    }
-    catch(err) {
-        res.status(400).json({ error: 'Something went wrong' });
-    }
-});
-
-/* POST submit updated datafile fields. */
-router.post('/update-datafile', async (req, res) => {
-    if(!ensureLoggedIn(req, res)) return;
-    const datasetID = req.body['datasetID'];
-    const datafileID = req.body['datafileID'];
-    const name = req.body['name'];
-    const labelID = req.body['labelID'];
-    const customLabel = req.body['customLabel'];
-
-    console.log(labelID + ', ' + customLabel);
-
-    try {
-        await controller.updateDatafile(req.session.userID, datasetID, datafileID, name, labelID, customLabel);
-        res.status(204).json();
-    }
-    catch(err) {
-        res.status(400).json({ error: 'Something went wrong' });
-    }
-});
-
-/* POST delete datafile from dataset. */
-router.post('/delete-datafile', async (req, res) => {
-    if(!ensureLoggedIn(req, res)) return;
-    const datasetID = req.body['datasetID'];
-    const datafileID = req.body['datafileID'];
-
-    try {
-        await controller.deleteDatafile(req.session.userID, datasetID, datafileID);
-        res.status(204).json();
-    }
-    catch(err) {
-        res.status(400).json({ error: 'Something went wrong' });
-    }
-});
-
-/* POST delete dataset. */
-router.post('/delete', async (req, res) => {
-    if(!ensureLoggedIn(req, res)) return;
-    const datasetID = req.body['datasetID'];
-
-    try {
-        await controller.deleteDataset(req.session.userID, datasetID);
-        res.status(204).json();
-    }
-    catch(err) {
-        res.status(400).json({ error: 'Something went wrong' });
-    }
-});
-
-/* GET fetch users' datasets. */
-router.get('/fetch', async (req, res) => {
-    if(!ensureLoggedIn(req, res)) return;
-
-    try {
-        const datasets = await controller.getDatasets(req.session.userID);
-        res.status(200).json(datasets);
-    }
-    catch(err) {
-        res.status(400).json({ error: 'Something went wrong' });
-    }
-});
-
-/* GET fetch dataset details. */
-router.get('/fetch-details', async (req, res) => {
-    if(!ensureLoggedIn(req, res)) return;
-    const datasetID = req.query.id;
-
-    try {
-        const dataset = await controller.getDatasetDetails(req.session.userID, datasetID);
-        res.status(200).json(dataset);
-    }
-    catch(err) {
-        res.status(400).json({ error: 'Something went wrong '});
-    }
-});
-
-/* GET fetch a queried page of dataset files. */
-router.get('/fetch-datafiles', async (req, res) => {
-    if(!ensureLoggedIn(req, res)) return;
-    const datasetID = req.query.id;
-    const query = req.query.query || '';
-    const page = req.query.page || 0;
-
-    try {
-        const files = await controller.getFiles(req.session.userID, datasetID, query, page);
-        if(files.length > 0)
-            console.log(files[0].labelID + ', ' + files[0].customLabel);
-        res.status(200).json(files);
-    }
-    catch(err) {
-        res.status(400).json({ error: 'Something went wrong' });
-    }
-});
+/* GET request datafiles. */
+router.get('/:datasetID/files', new ActionSequence()
+    .authenticate()
+    .withPathParameters(['datasetID'])
+    .assert(Assertions.isInt(), 'datasetID')
+    .withQueryParameters([], ['query', 'page'])
+    .assert(Assertions.disjunction().isString().isNull().isUndefined(), 'query')
+    .assert(Assertions.disjunction().nested(Assertions.isInt().greaterThanOrEqual(1)).isNull().isUndefined(), 'page')
+    .openTransaction()
+    .withEntity('dataset', Dataset, ['datasetID'])
+    .authorize('dataset')
+    .withDynamic('files', async ({ dataset, connection, query, page }) => await dataset.searchDatafiles(query, page, 20, connection))
+    .append((seq, { files }) => seq.terminate(200, files.map(({ datafileID, filename, labelID, customLabel, dateAdded }) =>
+                                                                ({ datafileID, filename, labelID, customLabel, dateAdded }))))
+    .export()
+);
 
 module.exports = router;

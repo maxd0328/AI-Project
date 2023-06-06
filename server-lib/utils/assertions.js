@@ -67,7 +67,7 @@ class Assertions {
     }
 
     isString() {
-        return this.custom(value => typeof value === 'number');
+        return this.custom(value => typeof value === 'string');
     }
 
     isObject() {
@@ -88,6 +88,26 @@ class Assertions {
 
     isNotEmpty() {
         return this.custom(value => value.length);
+    }
+
+    hasLengthBetween(lowerBound, upperBound) {
+        return this.custom(value => value.length >= lowerBound && value.length <= upperBound);
+    }
+
+    hasMinimumLength(bound) {
+        return this.custom(value => value.length >= bound);
+    }
+
+    hasMaximumLength(bound) {
+        return this.custom(value => value.length <= bound);
+    }
+
+    matches(regex) {
+        return this.custom(value => regex.test(value));
+    }
+
+    isOneOf(...values) {
+        return this.custom(value => values.includes(value));
     }
 
     greaterThan(bound) {

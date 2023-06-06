@@ -9,6 +9,10 @@ class Preset extends S3Entity {
         this.description = description;
     }
 
+    defaultParams() {
+        return { name: 'New Preset', description: '' };
+    }
+
     genS3Key() {
         return `preset-${this.presetID}.matej`;
     }

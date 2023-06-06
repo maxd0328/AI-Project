@@ -15,8 +15,11 @@ const checkPreconditions = preconditions => {
 
 const getSQLForDefined = () => {
     const definedKeys = this.keys.concat(this.attribs).filter(col => this[col] !== undefined);
-    const conditions = definedKeys.map(col => `${col} = ?`).join(' AND ');
-    const values = definedKeys.map(col => this[col]);
+    let conditions = definedKeys.map(col => `${col} = ?`).join(' AND ');
+    let values = definedKeys.map(col => this[col]);
+
+    if(conditions)
+        conditions = 'WHERE ' + conditions;
 
     return [conditions, values];
 };
@@ -36,10 +39,29 @@ class Entity {
 
     assert = assert;
 
+    setOrdering(attrib, ascending) {
+        this.orderAttrib = attrib;
+        this.orderAscending = ascending;
+    }
+
+    useDefault() {
+        const defaults = this.defaultParams();
+        if(defaults)
+            for(const field in defaults)
+                if(defaults.hasOwnProperty(field) && typeof this[field] === 'undefined')
+                    this[field] = defaults[field];
+    }
+
+    defaultParams() { // Implemented by subclasses to add default attrib values if they don't already exist
+    }
+
     preconditions() { // Implemented by subclasses to assert preconditions before writing to the database
     }
 
     async create(connection = db) {
+        if(this.attribs.includes('lastModified'))
+            this.lastModified = Date.now();
+
         checkPreconditions(this.preconditions);
 
         const attribs = this.autoIncrement ? this.attribs : [...this.keys, ...this.attribs];
@@ -58,6 +80,9 @@ class Entity {
     }
 
     async save(connection = db) {
+        if(this.attribs.includes('lastModified'))
+            this.lastModified = Date.now();
+
         checkPreconditions(this.preconditions);
 
         const updates = this.attribs.map(attrib => `${attrib} = ?`).join(', ');
@@ -71,11 +96,11 @@ class Entity {
         });
     }
 
-    async delete(connection = db) {
+    async delete(connection = db, rollbackEvents = null) {
         checkPreconditions(this.preconditions);
 
-        await this.finalize(connection);
-        await this.cascade('finalize', connection);
+        await this.finalize(connection, rollbackEvents);
+        await this.cascade('finalize', connection, rollbackEvents);
 
         const conditions = this.keys.map(key => `${key} = ?`).join(' AND ');
         const values = this.keys.map(key => this[key]);
@@ -89,7 +114,7 @@ class Entity {
     async exists(connection = db) {
         const [conditions, values] = getSQLForDefined.call(this);
         return (await connection.queryOne({
-            query: `SELECT EXISTS(SELECT 1 FROM ${this.table} WHERE ${conditions}) AS rowExists`,
+            query: `SELECT EXISTS(SELECT 1 FROM ${this.table} ${conditions}) AS rowExists`,
             values
         })).rowExists;
     }
@@ -100,11 +125,11 @@ class Entity {
     async fetch(connection = db) {
         const [conditions, values] = getSQLForDefined.call(this);
         const row = await connection.queryBinary({
-            query: `SELECT * FROM ${this.table} WHERE ${conditions}`,
+            query: `SELECT * FROM ${this.table} ${conditions}`,
             values
         });
         if(row) {
-            await this.onFetch(row, connection);
+            if(!this.quickFetch) await this.onFetch(row, connection);
             return new this.wrapper(row);
         }
         else return null;
@@ -113,11 +138,11 @@ class Entity {
     async fetchAll(connection = db) {
         const [conditions, values] = getSQLForDefined.call(this);
         const result = await connection.queryAny({
-            query: `SELECT * FROM ${this.table} WHERE ${conditions}`,
+            query: `SELECT * FROM ${this.table} ${conditions} ${this.orderAttrib ? `ORDER BY ${this.orderAttrib} ${this.orderAscending ? 'ASC' : 'DESC'}` : ''}`,
             values
         });
         return await Promise.all(result.map(async row => {
-            await this.onFetch(row, connection);
+            if(!this.quickFetch) await this.onFetch(row, connection);
             return new this.wrapper(row);
         }));
     }
@@ -125,22 +150,20 @@ class Entity {
     async fetchOne(connection = db) {
         const [conditions, values] = getSQLForDefined.call(this);
         const row = await connection.queryOne({
-            query: `SELECT *
-                    FROM ${this.table}
-                    WHERE ${conditions}`,
+            query: `SELECT * FROM ${this.table} ${conditions}`,
             values
         });
-        await this.onFetch(row, connection);
+        if(!this.quickFetch) await this.onFetch(row, connection);
         return new this.wrapper(row);
     }
 
-    async finalize(connection) { // Implemented by subclasses to add a finalization procedure on top of just deleting the row
+    async finalize(connection, rollbackEvents) { // Implemented by subclasses to add a finalization procedure on top of just deleting the row
     }
 
-    async cascade(action, connection) { // Implemented by subclasses to do any necessary cascades upon finalization (mainly for deleting S3 keys of related entities)
+    async cascade(action, connection, rollbackEvents) { // Implemented by subclasses to do any necessary cascades upon finalization (mainly for deleting S3 keys of related entities)
     }
 
-    async forward(entity, action, connection) {
+    async forward(entity, action, connection, rollbackEvents) {
         const obj = {};
         for(const key of this.keys)
             if(this[key] !== undefined)
@@ -151,9 +174,9 @@ class Entity {
 
         const entities = new entity(obj).fetchAll(connection);
         for(const entity of entities)
-            await entity[action](connection);
+            await entity[action](connection, rollbackEvents);
         for(const entity of entities)
-            await entity.cascade(action, connection);
+            await entity.cascade(action, connection, rollbackEvents);
     }
 
 }
@@ -172,23 +195,38 @@ class S3Entity extends Entity {
     preconditionsS3() { // Implemented by subclasses to do any additional database fetches necessary for building the object
     }
 
+    async contentExists() {
+        checkPreconditions(this.preconditionsS3);
+        return await aws.s3.resourceExists(this.bucket, this.genS3Key());
+    }
+
     async fetchContent() {
         checkPreconditions(this.preconditionsS3);
         return await aws.s3.getResource(this.bucket, this.genS3Key());
     }
 
-    async saveContent(content) {
+    async saveContent(content, rollbackEvents = null) {
         checkPreconditions(this.preconditionsS3);
+        const backup = rollbackEvents ? await aws.s3.getResource(this.bucket, this.genS3Key()) : null;
         await aws.s3.putResource(this.bucket, this.genS3Key(), content);
+        if(rollbackEvents)
+            rollbackEvents.push(async () => await this.saveContent(backup));
     }
 
-    async saveContentStream(stream) {
+    async saveContentStream(stream, rollbackEvents = null) {
         checkPreconditions(this.preconditionsS3);
+        const backup = rollbackEvents && await this.contentExists() ? await aws.s3.getResource(this.bucket, this.genS3Key()) : null;
         await aws.s3.putResourceStream(this.bucket, this.genS3Key(), stream);
+        if(rollbackEvents)
+            rollbackEvents.push(async () => backup === null ? await this.deleteContent() : await this.saveContent(backup));
     }
 
-    async deleteContent() {
+    async deleteContent(rollbackEvents = null) {
+        checkPreconditions(this.preconditionsS3);
+        const backup = rollbackEvents && await this.contentExists() ? await aws.s3.getResource(this.bucket, this.genS3Key()) : null;
         await aws.s3.deleteResource(this.bucket, this.genS3Key());
+        if(rollbackEvents && backup !== null)
+            rollbackEvents.push(async () => await this.saveContent(backup));
     }
 
     async createPresignedURL(expiry = 60 * 60) {
@@ -196,9 +234,9 @@ class S3Entity extends Entity {
         return await aws.s3.createPresignedURL(this.bucket, this.genS3Key(), expiry);
     }
 
-    async finalize(connection) {
-        await super.finalize(connection);
-        await this.deleteContent();
+    async finalize(connection, rollbackEvents) {
+        await super.finalize(connection, rollbackEvents);
+        await this.deleteContent(rollbackEvents);
     }
 
 }
