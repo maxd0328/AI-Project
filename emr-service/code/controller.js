@@ -1,6 +1,14 @@
 const AWS = require('../commons/aws').aws;
 const configurations = require('./configuration');
 
+/**
+ * NOTICE
+ *
+ * This module is DEPRECATED
+ * For now, the EMR service has been removed from the Docker Compose
+ * Post-MVP development will likely involve updating this module
+ */
+
 function setUpEMRCluster(emrParameters) {
   // Set up the EMR cluster configuration
   const params = {
@@ -102,7 +110,7 @@ async function getEMRLink(projectID) {
 }
 
 class EMRParams {
-  constructor(userID, name, jarAddress, projectID, s3name, region, publicKey, privateKey, newTraining, networkPath, numberOfCores, emrType, serverIp) {
+  async constructor(userID, name, jarAddress, projectID, s3name, region, publicKey, privateKey, newTraining, networkPath, numberOfCores, emrType, serverIp) {
     const [configAddress, dataAddress] = await configurations.createEMRConfiguration(userID, projectID);
     this.name = name;
     this.jarAddress = jarAddress;
@@ -121,7 +129,7 @@ class EMRParams {
 }
 
 async function setUpEMRParams(projectID) {
-    const [cfgKey, csvKey] = createEMRConfiguration(projectID);
+    const [cfgKey, csvKey] = configurations.createEMRConfiguration(projectID);
     return new EMRParams(projectID, process.env.JAR_LOCATION, csvKey, cfgKey, process.env.S3_USER_BUCKET,
         process.env.AWS_REGION, process.env.AWS_ACCESS_KEY_ID, process.env.AWS_SECRET_ACCESS_KEY, true, null,
         process.env.EMR_CORES, process.env.EMR_TYPE, process.env.SERVER_IP);

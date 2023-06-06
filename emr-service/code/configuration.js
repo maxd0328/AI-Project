@@ -2,6 +2,14 @@ const db = require('../commons/database');
 const s3 = require('../commons/s3');
 const compiler = require('ms-compiler');
 
+/**
+ * NOTICE
+ *
+ * This module is DEPRECATED
+ * For now, the EMR service has been removed from the Docker Compose
+ * Post-MVP development will likely involve updating this module
+ */
+
 const genS3ScriptKey = (scriptID) => `script-${scriptID}.matej`;
 
 const genS3PresetKey = (presetID) => `preset-${presetID}.matej`;

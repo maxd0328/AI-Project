@@ -4,8 +4,16 @@ const fetch = require('node-fetch');
 const controller = require('./controller');
 const configurations = require('./configuration');
 
+/**
+ * NOTICE
+ *
+ * This implementation is DEPRECATED
+ * For now, the EMR service has been removed from the Docker Compose
+ * Post-MVP development will likely involve updating this module
+ */
+
 router.delete('/:id', new ActionSequence().authenticate().withPathParameters(['id']).assert(Assertions.isInt(), 'id')
-    .withEntity('project', Project, ['id']).authorize('project').append((seq, {project}) => {
+    .withEntity('project', Project, ['id']).authorize('project').append(async (seq, {project}) => {
         const response = await fetch(`http://${controller.getEMRLink(project.projectID)}/api/training/stop`, { method: 'POST' });
         if (!response.ok) {
             seq.terminate(500, { error: 'An error occurred while stopping training' });
@@ -16,8 +24,8 @@ router.delete('/:id', new ActionSequence().authenticate().withPathParameters(['i
     }).export());
 
 router.get('/:id', new ActionSequence().authenticate().withPathParameters(['id']).assert(Assertions.isInt(), 'id')
-    .withEntity('project', Project, ['id']).authorize('project').append((seq, {project}) => {
-        emrParams = controller.setUpEMRParams(project.projectID);
+    .withEntity('project', Project, ['id']).authorize('project').append(async (seq, {project}) => {
+        emrParams = await controller.setUpEMRParams(project.projectID);
         controller.launchEMRCluster(emrParams);
         seq.terminate(204);
     }).export());

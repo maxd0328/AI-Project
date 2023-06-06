@@ -17,14 +17,15 @@ services:
       NODE_ENV: production
       SERVICE: user-service
       PORT: 8080
-  emr-service:
-    image: 863286959775.dkr.ecr.us-east-1.amazonaws.com/ai-project-emr:latest
-    ports:
-      - "3002:8080"
-    environment:
-      NODE_ENV: production
-      SERVICE: emr-service
-      PORT: 8080
+# NOTICE - this container is disabled until post-MVP development and inclusion of EMR training
+# emr-service:
+#   image: 863286959775.dkr.ecr.us-east-1.amazonaws.com/ai-project-emr:latest
+#   ports:
+#     - "3002:8080"
+#   environment:
+#     NODE_ENV: production
+#     SERVICE: emr-service
+#     PORT: 8080
   bucket-service:
     image: 863286959775.dkr.ecr.us-east-1.amazonaws.com/ai-project-bucket-service:latest
     ports:

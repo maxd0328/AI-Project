@@ -17,14 +17,15 @@ services:
       NODE_ENV: development
       SERVICE: user-service
       PORT: 8080
-  emr-service:
-    build: ./emr-service
-    ports:
-      - "3002:8080"
-    environment:
-      NODE_ENV: development
-      SERVICE: emr-service
-      PORT: 8080
+# NOTICE - this container is disabled until post-MVP development and inclusion of EMR training
+# emr-service:
+#   build: ./emr-service
+#   ports:
+#     - "3002:8080"
+#   environment:
+#     NODE_ENV: development
+#     SERVICE: emr-service
+#     PORT: 8080
   bucket-service:
     build: ./bucket-service
     ports:
@@ -82,31 +83,31 @@ services:
       - ./.local/config-s3:/.minio
     command: server /data
 
-  spark-master:
-    image: bitnami/spark:latest
-    environment:
-      - SPARK_MODE=master
-      - SPARK_RPC_AUTHENTICATION_ENABLED=no
-      - SPARK_RPC_ENCRYPTION_ENABLED=no
-      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
-      - SPARK_SSL_ENABLED=no
-    ports:
-      - "7077:7077"
-      - "6060:6060"
-
-  spark-worker:
-      image: bitnami/spark:latest
-      environment:
-        - SPARK_MODE=worker
-        - SPARK_MASTER_URL=spark://spark-master:7077
-        - SPARK_WORKER_MEMORY=1G
-        - SPARK_WORKER_CORES=1
-        - SPARK_RPC_AUTHENTICATION_ENABLED=no
-        - SPARK_RPC_ENCRYPTION_ENABLED=no
-        - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
-        - SPARK_SSL_ENABLED=no
-      depends_on:
-        - spark-master
+# NOTICE - these containers are disabled until post-MVP development and inclusion of EMR training
+# spark-master:
+#   image: bitnami/spark:latest
+#   environment:
+#     - SPARK_MODE=master
+#     - SPARK_RPC_AUTHENTICATION_ENABLED=no
+#     - SPARK_RPC_ENCRYPTION_ENABLED=no
+#     - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+#     - SPARK_SSL_ENABLED=no
+#   ports:
+#     - "7077:7077"
+#     - "6060:6060"
+# spark-worker:
+#     image: bitnami/spark:latest
+#     environment:
+#       - SPARK_MODE=worker
+#       - SPARK_MASTER_URL=spark://spark-master:7077
+#       - SPARK_WORKER_MEMORY=1G
+#       - SPARK_WORKER_CORES=1
+#       - SPARK_RPC_AUTHENTICATION_ENABLED=no
+#       - SPARK_RPC_ENCRYPTION_ENABLED=no
+#       - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+#       - SPARK_SSL_ENABLED=no
+#     depends_on:
+#       - spark-master
 
 volumes:
   db-data:
