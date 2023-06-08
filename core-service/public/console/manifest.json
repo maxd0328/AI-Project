@@ -1,0 +1,10 @@
+{
+  "short_name": "Console",
+  "name": "GrAI Matter Console",
+  "icons": [
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}
