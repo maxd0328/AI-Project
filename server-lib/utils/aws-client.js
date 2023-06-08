@@ -164,7 +164,7 @@ class AWSClient {
 
     constructor({ sesApiVersion, s3AccessKeyId, s3SecretAccessKey, s3Endpoint }) {
         this.ses = new SESClient({ sesApiVersion });
-        this.s3 = new S3Client({ s3AccessKeyId, s3SecretAccessKey, s3Endpoint });
+        this.s3 = new S3Client({ accessKeyId: s3AccessKeyId, secretAccessKey: s3SecretAccessKey, endpoint: s3Endpoint });
     }
 
 }

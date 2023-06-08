@@ -7,7 +7,7 @@ export const SessionProvider = ({ children }) => {
     const [error, setError] = useState(null);
     useEffect(() => {
         /*
-        fetch('/user/session')
+        fetch('/user')
             .then(response => response.json())
             .then(data => setSession(data))
             .catch(error => setError(error.toString()));

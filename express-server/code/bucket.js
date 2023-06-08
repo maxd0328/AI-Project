@@ -105,14 +105,17 @@ router.put('/projects/:projectID/pipeline', new ActionSequence()
     .authenticate()
     .withPathParameters(['projectID'])
     .withRequestBody(['presetID', 'stages'])
-    .assert(Assertions.isInt(), 'projectID', 'presetID')
+    .assert(Assertions.isInt(), 'projectID')
+    .assert(Assertions.disjunction().isInt().isNull(), 'presetID')
     .assert(Assertions.isArray(), 'stages')
     .openTransaction()
     .withEntity('project', Project, ['projectID'])
     .authorize('project')
     .append(async (seq, { project, stages, presetID, connection, rollbackEvents }) => {
         await project.clearStages(connection, rollbackEvents);
-        for(let i = 0 ; i < stages[i].length ; ++i) {
+        for(let i = 0 ; i < stages.length ; ++i) {
+            if(stages[i].scriptID === undefined)
+                stages[i].scriptID = null;
             const { name, type, scriptID, content } = stages[i];
             const stageObj = project.newStage(i, { name, type, scriptID });
             await stageObj.create(connection);
@@ -156,7 +159,7 @@ router.get('/projects/:projectID', new ActionSequence()
     .openTransaction()
     .withEntity('project', Project, ['projectID'])
     .authorize('project')
-    .append((seq, { project: { name, type, lastModified, datasetIDs } }) => seq.terminate(200, { name, type, lastModified, datasetIDs }))
+    .append((seq, { project: { name, type, presetID, lastModified, datasetIDs } }) => seq.terminate(200, { name, type, presetID, lastModified, datasetIDs }))
     .export()
 );
 

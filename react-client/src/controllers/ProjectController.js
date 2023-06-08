@@ -1,14 +1,14 @@
-import {get, post} from './GeneralController';
+import { get, post, put, _delete } from './GeneralController';
 
-export const fetchProject = async projectID => ({ name: 'My Project', type: 'cnn' }); //await get(`/bucket/fetch-project?id=${projectID}`);
-export const fetchPresets = async () => await get('/bucket/fetch-presets');
-export const fetchPresetContent = async presetID => await get(`/bucket/preset-content?id=${presetID}`);
-export const fetchStages = async projectID => await get(`/bucket/fetch-pipeline?id=${projectID}`);
+export const fetchProject = async projectID => await get(`/bucket/projects/${projectID}`);
+export const fetchPresets = async () => await get('/bucket/presets');
+export const fetchPresetContent = async presetID => (await get(`/bucket/presets/${presetID}`)).content;
+export const fetchStages = async projectID => await get(`/bucket/projects/${projectID}/pipeline`);
 
-export const sendProjectName = async (projectID, name) => await post('/bucket/rename-project', { projectID, name });
-export const sendDeleteProject = async projectID => await post('/bucket/delete-project', { projectID });
-export const saveStages = async (projectID, presetID, stages) => await post('/bucket/save-pipeline', { projectID, presetID, stages });
+export const sendProjectName = async (projectID, name) => await put(`/bucket/projects/${projectID}`, { name });
+export const sendDeleteProject = async projectID => await _delete(`/bucket/projects/${projectID}`);
+export const saveStages = async (projectID, presetID, stages) => await put(`/bucket/projects/${projectID}/pipeline`, { presetID, stages });
 
 export const fetchLinkedDatasets = async projectID => await get(`/bucket/fetch-linked-datasets?id=${projectID}`);
-export const sendDatasetLink = async (projectID, datasetID) => await post('/bucket/link-dataset', { projectID, datasetID });
-export const sendDatasetUnlink = async (projectID, datasetID) => await post('/bucket/unlink-dataset', { projectID, datasetID });
+export const sendDatasetLink = async (projectID, datasetID) => await post(`/bucket/projects/${projectID}/datasets/${datasetID}`);
+export const sendDatasetUnlink = async (projectID, datasetID) => await _delete(`/bucket/projects/${projectID}/datasets/${datasetID}`);

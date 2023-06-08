@@ -70,7 +70,7 @@ router.get('/:datasetID', new ActionSequence()
 );
 
 /* POST add dataset label. */
-router.post('/:datasetID/label', new ActionSequence()
+router.post('/:datasetID/labels', new ActionSequence()
     .authenticate()
     .withPathParameters(['datasetID'])
     .assert(Assertions.isInt(), 'datasetID')
@@ -88,7 +88,7 @@ router.post('/:datasetID/label', new ActionSequence()
 );
 
 /* PUT edit dataset label. */
-router.put('/:datasetID/label/:labelID', new ActionSequence()
+router.put('/:datasetID/labels/:labelID', new ActionSequence()
     .authenticate()
     .withPathParameters(['datasetID', 'labelID'])
     .assert(Assertions.isInt(), 'datasetID', 'labelID')
@@ -106,7 +106,7 @@ router.put('/:datasetID/label/:labelID', new ActionSequence()
 );
 
 /* DELETE delete dataset label. */
-router.delete('/:datasetID/label/:labelID', new ActionSequence()
+router.delete('/:datasetID/labels/:labelID', new ActionSequence()
     .authenticate()
     .withPathParameters(['datasetID', 'labelID'])
     .assert(Assertions.isInt(), 'datasetID', 'labelID')
@@ -200,8 +200,11 @@ router.get('/:datasetID/files', new ActionSequence()
     .withEntity('dataset', Dataset, ['datasetID'])
     .authorize('dataset')
     .withDynamic('files', async ({ dataset, connection, query, page }) => await dataset.searchDatafiles(query, page, 20, connection))
-    .append((seq, { files }) => seq.terminate(200, files.map(({ datafileID, filename, labelID, customLabel, dateAdded }) =>
-                                                                ({ datafileID, filename, labelID, customLabel, dateAdded }))))
+    .append(async (seq, { files }) => seq.terminate(200, await Promise.all(files.map(async datafile => {
+        const { datafileID, filename, labelID, customLabel, dateAdded } = datafile;
+        const url = await datafile.createPresignedURL();
+        return { datafileID, filename, labelID, customLabel, dateAdded, url };
+    }))))
     .export()
 );
 

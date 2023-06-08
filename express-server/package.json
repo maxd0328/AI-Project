@@ -1,0 +1,12 @@
+{
+    "name": "express-server",
+    "version": "1.0.0",
+    "private": true,
+    "dependencies": {
+        "express": "~4.16.1",
+        "uuid": "9.0.0",
+        "multer": "^1.4.5-lts.1",
+        "server-lib": "1.0.0",
+        "ms-compiler": "1.0.0"
+    }
+}

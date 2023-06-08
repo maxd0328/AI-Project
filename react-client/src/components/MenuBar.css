@@ -28,6 +28,7 @@
 
 .menu-bar-image-button:not(:active) {
     transition: background-color 0.15s;
+    outline: none;
 }
 
 .menu-bar-image-button:hover {
@@ -36,6 +37,7 @@
 
 .menu-bar-image-button:active {
     background-color: rgba(100, 100, 100, 0.6);
+    outline: none;
 }
 
 .menu-bar img {

@@ -9,15 +9,16 @@ const MenuBar = () => {
 
     return (
         <div className="menu-bar">
-            <button className="menu-bar-invisible" onClick={goHome}>
-                <h2>GrAI Matter</h2>
+            <h2>AxoModel</h2>
+            <button className="menu-bar-image-button" style={{marginLeft: 15 + 'px', width: 35 + 'px', height: 35 + 'px'}} onClick={goHome}>
+                <img src="/console/images/home.png" alt="Home" style={{width: 70 + '%', height: 70 + '%'}}/>
             </button>
             <div style={{flexGrow: 1}}/>
             <button className="menu-bar-image-button" style={{marginRight: 15 + 'px'}}>
-                <img src="/console/images/menu.png" alt="/console/images/menu.png"/>
+                <img src="/console/images/menu.png" alt="Menu"/>
             </button>
             <button className="menu-bar-image-button" style={{marginRight: 30 + 'px'}}>
-                <img src="/console/images/user.png" alt="/console/images/user.png"/>
+                <img src="/console/images/user.png" alt="Account"/>
             </button>
         </div>
     );

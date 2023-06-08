@@ -1,21 +1,11 @@
 @echo off
 
-:: If no arguments were passed, build every image
-if "%1" == "all" (
-    :: Build all images
-    for /d %%d in (*-service) do (
-        .\build-image.bat %%d
-    )
+:: Build the docker image using the Dockerfile
+docker build -t ai-project-server .
+docker tag %1:latest 863286959775.dkr.ecr.us-east-1.amazonaws.com/ai-project-server:latest
 
-    :: Automatically deploy docker-compose.yml to AWS
-    eb deploy
-) else if "%1" == "" (
-    :: Automatically deploy docker-compose.yml to AWS
-    eb deploy
-) else (
-    :: Build image provided by argument
-    .\build-image.bat %1
+:: Push the image to the corresponding Amazon ECR (Elastic Container Registry) repository
+docker push 863286959775.dkr.ecr.us-east-1.amazonaws.com/ai-project-server:latest
 
-    :: Automatically deploy docker-compose.yml to AWS
-    eb deploy
-)
+:: Automatically deploy docker-compose.yml to AWS
+eb deploy

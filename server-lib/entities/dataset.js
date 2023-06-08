@@ -15,7 +15,7 @@ class DataLabel {
 class Dataset extends Entity {
 
     constructor({ datasetID, userID, name, nextLabel, nextFile, lastModified, labels }) {
-        super(Dataset, 'datasets', ['datasetID'], ['userID', 'name', 'lastModified'], true);
+        super(Dataset, 'datasets', ['datasetID'], ['userID', 'name', 'nextLabel', 'nextFile', 'lastModified'], true);
         super.setOrdering('lastModified', false);
         this.datasetID = datasetID;
         this.userID = userID;
@@ -29,9 +29,10 @@ class Dataset extends Entity {
         if(maxLabelID >= this.nextLabel)
             this.nextLabel = maxLabelID + 1;
 
-        for(let label of this.labels)
-            if(typeof label.labelID !== 'number' || isNaN(label.labelID) || this.labels.filter(e => e.labelID === label.labelID).length > 1)
-                label.labelID = this.nextLabel++;
+        if(this.labels)
+            for(let label of this.labels)
+                if(typeof label.labelID !== 'number' || isNaN(label.labelID) || this.labels.filter(e => e.labelID === label.labelID).length > 1)
+                    label.labelID = this.nextLabel++;
     }
 
     defaultParams() {
@@ -72,7 +73,7 @@ class Dataset extends Entity {
     async searchDatafiles(query, page, pageSize = 20, connection = db) {
         return (await connection.queryAny({
             query: `SELECT * FROM datafiles WHERE datasetID = ? AND filename LIKE ? ORDER BY dateAdded DESC LIMIT ? OFFSET ?`,
-            values: [this.datasetID, query || '', pageSize, ((page || 1) - 1) * pageSize]
+            values: [this.datasetID, `%${query || ''}%`, pageSize, ((page || 1) - 1) * pageSize]
         })).map(e => new Datafile(e));
     }
 
@@ -92,6 +93,7 @@ class Dataset extends Entity {
     }
 
     preconditions() {
+        super.assert(this.labels, 'Label array must exist before saving');
         super.assert(new Set(this.labels.map(label => label.labelID)).size === this.labels.length, 'Duplicate labelIDs present in dataset');
         super.assert(Math.max.apply(Math, this.labels.map(label => label.labelID)) < this.nextLabel, 'LabelID exists outside of reserved ID space');
     }
@@ -107,7 +109,7 @@ class Dataset extends Entity {
     }
 
     async save(connection = db) {
-        await super.save();
+        await super.save(connection);
 
         const prevLabels = (await connection.queryAny({
             query: `SELECT labelID, string FROM dataLabels WHERE datasetID = ?`,

@@ -16,7 +16,7 @@
     "react-router-dom": "^6.11.1",
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4",
-    "ms-compiler": "file:../ms-compiler"
+    "ms-compiler": "1.0.0"
   },
   "scripts": {
     "start": "react-scripts start",

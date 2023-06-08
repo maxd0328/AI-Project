@@ -113,7 +113,6 @@ export const DataFile = ({ file, dataLabels, callbackSet, callbackRemove }) => {
             setDetails({ size: blob.size, type: blob.type });
         }
         catch(err) {
-            console.log(err);
             setDetails({ size: 0, type: 'Error' });
         }
     };

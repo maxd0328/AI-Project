@@ -290,7 +290,7 @@ const HomePage = () => {
                 { logoutError ? <p style={{marginLeft: 20 + 'px', color: '#ff4444'}}>Logout failed</p> : null }
             </div>
             <div style={{flexGrow: 1}}/>
-            <p style={{textAlign: 'center'}}>&copy; GrAI Matter 2023</p>
+            <p style={{textAlign: 'center'}}>AxoModel v1.0.0 Release</p>
         </div>
     );
 };

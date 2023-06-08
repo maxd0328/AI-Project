@@ -1,46 +1,15 @@
 version: '3'
 
 services:
-  core-service:
-    build: ./core-service
+  ai-project-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "3000:8080"
     environment:
       NODE_ENV: development
       SERVICE: core-service
-      PORT: 8080
-  user-service:
-    build: ./user-service
-    ports:
-      - "3001:8080"
-    environment:
-      NODE_ENV: development
-      SERVICE: user-service
-      PORT: 8080
-# NOTICE - this container is disabled until post-MVP development and inclusion of EMR training
-# emr-service:
-#   build: ./emr-service
-#   ports:
-#     - "3002:8080"
-#   environment:
-#     NODE_ENV: development
-#     SERVICE: emr-service
-#     PORT: 8080
-  bucket-service:
-    build: ./bucket-service
-    ports:
-      - "3003:8080"
-    environment:
-      NODE_ENV: development
-      SERVICE: bucket-service
-      PORT: 8080
-  dataset-service:
-    build: ./dataset-service
-    ports:
-      - "3004:8080"
-    environment:
-      NODE_ENV: development
-      SERVICE: dataset-service
       PORT: 8080
 
   # AWS substitute services
@@ -67,10 +36,6 @@ services:
       - ./.local/logs:/etc/nginx/logs
     ports:
       - "80:80"
-    depends_on:
-      - core-service
-      - user-service
-      - emr-service
   minio:
     image: minio/minio:latest
     ports:

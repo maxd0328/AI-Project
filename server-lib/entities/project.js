@@ -9,7 +9,7 @@ class Project extends Entity {
     constructor({ projectID, userID, name, type, presetID, lastModified, datasetIDs }) {
         super(Project, 'projects', ['projectID'], ['userID', 'name', 'type', 'presetID', 'lastModified'], true);
         super.setOrdering('lastModified', false);
-        this.project = projectID;
+        this.projectID = projectID;
         this.userID = userID;
         this.name = name;
         this.type = type;
@@ -37,7 +37,7 @@ class Project extends Entity {
 
     // A workaround to be more efficient, this will fail to account for changes to the finalization cascades
     async clearStages(connection = db, rollbackEvents = null) {
-        const stages = await fetchStages(connection);
+        const stages = await this.fetchStages(connection);
         for(const stage of stages)
             await stage.deleteContent(rollbackEvents);
         await connection.executeAny({
@@ -46,7 +46,7 @@ class Project extends Entity {
         });
     }
 
-    async newStage(location, params) {
+    newStage(location, params) {
         return new ConfigStage({
             projectID: this.projectID,
             location,

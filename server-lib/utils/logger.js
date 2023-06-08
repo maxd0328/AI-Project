@@ -24,18 +24,20 @@ class Logger {
             ),
             transports
         });
+
+        this.serviceName = serviceName;
     }
 
     info(message) {
-        this.internal.info(message);
+        this.internal.info({ message, service: this.serviceName });
     }
 
     warn(message) {
-        this.internal.warn(message);
+        this.internal.warn({ message, service: this.serviceName });
     }
 
     error(message) {
-        this.internal.error(message);
+        this.internal.error({ message, service: this.serviceName });
     }
 
 }

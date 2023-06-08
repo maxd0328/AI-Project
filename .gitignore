@@ -3,10 +3,8 @@
 .idea
 
 # Node.js dependency files
+node_modules
 */node_modules
-
-# Temporary files
-*/commons_tmp
 
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
@@ -15,10 +13,9 @@
 !.elasticbeanstalk/*.global.yml
 
 # React build outputs
-core-service/public/console/*
+express-server/public/console/*
 
-# React Dependencies
-react-client/node_modules
+# React Special Dependencies
 react-client/.pnp
 react-client/.pnp.js
 

@@ -5,6 +5,7 @@
  */
 
 let http = require('http');
+let path = require('path');
 
 /**
  * Load app from server library
@@ -13,10 +14,14 @@ let http = require('http');
 const library = require('server-lib');
 const repo = library.utils.middleware.MiddlewareRepository;
 
-library.init();
 const app = library.app.createExpressApp(
+    repo.viewEJS(path.join(__dirname, 'views/')),
+    repo.serveStatic(path.join(__dirname, 'public/')),
     repo.session(),
-    repo.router('/dataset', require('./code/routes')));
+    repo.router('/user', require('./code/user')),
+    repo.router('/bucket', require('./code/bucket')),
+    repo.router('/datasets', require('./code/datasets')),
+    repo.router('/', require('./code/core')));
 
 /**
  * Get port from environment and store in Express.

@@ -1,0 +1,7 @@
+{
+    "name": "ai-project",
+    "private": true,
+    "workspaces": {
+        "packages": ["react-client", "express-server", "server-lib", "ms-compiler"]
+    }
+}

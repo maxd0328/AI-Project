@@ -32,7 +32,7 @@ const ProjectPage = () => {
     const pages = useMemo(() => [
         { hash: 'details', gen: () => <DetailsTab project={project} setProject={setProject} raiseError={setError.bind(null, true)}/> },
         { hash: 'configuration', gen: () => <ConfigurationTab project={project} setProject={setProject}/> },
-        { hash: 'datasets', gen: () => <DatasetsTab project={project} /> },
+        { hash: 'datasets', gen: () => <DatasetsTab project={project} setProject={setProject} /> },
         { hash: 'training', gen: () => <TrainingTab/> },
         { hash: 'results', gen: () => <ResultsTab/> }
     ], [project]);

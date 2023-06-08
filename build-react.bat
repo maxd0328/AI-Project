@@ -3,7 +3,7 @@
 :: Console react client
 cd react-client
 call npm run build
-del /s /q ..\core-service\public\console\*.*
-xcopy /s /e .\build ..\core-service\public\console\
+del /s /q ..\express-server\public\console\*.*
+xcopy /s /e .\build ..\express-server\public\console\
 rmdir /s /q .\build
 cd ..

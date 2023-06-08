@@ -1,8 +1,8 @@
-const mysql = require('mysql2/promise');
 const { DatabaseConnectionPool } = require('../utils/database');
 const { AWSClient } = require('../utils/aws-client');
 const Logger = require('../utils/logger');
 const Redis = require('ioredis');
+const mysql = require('mysql2/promise');
 
 const db = new DatabaseConnectionPool(mysql.createPool({
     host: process.env.DATABASE_ENDPOINT,
@@ -15,9 +15,9 @@ const db = new DatabaseConnectionPool(mysql.createPool({
 
 const aws = new AWSClient({
     apiVersion: '2010-12-01',
-    accessKeyId: process.env.NODE_ENV === 'development' ? process.env.S3_ACCESS_KEY_ID : null,
-    secretAccessKey: process.env.NODE_ENV === 'development' ? process.env.S3_SECRET_ACCESS_KEY : null,
-    endpoint: process.env.NODE_ENV === 'development' ? process.env.S3_ENDPOINT : null
+    s3AccessKeyId: process.env.NODE_ENV === 'development' ? process.env.S3_ACCESS_KEY_ID : null,
+    s3SecretAccessKey: process.env.NODE_ENV === 'development' ? process.env.S3_SECRET_ACCESS_KEY : null,
+    s3Endpoint: process.env.NODE_ENV === 'development' ? process.env.S3_ENDPOINT : null
 });
 
 const logger = new Logger(process.env.SERVICE, process.env.LOG_PATH);

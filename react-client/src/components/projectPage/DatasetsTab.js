@@ -29,14 +29,12 @@ const SelectedDataset = ({ dataset, remove, open }) => {
     );
 };
 
-const DatasetsTab = ({ project }) => {
+const DatasetsTab = ({ project, setProject }) => {
     const [availableDatasets, setAvailableDatasets] = useState([]);
     const [loadingAvailableDatasets, setLoadingAvailableDatasets] = useState(false);
     const [errorAvailableDatasets, setErrorAvailableDatasets] = useState(false);
     const [searchAvailableDatasets, setSearchAvailableDatasets] = useState('');
 
-    const [selectedDatasets, setSelectedDatasets] = useState([]);
-    const [loadingSelectedDatasets, setLoadingSelectedDatasets] = useState(false);
     const [errorSelectedDatasets, setErrorSelectedDatasets] = useState(false);
 
     const reloadAvailableDatasets = useCallback(() => {
@@ -51,39 +49,32 @@ const DatasetsTab = ({ project }) => {
         });
     }, []);
 
-    const reloadSelectedDatasets = useCallback(() => {
-        setLoadingSelectedDatasets(true);
-        ProjectController.fetchLinkedDatasets(project.projectID).then(datasets => {
-            setSelectedDatasets(datasets);
-            setLoadingSelectedDatasets(false);
-            setErrorSelectedDatasets(false);
-        }).catch(err => {
-            setLoadingSelectedDatasets(false);
-            setErrorSelectedDatasets(true);
-        });
-    }, [project]);
-
     useEffect(reloadAvailableDatasets, [reloadAvailableDatasets]);
-    useEffect(reloadSelectedDatasets, [reloadSelectedDatasets]);
 
     const updateSearchAvailableDatasets = event => setSearchAvailableDatasets(event.target.value);
 
-    const isSelected = dataset => selectedDatasets.find(e => e.datasetID === dataset.datasetID);
+    const isSelected = dataset => project.datasetIDs.indexOf(dataset.datasetID) >= 0;
 
     const openDataset = dataset => {
         const url = dataset ? `/console/datasets?id=${dataset.datasetID}` : '/console/datasets';
         window.open(new URL(url, window.location.origin).href, '_blank');
     };
 
-    const addDataset = dataset => ProjectController.sendDatasetLink(project.projectID, dataset.datasetID).then(() => setSelectedDatasets(datasets => {
-        const newDatasets = [...datasets];
-        newDatasets.push(dataset);
-        return newDatasets;
-    })).catch(err => setErrorSelectedDatasets(true));
+    const addDataset = dataset => ProjectController.sendDatasetLink(project.projectID, dataset.datasetID).then(() => {
+        setProject(project => {
+            const newDatasets = [...project.datasetIDs];
+            newDatasets.push(dataset.datasetID);
+            return { ...project, datasetIDs: newDatasets };
+        });
+        setErrorSelectedDatasets(false);
+    }).catch(err => setErrorSelectedDatasets(true));
 
-    const removeDataset = dataset => ProjectController.sendDatasetUnlink(project.projectID, dataset.datasetID).then(() => setSelectedDatasets(datasets => {
-        return datasets.filter(e => e.datasetID !== dataset.datasetID);
-    })).catch(err => setErrorSelectedDatasets(true));
+    const removeDataset = dataset => ProjectController.sendDatasetUnlink(project.projectID, dataset.datasetID).then(() => {
+        setProject(project => {
+            return { ...project, datasetIDs: project.datasetIDs.filter(e => e !== dataset.datasetID) };
+        });
+        setErrorSelectedDatasets(false);
+    }).catch(err => setErrorSelectedDatasets(true));
 
     const filteredAvailableDatasets = availableDatasets.filter(e => e.name.toLowerCase().includes(searchAvailableDatasets.toLowerCase().trim()));
     return (
@@ -123,22 +114,17 @@ const DatasetsTab = ({ project }) => {
                 <button className="button green" onClick={openDataset.bind(null, null)}>Open Dataset Editor</button>
             </div>
             <h3 className="outer-element" style={{marginBottom: 15 + 'px'}}>Selected Datasets</h3>
-            { loadingSelectedDatasets ? (
-                <div className="centered-container" style={{height: 'auto'}}>
-                    <p style={{marginBottom: 20 + 'px'}}>Loading datasets...</p>
-                </div>
-            ) : errorSelectedDatasets ? (
-                <div className="centered-container" style={{height: 'auto'}}>
-                    <p>Something went wrong, please try again later.</p>
-                    <button className="button blue" onClick={reloadSelectedDatasets} style={{marginBottom: 10 + 'px'}}>Reload</button>
-                </div>
-            ) : !selectedDatasets.length ? (
+            { errorSelectedDatasets ? <p className="outer-element" style={{color: '#ff3333'}}>Error while updating selecting datasets</p> : null }
+            { !project.datasetIDs.length ? (
                 <div className="centered-container" style={{height: 'auto'}}>
                     <p style={{marginBottom: 20 + 'px'}}>No datasets have been added to this project.</p>
                 </div>
-            ) : selectedDatasets.map(dataset => (
-                <SelectedDataset dataset={dataset} remove={removeDataset} open={openDataset} key={dataset.datasetID} />
-            )) }
+            ) : project.datasetIDs.map(datasetID => {
+                const dataset = availableDatasets.find(e => e.datasetID === datasetID);
+                if(!dataset)
+                    return null;
+                return <SelectedDataset dataset={dataset} remove={removeDataset} open={openDataset} key={datasetID}/>;
+            }) }
         </div>
     );
 };

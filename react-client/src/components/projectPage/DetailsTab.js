@@ -32,7 +32,7 @@ const DetailsTab = (props) => {
         setEditName(false);
         Controller.sendProjectName(props.project.projectID, provisionalName).then(() => {
             setEditName(false);
-            props.setProject({ ...props.project, name: provisionalName });
+            props.setProject(project => ({ ...project, name: provisionalName }));
         }).catch((err) => props.raiseError());
     };
 

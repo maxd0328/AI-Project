@@ -10,18 +10,8 @@ if "%1" == "reset" (
     mkdir .local\data-s3\
 )
 
-:: Create a temporary 'real' folder for commons in each microservice
-for /d %%d in (*-service) do (
-    mkdir %%d\commons-tmp
-    xcopy /E /Y /I %%d\commons\* %%d\commons-tmp\
-)
-
+:: Build docker containers
 docker-compose -f docker-compose.local.yml build
-
-:: Delete temporary folders for each service
-for /d %%d in (*-service) do (
-    rmdir /S /Q %%d\commons-tmp
-)
 
 :: Start local server
 start cmd.exe /c "docker-compose -f docker-compose.local.yml up"

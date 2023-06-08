@@ -50,7 +50,6 @@ class DatabaseError extends Error {
 
         super(message || DatabaseError.ERROR_TYPES.find(type => type.code === code).message);
         this.code = code;
-        this.internal = internal;
         this.sqlcode = sqlcode;
     }
 

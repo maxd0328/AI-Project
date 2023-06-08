@@ -1,20 +1,8 @@
 const { db, aws } = require('../instance/services');
-const assert = require('assert');
+const internalAssert = require('assert');
 
-const checkPreconditions = preconditions => {
-    try {
-        if(preconditions)
-            preconditions();
-    }
-    catch(err) {
-        if(err instanceof assert.AssertionError)
-            console.error(`Preconditions failed; unable to write to database`);
-        throw err;
-    }
-};
-
-const getSQLForDefined = () => {
-    const definedKeys = this.keys.concat(this.attribs).filter(col => this[col] !== undefined);
+function getSQLForDefined() {
+    const definedKeys = this.keyAttribs.concat(this.attribs).filter(col => this[col] !== undefined);
     let conditions = definedKeys.map(col => `${col} = ?`).join(' AND ');
     let values = definedKeys.map(col => this[col]);
 
@@ -26,18 +14,20 @@ const getSQLForDefined = () => {
 
 class Entity {
 
-    constructor(wrapper, table, keys, attribs, autoIncrement) {
+    constructor(wrapper, table, keyAttribs, attribs, autoIncrement) {
         this.wrapper = wrapper;
         this.table = table;
-        this.keys = keys;
+        this.keyAttribs = keyAttribs;
         this.attribs = attribs;
         this.autoIncrement = autoIncrement;
 
-        if(autoIncrement && keys.length !== 1)
+        if(autoIncrement && keyAttribs.length !== 1)
             throw new Error('Auto increment may only be used with single keys');
     }
 
-    assert = assert;
+    assert(...args) {
+        internalAssert(...args);
+    }
 
     setOrdering(attrib, ascending) {
         this.orderAttrib = attrib;
@@ -62,9 +52,9 @@ class Entity {
         if(this.attribs.includes('lastModified'))
             this.lastModified = Date.now();
 
-        checkPreconditions(this.preconditions);
+        this.preconditions();
 
-        const attribs = this.autoIncrement ? this.attribs : [...this.keys, ...this.attribs];
+        const attribs = this.autoIncrement ? this.attribs : [...this.keyAttribs, ...this.attribs];
         const attribStr = attribs.join(', ');
         const valueStr = Array(attribs.length).fill('?').join(', ');
         const values = attribs.map(attrib => this[attrib]);
@@ -75,7 +65,7 @@ class Entity {
         });
 
         if(this.autoIncrement)
-            this[this.keys[0]] = result.insertId;
+            this[this.keyAttribs[0]] = result.insertId;
         return result;
     }
 
@@ -83,12 +73,12 @@ class Entity {
         if(this.attribs.includes('lastModified'))
             this.lastModified = Date.now();
 
-        checkPreconditions(this.preconditions);
+        this.preconditions();
 
         const updates = this.attribs.map(attrib => `${attrib} = ?`).join(', ');
         const updateValues = this.attribs.map(attrib => this[attrib]);
-        const conditions = this.keys.map(key => `${key} = ?`).join(' AND ');
-        const conditionValues = this.keys.map(key => this[key]);
+        const conditions = this.keyAttribs.map(key => `${key} = ?`).join(' AND ');
+        const conditionValues = this.keyAttribs.map(key => this[key]);
 
         return await connection.executeOne({
             query: `UPDATE ${this.table} SET ${updates} WHERE ${conditions}`,
@@ -97,13 +87,13 @@ class Entity {
     }
 
     async delete(connection = db, rollbackEvents = null) {
-        checkPreconditions(this.preconditions);
+        this.preconditions();
 
         await this.finalize(connection, rollbackEvents);
         await this.cascade('finalize', connection, rollbackEvents);
 
-        const conditions = this.keys.map(key => `${key} = ?`).join(' AND ');
-        const values = this.keys.map(key => this[key]);
+        const conditions = this.keyAttribs.map(key => `${key} = ?`).join(' AND ');
+        const values = this.keyAttribs.map(key => this[key]);
 
         return await connection.executeOne({
             query: `DELETE FROM ${this.table} WHERE ${conditions}`,
@@ -165,7 +155,7 @@ class Entity {
 
     async forward(entity, action, connection, rollbackEvents) {
         const obj = {};
-        for(const key of this.keys)
+        for(const key of this.keyAttribs)
             if(this[key] !== undefined)
                 obj[key] = this[key];
 
@@ -183,8 +173,8 @@ class Entity {
 
 class S3Entity extends Entity {
 
-    constructor(wrapper, bucket, table, keys, attribs, autoIncrement) {
-        super(wrapper, table, keys, attribs, autoIncrement);
+    constructor(wrapper, bucket, table, keyAttribs, attribs, autoIncrement) {
+        super(wrapper, table, keyAttribs, attribs, autoIncrement);
         this.bucket = bucket;
     }
 
@@ -196,25 +186,25 @@ class S3Entity extends Entity {
     }
 
     async contentExists() {
-        checkPreconditions(this.preconditionsS3);
+        this.preconditionsS3();
         return await aws.s3.resourceExists(this.bucket, this.genS3Key());
     }
 
     async fetchContent() {
-        checkPreconditions(this.preconditionsS3);
+        this.preconditionsS3();
         return await aws.s3.getResource(this.bucket, this.genS3Key());
     }
 
     async saveContent(content, rollbackEvents = null) {
-        checkPreconditions(this.preconditionsS3);
-        const backup = rollbackEvents ? await aws.s3.getResource(this.bucket, this.genS3Key()) : null;
+        this.preconditionsS3();
+        const backup = rollbackEvents && await this.contentExists() ? await aws.s3.getResource(this.bucket, this.genS3Key()) : null;
         await aws.s3.putResource(this.bucket, this.genS3Key(), content);
         if(rollbackEvents)
-            rollbackEvents.push(async () => await this.saveContent(backup));
+            rollbackEvents.push(async () => backup === null ? await this.deleteContent() : await this.saveContent(backup));
     }
 
     async saveContentStream(stream, rollbackEvents = null) {
-        checkPreconditions(this.preconditionsS3);
+        this.preconditionsS3();
         const backup = rollbackEvents && await this.contentExists() ? await aws.s3.getResource(this.bucket, this.genS3Key()) : null;
         await aws.s3.putResourceStream(this.bucket, this.genS3Key(), stream);
         if(rollbackEvents)
@@ -222,7 +212,7 @@ class S3Entity extends Entity {
     }
 
     async deleteContent(rollbackEvents = null) {
-        checkPreconditions(this.preconditionsS3);
+        this.preconditionsS3();
         const backup = rollbackEvents && await this.contentExists() ? await aws.s3.getResource(this.bucket, this.genS3Key()) : null;
         await aws.s3.deleteResource(this.bucket, this.genS3Key());
         if(rollbackEvents && backup !== null)
@@ -230,7 +220,7 @@ class S3Entity extends Entity {
     }
 
     async createPresignedURL(expiry = 60 * 60) {
-        checkPreconditions(this.preconditionsS3);
+        this.preconditionsS3();
         return await aws.s3.createPresignedURL(this.bucket, this.genS3Key(), expiry);
     }
 

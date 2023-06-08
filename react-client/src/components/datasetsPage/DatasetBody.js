@@ -31,7 +31,6 @@ const DatasetBody = ({ datasetID, updateName, remove }) => {
             setDatasetError(false);
             if(callback) callback(result);
         }).catch(err => {
-            console.error(err);
             setLoadingDataset(false);
             setDatasetError(true);
         });

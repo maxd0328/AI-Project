@@ -1,44 +1,11 @@
 version: '3'
 
 services:
-  core-service:
-    image: 863286959775.dkr.ecr.us-east-1.amazonaws.com/ai-project-core-service:latest
+  ai-project-server:
+    image: 863286959775.dkr.ecr.us-east-1.amazonaws.com/ai-project-server:latest
     ports:
       - "3000:8080"
     environment:
       NODE_ENV: production
-      SERVICE: core-service
-      PORT: 8080
-  user-service:
-    image: 863286959775.dkr.ecr.us-east-1.amazonaws.com/ai-project-user-service:latest
-    ports:
-      - "3001:8080"
-    environment:
-      NODE_ENV: production
-      SERVICE: user-service
-      PORT: 8080
-# NOTICE - this container is disabled until post-MVP development and inclusion of EMR training
-# emr-service:
-#   image: 863286959775.dkr.ecr.us-east-1.amazonaws.com/ai-project-emr:latest
-#   ports:
-#     - "3002:8080"
-#   environment:
-#     NODE_ENV: production
-#     SERVICE: emr-service
-#     PORT: 8080
-  bucket-service:
-    image: 863286959775.dkr.ecr.us-east-1.amazonaws.com/ai-project-bucket-service:latest
-    ports:
-      - "3003:8080"
-    environment:
-      NODE_ENV: production
-      SERVICE: bucket-service
-      PORT: 8080
-  dataset-service:
-    image: 863286959775.dkr.ecr.us-east-1.amazonaws.com/ai-project-dataset-service:latest
-    ports:
-      - "3004:8080"
-    environment:
-      NODE_ENV: production
-      SERVICE: dataset-service
+      SERVICE: ai-project-server
       PORT: 8080

@@ -1,7 +1,18 @@
 const { db, logger } = require('../instance/services');
 const { DatabaseError } = require('./database');
-const { ServerError } = require('./error');
+const ServerError = require('./error');
 const assert = require('assert');
+
+function convertString(value) {
+    if(value !== '' && !isNaN(Number(value)))
+        return Number(value);
+    else if(value === 'true')
+        return true;
+    else if (value === 'false')
+        return false;
+    else
+        return value;
+}
 
 class ActionSequence {
 
@@ -86,7 +97,7 @@ class ActionSequence {
 
     intermediate(func) {
         return this.append(async (seq, props) => {
-            func(props);
+            await func(props);
             await seq.proceed();
         });
     }
@@ -98,19 +109,19 @@ class ActionSequence {
         });
     }
 
-    withParameters(type, required, optional = []) {
+    withParameters(type, required, optional = [], json = false) {
         return this.append(async seq => {
             for(const field of required) {
-                if(!seq.request[type].hasOwnProperty(field)) {
+                if(!Object.hasOwnProperty.call(seq.request[type], field)) {
                     seq.terminate(400, { message: `Missing field in ${type}: '${field}'` });
                     return;
                 }
-                else seq.putResource(field, seq.request[type][field]);
+                else seq.putResource(field, json ? seq.request[type][field] : convertString(seq.request[type][field]));
             }
 
             for(const field of optional) {
-                if(seq.request[type].hasOwnProperty(field))
-                    seq.putResource(field, seq.request[type][field]);
+                if(Object.hasOwnProperty.call(seq.request[type], field))
+                    seq.putResource(field, json ? seq.request[type][field] : convertString(seq.request[type][field]));
                 else seq.putResource(field, null);
             }
             await seq.proceed();
@@ -118,15 +129,15 @@ class ActionSequence {
     }
 
     withPathParameters(required, optional = []) {
-        return this.withParameters('params', required, optional);
+        return this.withParameters('params', required, optional, false);
     }
 
     withQueryParameters(required, optional = []) {
-        return this.withParameters('query', required, optional);
+        return this.withParameters('query', required, optional, false);
     }
 
     withRequestBody(required, optional = []) {
-        return this.withParameters('body', required, optional);
+        return this.withParameters('body', required, optional, true);
     }
 
     withSession() {
@@ -226,7 +237,8 @@ class ActionSequence {
             if(useDefault)
                 entity.useDefault();
             const result = await entity[func](props.connection);
-            seq.putResource(name, result);
+            seq.putResource(name, func === 'create' ? entity : result);
+            await seq.proceed();
         });
     }
 
@@ -387,7 +399,7 @@ class SequenceExecutor {
     #actions = null;
 
     #executionIndex = -1;
-    #terminated = false;
+    #terminationAction = null;
     #resources = {};
 
     constructor(sequence, request, response) {
@@ -402,14 +414,14 @@ class SequenceExecutor {
 
         this.#executionIndex = 0;
         this.#resources = {...SequenceExecutor.PRELOADED_RESOURCES};
-        this.#terminated = false;
+        this.#terminationAction = null;
 
         if(this.#actions.length) {
             try {
                 await this.#actions[this.#executionIndex](this, this.#resources);
             }
             catch(err) {
-                if(!this.#terminated) {
+                if(!this.#terminationAction) {
                     if(err instanceof DatabaseError)
                         this.terminate(err.httpStatus(), err.httpMessage());
                     else if(err instanceof ServerError)
@@ -426,18 +438,22 @@ class SequenceExecutor {
             }
         }
 
-        if(!this.#terminated)
-            throw new Error('Action sequence was never terminated');
+        if(this.#terminationAction)
+            this.#terminationAction();
+        else {
+            logger.error('Action sequence was never terminated');
+            this.#response.status(500).json({ message: 'An unexpected server fault has occurred' });
+        }
         this.#executionIndex = -1;
     }
 
     ensureNotTerminated() {
-        if(this.#terminated)
+        if(this.#terminationAction)
             throw new Error('This action sequence has been terminated');
     }
 
     isTerminated() {
-        return this.#terminated;
+        return this.#terminationAction;
     }
 
     async proceed() {
@@ -449,26 +465,26 @@ class SequenceExecutor {
 
     terminate(code, json = {}) {
         this.ensureNotTerminated();
-        this.#response.status(code).json(json);
-        this.#terminated = true;
+        this.#terminationAction = () => this.#response.status(code).json(json);
+        logger.info(`Action terminated with code ${code}: ${JSON.stringify(json)}`);
     }
 
     terminateWithRender(view, options = {}) {
         this.ensureNotTerminated();
-        this.#response.render(view, options);
-        this.#terminated = true;
+        this.#terminationAction = () => this.#response.render(view, options);
+        logger.info(`Action terminated with rendering of view '${view}' and options: ${JSON.stringify(options)}`);
     }
 
     terminateWithFile(path) {
         this.ensureNotTerminated();
-        this.#response.sendFile(path);
-        this.#terminated = true;
+        this.#terminationAction = () => this.#response.sendFile(path);
+        logger.info(`Action terminated with file: '${path}'`);
     }
 
     redirect(code, url) {
         this.ensureNotTerminated();
-        this.#response.redirect(code, url);
-        this.#terminated = true;
+        this.#terminationAction = () => this.#response.redirect(code, url);
+        logger.info(`Action terminated with code ${code} and redirection URL '${url}'`);
     }
 
     putResource(name, resource) {

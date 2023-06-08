@@ -1,3 +1,5 @@
+require('dotenv').config({ path: require('path').join(__dirname, `.env.${process.env.NODE_ENV}`) });
+
 const { Entity, S3Entity } = require('./entities/entity');
 const ConfigStage = require('./entities/configStage');
 const Datafile = require('./entities/datafile');
@@ -18,10 +20,7 @@ const ServerError = require('./utils/error');
 const Logger = require('./utils/logger');
 const { Middleware, ViewEngineMiddleware, RouterMiddleware, MiddlewareRepository } = require('./utils/middleware');
 
-const init = () => require('dotenv').config({ path: require('path').join(__dirname, `.env.${process.env.NODE_ENV}`) });
-
 module.exports = {
-    init,
     entities: {
         Entity,
         S3Entity,

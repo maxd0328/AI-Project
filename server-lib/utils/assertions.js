@@ -67,7 +67,7 @@ class Assertions {
     }
 
     isString() {
-        return this.custom(value => typeof value === 'string');
+        return this.custom(value => typeof value === 'string' || typeof value === 'number');
     }
 
     isObject() {

@@ -55,10 +55,22 @@ export async function get(route) {
 
     if(!response.ok)
         throw new Error('BAD_REQUEST');
-    return await response.json();
+    if(response.status !== 204)
+        return await response.json();
 }
 
-export async function post(route, body, results) {
+export async function _delete(route) {
+    const response = await fetch(route, {
+        method: 'DELETE'
+    });
+
+    if(!response.ok)
+        throw new Error('BAD_REQUEST');
+    if(response.status !== 204)
+        return await response.json();
+}
+
+export async function post(route, body = {}) {
     const response = await fetch(route, {
         method: 'POST',
         headers: {
@@ -69,11 +81,26 @@ export async function post(route, body, results) {
 
     if(!response.ok)
         throw new Error('BAD_REQUEST');
-    if(results)
+    if(response.status !== 204)
         return await response.json();
 }
 
-export async function postForm(route, form, results) {
+export async function put(route, body = {}) {
+    const response = await fetch(route, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+    });
+
+    if(!response.ok)
+        throw new Error('BAD_REQUEST');
+    if(response.status !== 204)
+        return await response.json();
+}
+
+export async function postForm(route, form) {
     const response = await fetch(route, {
         method: 'POST',
         body: form
@@ -81,6 +108,6 @@ export async function postForm(route, form, results) {
 
     if(!response.ok)
         throw new Error('BAD_REQUEST');
-    if(results)
+    if(response.status !== 204)
         return await response.json();
 }
