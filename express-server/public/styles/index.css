@@ -1,4 +1,8 @@
 
+html, body {
+    scroll-behavior: smooth;
+}
+
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -13,7 +17,7 @@ body {
 }
 
 .background {
-    background-image: url('/images/background.jpg');
+    background-image: url('../images/background.png');
     background-size: cover;
     background-position: center;
     width: 100%;
@@ -25,14 +29,82 @@ body {
 }
 
 .content-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.content-container-padding {
+    flex-grow: 1;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.content-container-center {
     max-width: 600px;
     margin: 0 auto;
     text-align: center;
     padding: 40px;
 }
 
+.arrow-button-container {
+    width: 70px;
+    height: 70px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.arrow-button {
+    cursor: pointer;
+    width: 50px;
+    height: 50px;
+    transition: width 0.15s, height 0.15s;
+}
+
+.arrow-button:hover {
+    width: 60px;
+    height: 60px;
+}
+
+.experiment-today {
+    display: flex;
+    flex-direction: row;
+    margin: 50px;
+    justify-content: center;
+}
+
+.experiment-today div {
+    width: 33%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0px 30px 50px 30px;
+    box-sizing: border-box;
+    border-left: 1px solid #555;
+}
+
+.experiment-today h2 {
+    text-align: center;
+}
+
+.experiment-today p {
+    text-align: left;
+}
+
 h1 {
     font-size: 32px;
+    color: #eee;
+    margin-bottom: 10px;
+}
+
+h2 {
+    font-size: 24px;
     color: #eee;
     margin-bottom: 10px;
 }
@@ -54,7 +126,7 @@ p {
 .button {
     display: inline-block;
     padding: 12px 24px;
-    background-color: #4CAF50;
+    background-color: #3b8a3e;
     color: white;
     text-decoration: none;
     border-radius: 4px;
@@ -63,6 +135,14 @@ p {
 
 .button:hover {
     background-color: #45a049;
+}
+
+.blue {
+    background-color: #0966c9;
+}
+
+.blue:hover {
+    background-color: #0c73e0;
 }
 
 .login-note {
