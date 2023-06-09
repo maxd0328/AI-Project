@@ -130,3 +130,16 @@ button[type="submit"]:active {
 .two-column-form input {
     width: 100%;
 }
+
+input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    vertical-align: middle; /* Adjusts the alignment vertically */
+    margin-bottom: 10px;
+}
+
+.terms-of-service {
+    display: flex;
+    align-items: center;
+}
