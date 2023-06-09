@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Register - GrAI Matter</title>
-        <link rel="stylesheet" type="text/css" href="/styles/styles.css">
+        <title>Register - AxoModel</title>
+        <link rel="stylesheet" type="text/css" href="../public/styles/styles.css">
     </head>
     <body>
         <div class="wrapper">
-            <h1>GrAI Matter</h1>
+            <h1>AxoModel</h1>
             <div class="container" style="max-width: 600px">
                 <h1 style="font-size: 26px">Register</h1>
                 <form action="/user" method="post" class="two-column-form">
@@ -25,6 +25,14 @@
                         <input type="password" id="password" name="password" required>
                         <label for="confirmPassword">Confirm Password</label>
                         <input type="password" id="confirmPassword" name="confirmPassword" required>
+                        <div class="terms-of-service">
+                            <input type="checkbox" id="terms" name="terms" required>
+                            <label for="terms">I agree to the <a href="/terms-of-service" target="_blank">terms of service</a>.</label>
+                        </div>
+                        <div class="terms-of-service">
+                            <input type="checkbox" id="privacy" name="privacy" required>
+                            <label for="terms">I agree to the <a href="/privacy-policy" target="_blank">privacy policy</a>.</label>
+                        </div>
                     </div>
                     <button type="submit">Register</button>
                 </form>
@@ -32,7 +40,8 @@
                     <p>Already have an account? <a href="/login">Log in</a></p>
                 </div>
             </div>
-            <p style="text-align: center">&copy; GrAI Matter 2023</p>
         </div>
+
+        <script src="/javascripts/register.js"></script>
     </body>
 </html>
