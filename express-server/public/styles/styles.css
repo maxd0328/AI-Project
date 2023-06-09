@@ -101,12 +101,12 @@ button[type="submit"]:active {
     margin-bottom: 10px;
 }
 
-.notes a {
+.notes a, .terms-of-service a {
     text-decoration: none;
     color: #3abcff;
 }
 
-.notes a:hover {
+.notes a:hover, .terms-of-service a:hover {
     color: #63c9ff;
 }
 
